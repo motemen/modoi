@@ -5,7 +5,7 @@ use base qw(Class::Accessor::Fast);
 require UNIVERSAL::require;
 use Madoi::Server;
 
-__PACKAGE__->mk_accessors(qw(config));
+__PACKAGE__->mk_accessors(qw(config server));
 
 sub new {
     my ($class, %option) = @_;
@@ -23,13 +23,17 @@ sub bootstrap {
 
 sub run {
     my $self = shift;
+
+    $self->server(
+        Madoi::Server->new(
+            %{$self->config->{server}},
+            madoi => $self,
+        )
+    );
+
     $self->load_plugins;
 
-    my $server = Madoi::Server->new(
-        %{$self->config->{server}},
-        madoi => $self,
-    );
-    $server->start;
+    $self->server->start;
 }
 
 sub load_plugins {
@@ -41,7 +45,7 @@ sub load_plugins {
         my $module = $_->{module};
         $module->require or die $@;
         $module =~ s/^(?!Madoi::Plugin::)/Madoi::Plugin::/;
-        my $plugin = $self->{plugins}->{$module} = $module->new;
+        my $plugin = $self->{plugins}->{$module} = $module->new({ config => $_->{config} });
         $plugin->register($self);
     }
 }

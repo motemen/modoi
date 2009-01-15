@@ -10,7 +10,10 @@ use Madoi;
 my $config = {
     plugin_path => dir($FindBin::Bin, 'lib', 'Madoi', 'Plugin'),
     plugins => [{
-        module => 'HandleContent::Store'
+        module => 'HandleContent::Store',
+        config => {
+            dir => 'store',
+        }
     }],
     server => {
         host => undef,
