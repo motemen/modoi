@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use base qw(Class::Accessor::Fast);
 require UNIVERSAL::require;
+use Path::Class;
 use Madoi::Server;
 
 __PACKAGE__->mk_accessors(qw(config server));
@@ -17,6 +18,10 @@ sub new {
 sub bootstrap {
     my $class = shift;
     my $self = $class->new(@_);
+
+    $self->config->{plugin_path} ||= dir($FindBin::Bin, 'lib', 'Madoi', 'Plugin');
+    $self->config->{server}->{port} ||= 3128;
+
     $self->run;
     $self;
 }

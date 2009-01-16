@@ -1,0 +1,4 @@
+plugins:
+  - module: HandleContent::Store
+    config:
+      dir: store

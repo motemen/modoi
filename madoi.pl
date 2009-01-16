@@ -3,22 +3,14 @@ use strict;
 use warnings;
 use FindBin;
 use Path::Class;
+use Getopt::Long;
+use YAML;
 
 use lib dir($FindBin::Bin, 'lib')->stringify;
 use Madoi;
 
-my $config = {
-    plugin_path => dir($FindBin::Bin, 'lib', 'Madoi', 'Plugin'),
-    plugins => [{
-        module => 'HandleContent::Store',
-        config => {
-            dir => 'store',
-        }
-    }],
-    server => {
-        host => undef,
-        port => 3128,
-    }
-};
+my $config = file($FindBin::Bin, 'config.yaml');
+GetOptions('--config=s', \$config);
+Getopt::Long::Configure('bundling'); # allows -c -v
 
-Madoi->bootstrap(config => $config);
+Madoi->bootstrap(config => YAML::LoadFile($config));
