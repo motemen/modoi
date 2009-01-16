@@ -23,8 +23,7 @@ sub ensure_dir {
     my @dirs = ();
     do { unshift @dirs, $path } until -d ($path = $path->parent);
 
-    warn @dirs;
-    -d or mkdir or die "Could not mkdir $_" foreach @dirs;
+    -d or mkdir $_ or die "Could not mkdir $_" foreach @dirs;
 }
 
 1;

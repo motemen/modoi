@@ -14,10 +14,6 @@ sub new {
     $self->push_filter(
         response => HTTP::Proxy::BodyFilter::complete->new
     );
-    $self->push_filter(
-        mime => 'text/*',
-        response => Madoi::HTTP::Proxy::Filter->new(madoi => $self->madoi),
-    );
     $self;
 }
 
