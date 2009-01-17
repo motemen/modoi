@@ -8,11 +8,8 @@ use Path::Class;
 our @EXPORT_OK = qw(absolutize ensure_dir);
 
 sub absolutize {
-    my $path = shift;
-    unless (-e $path) {
-        $path = file($FindBin::Bin, $path);
-    }
-    -d $path ? dir($path) : file($path);
+    my ($which, $path) = (@_ == 1 ? ('file', @_) : @_);
+    ($which eq 'dir' ? \&dir : \&file)->($FindBin::Bin, $path);
 }
 
 sub ensure_dir {
