@@ -1,0 +1,3 @@
+- regexp: (su\d+\.\w+\b)
+  rewrite: http://www.nijibox5.com/futabafiles/tubu/src/$1
+- regexp: http://[[:ascii:]]+?/src/\d+\.(?:jpe?g|png|gif)

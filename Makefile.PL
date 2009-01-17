@@ -11,4 +11,6 @@ build_requires 'Exporter::Lite';
 build_requires 'Getopt::Long';
 build_requires 'YAML';
 
+tests 't/*.t t/*/*.t t/*/*/*.t';
+
 WriteAll;

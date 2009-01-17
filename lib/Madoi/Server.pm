@@ -12,6 +12,7 @@ sub new {
     my $self = $class->SUPER::new(@_);
     $self->madoi({ @_ }->{madoi});
     $self->push_filter(
+        mime     => '*/*',
         response => HTTP::Proxy::BodyFilter::complete->new
     );
     $self;

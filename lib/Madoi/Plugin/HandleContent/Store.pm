@@ -10,6 +10,8 @@ sub filter {
     Madoi->context->downloader->store($res->request->uri, $$content_ref);
 }
 
+sub mime_type { '*/*' }
+
 sub will_modify { 0 };
 
 1;

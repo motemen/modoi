@@ -5,10 +5,12 @@ use base qw(Madoi::Plugin HTTP::Proxy::BodyFilter);
 
 sub register {
     my ($self, $context) = @_;
-    warn "$self->register";
     $context->server->push_filter(
-        response => $self
+        mime     => $self->mime_type,
+        response => $self,
     );
 }
+
+sub mime_type { 'text/*' }
 
 1;

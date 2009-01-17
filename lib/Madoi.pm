@@ -19,6 +19,7 @@ sub new {
     $self->config({}) unless $self->config;
     $self->config->{plugin_path} ||= dir($FindBin::Bin, 'lib', 'Madoi', 'Plugin');
     $self->config->{downloader}->{store_dir} ||= dir($FindBin::Bin, 'store');
+    $self->config->{server}->{host} ||= '';
     $self->config->{server}->{port} ||= 3128;
 
     $class->context($self);
@@ -54,6 +55,13 @@ sub run {
     $self->server->start;
 }
 
+# TODO
+sub log {
+    my ($self, $level, $message) = @_;
+    my ($pkg) = caller;
+    print STDERR "[$level] $pkg $message\n";
+}
+
 sub load_plugins {
     my $self = shift;
     my $plugin_dir = $self->config->{plugin_path};
@@ -63,8 +71,11 @@ sub load_plugins {
         my $module = $_->{module};
         $module->require or die $@;
         $module =~ s/^(?!Madoi::Plugin::)/Madoi::Plugin::/;
+
         my $plugin = $self->{plugins}->{$module} = $module->new({ config => $_->{config} });
-        $plugin->register($self);
+           $plugin->register($self);
+
+        $self->log(info => "loaded plugin $_->{module}");
     }
 }
 

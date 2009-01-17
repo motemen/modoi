@@ -2,6 +2,7 @@ package Madoi::Downloader;
 use strict;
 use warnings;
 use base qw(LWP::UserAgent Class::Accessor::Fast);
+use Madoi;
 use Madoi::Util;
 use URI;
 use Path::Class qw(dir);
@@ -32,6 +33,8 @@ sub store_dir {
 sub download {
     my ($self, $uri) = @_;
 
+    Madoi->context->log(debug => "download $uri");
+
     my $res = $self->get($uri);
     return if $res->is_error;
 
@@ -44,11 +47,11 @@ sub store {
     my ($self, $uri, $content) = @_;
 
     $uri = URI->new($uri);
-    $uri->path('/index.html') if $uri->path eq '/'; # XXX
+    $uri->path($uri->path . 'index.html') if $uri->path =~ qr'/$'; # XXX
 
-    warn __PACKAGE__ . ": $uri";
+    Madoi::Util::ensure_dir my $file = $self->store_dir->file($uri->host, $uri->path_query);
 
-    Madoi::Util::ensure_dir my $file = $self->store_dir->file($uri->host, $uri->path);
+    Madoi->context->log(debug => "store $file");
 
     my $fh = $file->openw;
     $fh->print($content);
