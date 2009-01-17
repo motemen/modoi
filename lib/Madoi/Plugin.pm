@@ -23,6 +23,10 @@ sub init {
     my $self = shift;
 }
 
+sub register {
+    my $self = shift;
+}
+
 sub class_id {
     my $self = shift;
 

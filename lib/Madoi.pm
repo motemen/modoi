@@ -3,12 +3,11 @@ use strict;
 use warnings;
 use base qw(Class::Accessor::Fast Class::Data::Inheritable);
 use Path::Class;
+use Madoi::Downloader;
+use Madoi::Server;
 require UNIVERSAL::require;
 
-use Madoi::Server;
-use Madoi::Downloader;
-
-__PACKAGE__->mk_accessors(qw(config downloader server));
+__PACKAGE__->mk_accessors(qw(config downloader server fetcher));
 
 __PACKAGE__->mk_classdata('context');
 
@@ -18,19 +17,26 @@ sub new {
 
     $self->config({}) unless $self->config;
     $self->config->{plugin_path} ||= dir($FindBin::Bin, 'lib', 'Madoi', 'Plugin');
-    $self->config->{downloader}->{store_dir} ||= dir($FindBin::Bin, 'store');
     $self->config->{server}->{host} ||= '';
     $self->config->{server}->{port} ||= 3128;
 
     $class->context($self);
 
     $self->init;
+
     $self;
 }
 
 sub init {
     my $self = shift;
-    $self->downloader(Madoi::Downloader->new(config => $self->config->{downloader}));
+
+    foreach (qw(downloader server fetcher)) {
+        my $module = __PACKAGE__ . '::' . ucfirst;
+        $module->require or die $@;
+        $self->$_($module->new(config => $self->config->{$_}));
+    }
+
+    $self->load_plugins;
 }
 
 sub bootstrap {
@@ -41,18 +47,7 @@ sub bootstrap {
 }
 
 sub run {
-    my $self = shift;
-
-    $self->server(
-        Madoi::Server->new(
-            %{$self->config->{server}},
-            madoi => $self,
-        )
-    );
-
-    $self->load_plugins; # TODO Move to init and add hook for server start
-
-    $self->server->start;
+    shift->server->run;
 }
 
 # TODO

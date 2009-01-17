@@ -1,3 +1,4 @@
 plugins:
   - module: HandleContent::Store
   - module: HandleContent::Fetch
+  - module: HandleContent::ServeCacheOn404

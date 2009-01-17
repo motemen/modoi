@@ -1,7 +1,7 @@
 package Madoi::Plugin::HandleContent::Fetch;
 use strict;
 use warnings;
-use base qw(Madoi::Plugin::HandleContent);
+use base qw(Madoi::Plugin);
 use YAML;
 use List::MoreUtils qw(uniq);
 
@@ -13,8 +13,12 @@ sub init {
 }
 
 sub filter {
-    my ($self, $content_ref, $res) = @_;
-    return unless $$content_ref;
+    my ($self, $res) = @_;
+    Madoi->context->downloader->download($_) foreach $self->find_links($res);
+}
+
+sub find_links {
+    my ($self, $res) = @_;
     
     my $uri = $res->request->uri;
     unless ($self->find_rule->{$uri->host}) {
@@ -34,8 +38,9 @@ sub filter {
     my @links = ();
 
     my $rules = $self->find_rule->{$uri->host};
+    my $content = $res->decoded_content;
     foreach my $rule (@$rules) {
-        while ($$content_ref =~ /($rule->{regexp})/g) {
+        while ($content =~ /($rule->{regexp})/g) {
             my $frag = $1;
 
             if ($rule->{rewrite}) {
@@ -51,9 +56,7 @@ sub filter {
         }
     }
 
-    Madoi->context->downloader->download($_) foreach uniq @links;
+    uniq @links;
 }
-
-sub will_modify { 0 }
 
 1;

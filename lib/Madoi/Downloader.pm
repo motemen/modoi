@@ -1,7 +1,7 @@
 package Madoi::Downloader;
 use strict;
 use warnings;
-use base qw(LWP::UserAgent Class::Accessor::Fast);
+use base qw(Class::Accessor::Fast);
 use Madoi;
 use Madoi::Util;
 use URI;
@@ -20,6 +20,8 @@ sub new {
 sub init_config {
     my ($self, $config) = @_;
 
+    $config->{store_dir} ||= '.downloader/store';
+
     my $store_dir = dir($config->{store_dir});
     $config->{store_dir} = $store_dir->is_absolute ? $store_dir : Madoi::Util::absolutize(dir => $store_dir);
 
@@ -35,8 +37,7 @@ sub download {
 
     Madoi->context->log(debug => "download $uri");
 
-    my $res = $self->get($uri);
-    return if $res->is_error;
+    my $res = Madoi->context->fetcher->fetch($uri) or return;
 
     $self->store($uri, $res->content);
 

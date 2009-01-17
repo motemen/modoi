@@ -2,8 +2,10 @@ use inc::Module::Install;
 
 name 'Madoi';
 
+license 'perl';
+
 build_requires 'Test::More';
-build_requires 'HTTP::Proxy';
+build_requires 'HTTP::Engine';
 build_requires 'Class::Accessor::Fast';
 build_requires 'Class::Data::Inheritable';
 build_requires 'Path::Class';

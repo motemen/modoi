@@ -3,9 +3,9 @@ use strict;
 use warnings;
 
 sub handle {
-    my ($class, $context, $dataref, $message) = @_;
-    foreach ($context->plugins('HandleContent')) {
-        $_->handle($dataref, $message);
+    my ($class, $res) = @_;
+    foreach (Madoi->context->plugins('HandleContent')) {
+        $_->filter($res);
     }
 }
 

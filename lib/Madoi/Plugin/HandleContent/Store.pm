@@ -1,17 +1,12 @@
 package Madoi::Plugin::HandleContent::Store;
 use strict;
 use warnings;
-use base qw(Madoi::Plugin::HandleContent);
+use base qw(Madoi::Plugin);
 
 sub filter {
-    my ($self, $content_ref, $res) = @_;
+    my ($self, $res) = @_;
     return if $res->is_error;
-    return unless $$content_ref; # for HTTP::Proxy::BodyFilter::complete
-    Madoi->context->downloader->store($res->request->uri, $$content_ref);
+    Madoi->context->downloader->store($res->request->uri, $res->content);
 }
-
-sub mime_type { '*/*' }
-
-sub will_modify { 0 };
 
 1;
