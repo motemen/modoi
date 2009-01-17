@@ -1,7 +1,7 @@
-package Madoi::Plugin::HandleContent::Fetch;
+package Modoi::Plugin::HandleContent::Fetch;
 use strict;
 use warnings;
-use base qw(Madoi::Plugin);
+use base qw(Modoi::Plugin);
 use YAML;
 use List::MoreUtils qw(uniq);
 
@@ -14,7 +14,7 @@ sub init {
 
 sub filter {
     my ($self, $res) = @_;
-    Madoi->context->downloader->download($_) foreach $self->find_links($res);
+    Modoi->context->downloader->download($_) foreach $self->find_links($res);
 }
 
 sub find_links {
@@ -29,7 +29,7 @@ sub find_links {
 
         if ($file) {
             $self->find_rule->{$uri->host} = YAML::LoadFile($file);
-            Madoi->context->log(info => "found $file for $uri");
+            Modoi->context->log(info => "found $file for $uri");
         } else {
             return;
         }
@@ -52,7 +52,7 @@ sub find_links {
                 push @links, URI->new_abs($frag, $res->base);
             }
 
-            Madoi->context->log(debug => "found link: $links[-1]");
+            Modoi->context->log(debug => "found link: $links[-1]");
         }
     }
 

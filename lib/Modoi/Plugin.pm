@@ -1,4 +1,4 @@
-package Madoi::Plugin;
+package Modoi::Plugin;
 use strict;
 use warnings;
 use base qw(Class::Accessor::Fast);
@@ -7,7 +7,7 @@ use File::Find::Rule;
 use Path::Class qw(dir);
 use Scalar::Util qw(blessed);
 
-use Madoi;
+use Modoi;
 
 __PACKAGE__->mk_accessors(qw(config));
 
@@ -31,7 +31,7 @@ sub class_id {
     my $self = shift;
 
     my $pkg = ref($self) || $self;
-       $pkg =~ s/Madoi::Plugin:://;
+       $pkg =~ s/Modoi::Plugin:://;
     my @pkg = split /::/, $pkg;
 
     join '-', @pkg;
@@ -39,7 +39,7 @@ sub class_id {
 
 sub assets_dir {
     my $self = shift;
-    my $context = Madoi->context;
+    my $context = Modoi->context;
 
     if ($self->config->{assets_path}) {
         return $self->config->{assets_path};

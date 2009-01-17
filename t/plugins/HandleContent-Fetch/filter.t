@@ -2,14 +2,14 @@ use strict;
 use Test::More tests => 2;
 use HTTP::Response;
 use HTTP::Request::Common;
-use Madoi;
+use Modoi;
 
-my $module = 'Madoi::Plugin::HandleContent::Fetch';
+my $module = 'Modoi::Plugin::HandleContent::Fetch';
 
 use_ok $module;
 
 use FindBin;
-Madoi->new(config => { assets_path => "$FindBin::Bin/../../../assets" });
+Modoi->new(config => { assets_path => "$FindBin::Bin/../../../assets" });
 
 my $res = HTTP::Response->new(200);
 $res->content('...  http://img.2chan.net/b/src/1232206461456.gif ...');

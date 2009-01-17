@@ -1,6 +1,6 @@
 use Test::More tests => 3;
-use Madoi::Util;
+use Modoi::Util;
 
-isa_ok Madoi::Util::absolutize('path'), 'Path::Class::File';
-isa_ok Madoi::Util::absolutize(file => 'path'), 'Path::Class::File';
-isa_ok Madoi::Util::absolutize(dir  => 'path'), 'Path::Class::Dir';
+isa_ok Modoi::Util::absolutize('path'), 'Path::Class::File';
+isa_ok Modoi::Util::absolutize(file => 'path'), 'Path::Class::File';
+isa_ok Modoi::Util::absolutize(dir  => 'path'), 'Path::Class::Dir';

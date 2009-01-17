@@ -1,4 +1,4 @@
-package Madoi::Util;
+package Modoi::Util;
 use strict;
 use warnings;
 use base qw(Exporter::Lite);

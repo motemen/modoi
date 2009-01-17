@@ -1,9 +1,9 @@
-package Madoi::Fetcher;
+package Modoi::Fetcher;
 use strict;
 use warnings;
 use base qw(Class::Accessor::Fast);
 use URI::Fetch;
-use Madoi::Util;
+use Modoi::Util;
 
 __PACKAGE__->mk_accessors(qw(config cache));
 
@@ -24,7 +24,7 @@ sub init_config {
 
     if ($config->{cache}->{module} eq 'Cache::FileCache') {
         if (my $cache_root = $config->{cache}->{options}->{cache_root}) {
-            $config->{cache}->{options}->{cache_root} = Madoi::Util::absolutize($cache_root);
+            $config->{cache}->{options}->{cache_root} = Modoi::Util::absolutize($cache_root);
         }
     }
 

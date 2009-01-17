@@ -1,11 +1,11 @@
-package Madoi::Server;
+package Modoi::Server;
 use strict;
 use warnings;
 use base qw(Class::Accessor::Fast);
 use LWP::UserAgent;
 use HTTP::Engine;
 use HTTP::Engine::Response;
-use Madoi::HandleContent;
+use Modoi::HandleContent;
 
 __PACKAGE__->mk_accessors(qw(madoi engine));
 
@@ -40,7 +40,7 @@ sub run {
 sub handle_request {
     my ($self, $req) = @_;
 
-    Madoi->context->log(info => join ' ', 'handle request', $req->method, $req->request_uri);
+    Modoi->context->log(info => join ' ', 'handle request', $req->method, $req->request_uri);
 
     if (my $host = $req->header('Host')) {
         $self->serve_proxy($req);
@@ -55,7 +55,7 @@ sub serve_proxy {
     my $_res;
     if (uc $req->method eq 'GET') {
         # TODO handle redirection
-        if (my $fetch_res = Madoi->context->fetcher->fetch($req->request_uri)) {
+        if (my $fetch_res = Modoi->context->fetcher->fetch($req->request_uri)) {
             $_res = $fetch_res->http_response;
             $_res->code(200);
             $_res->content($fetch_res->content);
@@ -64,13 +64,13 @@ sub serve_proxy {
     }
 
     unless ($_res) {
-        Madoi->context->log(debug => Madoi->context->fetcher . '->fetch failed');
+        Modoi->context->log(debug => Modoi->context->fetcher . '->fetch failed');
         my $_req = $req->as_http_request;
            $_req->uri($req->request_uri);
         $_res = LWP::UserAgent->new->simple_request($_req)
     }
 
-    Madoi::HandleContent->handle($_res); # XXX
+    Modoi::HandleContent->handle($_res); # XXX
 
     my $res = HTTP::Engine::Response->new;
        $res->set_http_response($_res);

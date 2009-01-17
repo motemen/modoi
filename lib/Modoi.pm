@@ -1,10 +1,10 @@
-package Madoi;
+package Modoi;
 use strict;
 use warnings;
 use base qw(Class::Accessor::Fast Class::Data::Inheritable);
 use Path::Class;
-use Madoi::Downloader;
-use Madoi::Server;
+use Modoi::Downloader;
+use Modoi::Server;
 require UNIVERSAL::require;
 
 __PACKAGE__->mk_accessors(qw(config downloader server fetcher));
@@ -16,7 +16,7 @@ sub new {
     my $self = $class->SUPER::new(ref $_[0] eq 'HASH' ? $_[0] : { @_ });
 
     $self->config({}) unless $self->config;
-    $self->config->{plugin_path} ||= dir($FindBin::Bin, 'lib', 'Madoi', 'Plugin');
+    $self->config->{plugin_path} ||= dir($FindBin::Bin, 'lib', 'Modoi', 'Plugin');
     $self->config->{server}->{host} ||= '';
     $self->config->{server}->{port} ||= 3128;
 
@@ -65,7 +65,7 @@ sub load_plugins {
     foreach (@{$self->config->{plugins}}) {
         my $module = $_->{module};
         $module->require or die $@;
-        $module =~ s/^(?!Madoi::Plugin::)/Madoi::Plugin::/;
+        $module =~ s/^(?!Modoi::Plugin::)/Modoi::Plugin::/;
 
         my $plugin = $self->{plugins}->{$module} = $module->new({ config => $_->{config} });
            $plugin->register($self);

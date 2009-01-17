@@ -7,10 +7,10 @@ use Getopt::Long;
 use YAML;
 
 use lib dir($FindBin::Bin, 'lib')->stringify;
-use Madoi;
+use Modoi;
 
 my $config = file($FindBin::Bin, 'config.yaml');
 GetOptions('--config=s', \$config);
 Getopt::Long::Configure('bundling'); # allows -c -v
 
-Madoi->bootstrap(config => YAML::LoadFile($config));
+Modoi->bootstrap(config => YAML::LoadFile($config));

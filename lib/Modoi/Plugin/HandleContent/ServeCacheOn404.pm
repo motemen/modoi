@@ -1,17 +1,17 @@
-package Madoi::Plugin::HandleContent::ServeCacheOn404;
+package Modoi::Plugin::HandleContent::ServeCacheOn404;
 use strict;
 use warnings;
-use base qw(Madoi::Plugin);
+use base qw(Modoi::Plugin);
 use Storable;
 
 sub filter {
     my ($self, $res) = @_;
     return unless $res->code == 404;
 
-    my $cache = Madoi->context->fetcher->cache;
+    my $cache = Modoi->context->fetcher->cache;
     my $entry = $cache->get($res->request->uri) or return;
 
-    Madoi->context->log(info => 'serve cache for ' . $res->request->uri);
+    Modoi->context->log(info => 'serve cache for ' . $res->request->uri);
 
     $entry = Storable::thaw($entry);
 
