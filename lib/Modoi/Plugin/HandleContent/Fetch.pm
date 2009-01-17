@@ -52,7 +52,7 @@ sub find_links {
                 push @links, URI->new_abs($frag, $res->base);
             }
 
-            Modoi->context->log(debug => "found link: $links[-1]");
+            Modoi->context->log(info => "found link: $links[-1]");
         }
     }
 

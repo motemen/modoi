@@ -40,7 +40,7 @@ sub run {
 sub handle_request {
     my ($self, $req) = @_;
 
-    Modoi->context->log(info => join ' ', 'handle request', $req->method, $req->request_uri);
+    Modoi->context->log(debug => join ' ', 'handle request', $req->method, $req->request_uri);
 
     if (my $host = $req->header('Host')) {
         $self->serve_proxy($req);
@@ -75,6 +75,16 @@ sub serve_proxy {
     my $res = HTTP::Engine::Response->new;
        $res->set_http_response($_res);
     $res;
+}
+
+{
+    require HTTP::Server::Simple;
+    no warnings 'redefine';
+
+    *HTTP::Server::Simple::print_banner = sub {
+        my $self = shift;
+        Modoi->context->log(info => 'You can connect to your server at http://localhost:' . $self->port . '/');
+    };
 }
 
 1;

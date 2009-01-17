@@ -2,3 +2,12 @@ plugins:
   - module: HandleContent::Store
   - module: HandleContent::Fetch
   - module: HandleContent::ServeCacheOn404
+
+logger:
+  - module: Screen
+    config:
+      min_level: debug
+  - module: File
+    config:
+      min_level: info
+      filename: log/modoi.log

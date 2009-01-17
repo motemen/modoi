@@ -7,7 +7,9 @@ use Modoi::Downloader;
 use Modoi::Server;
 require UNIVERSAL::require;
 
-__PACKAGE__->mk_accessors(qw(config downloader server fetcher));
+our @Components = qw(downloader server fetcher logger);
+
+__PACKAGE__->mk_accessors(qw(config), @Components);
 
 __PACKAGE__->mk_classdata('context');
 
@@ -30,7 +32,7 @@ sub new {
 sub init {
     my $self = shift;
 
-    foreach (qw(downloader server fetcher)) {
+    foreach (@Components) {
         my $module = __PACKAGE__ . '::' . ucfirst;
         $module->require or die $@;
         $self->$_($module->new(config => $self->config->{$_}));
@@ -50,11 +52,10 @@ sub run {
     shift->server->run;
 }
 
-# TODO
 sub log {
     my ($self, $level, $message) = @_;
     my ($pkg) = caller;
-    print STDERR "[$level] $pkg $message\n";
+    $self->logger->log(level => $level, message => "[$level] $pkg $message\n");
 }
 
 sub load_plugins {
