@@ -1,4 +1,4 @@
-package Modoi::Plugin::HandleContent::ServeCacheOn404;
+package Modoi::Plugin::Filter::Response::ServeCacheOn404;
 use strict;
 use warnings;
 use base qw(Modoi::Plugin);

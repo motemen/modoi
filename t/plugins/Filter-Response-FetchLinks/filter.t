@@ -4,7 +4,7 @@ use HTTP::Response;
 use HTTP::Request::Common;
 use Modoi;
 
-my $module = 'Modoi::Plugin::HandleContent::Fetch';
+my $module = 'Modoi::Plugin::Filter::Response::FetchLinks';
 
 use_ok $module;
 

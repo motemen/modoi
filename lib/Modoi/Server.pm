@@ -5,7 +5,6 @@ use base qw(Class::Accessor::Fast);
 use LWP::UserAgent;
 use HTTP::Engine;
 use HTTP::Engine::Response;
-use Modoi::HandleContent;
 
 __PACKAGE__->mk_accessors(qw(madoi engine));
 
@@ -53,7 +52,16 @@ sub serve_proxy {
     my ($self, $req) = @_;
 
     my $_res;
-    if (uc $req->method eq 'GET') {
+
+    foreach (Modoi->context->plugins('Filter::Request')) {
+        $_->filter($req, \$_res);
+    }
+
+    if ($_res && $_res->isa('HTTP::Engine::Response')) {
+        return $_res;
+    }
+
+    if (!$_res && uc $req->method eq 'GET') {
         # TODO handle redirection
         if (my $fetch_res = Modoi->context->fetcher->fetch($req->request_uri)) {
             $_res = $fetch_res->http_response;
@@ -70,7 +78,9 @@ sub serve_proxy {
         $_res = LWP::UserAgent->new->simple_request($_req)
     }
 
-    Modoi::HandleContent->handle($_res); # XXX
+    foreach (Modoi->context->plugins('Filter::Response')) {
+        $_->filter($_res);
+    }
 
     my $res = HTTP::Engine::Response->new;
        $res->set_http_response($_res);

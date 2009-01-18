@@ -1,4 +1,4 @@
-package Modoi::Plugin::HandleContent::Store;
+package Modoi::Plugin::Filter::Response::Store;
 use strict;
 use warnings;
 use base qw(Modoi::Plugin);
