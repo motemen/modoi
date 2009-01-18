@@ -40,7 +40,19 @@ sub init {
 
 sub fetch {
     my ($self, $uri) = @_;
-    URI::Fetch->fetch("$uri", Cache => $self->cache);
+
+    URI::Fetch->fetch(
+        "$uri",
+        Cache => $self->cache,
+        CacheEntryGrep => sub {
+            my $res = shift;
+            foreach (Modoi->context->plugins('Filter::Fetcher')) {
+                $_->filter($res)
+                    or Modoi->context->log(info => "do not cache: $uri") and return;
+            }
+            1;
+        },
+    );
 }
 
 1;
