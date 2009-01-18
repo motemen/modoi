@@ -35,28 +35,40 @@ sub store_dir {
 sub download {
     my ($self, $uri) = @_;
 
-    Modoi->context->log(debug => "download $uri");
+    my $file = $self->file_for_uri($uri);
+    if (-e $file) {
+        # TODO check Last-Modified or something
+        Modoi->context->log(debug => "download $uri => file exists");
+        return 1;
+    }
 
-    my $res = Modoi->context->fetcher->fetch($uri) or return;
-
-    $self->store($uri, $res->content);
-
-    1;
+    if (my $res = Modoi->context->fetcher->fetch($uri)) {
+        Modoi->context->log(debug => "download $uri => $file");
+        $self->store($uri, $res->content);
+        1;
+    } else {
+        Modoi->context->log(debug => "download $uri => failed");
+        0;
+    }
 }
 
 sub store {
     my ($self, $uri, $content) = @_;
 
-    $uri = URI->new($uri);
-    $uri->path($uri->path . 'index.html') if $uri->path =~ qr'/$'; # XXX
-
-    Modoi::Util::ensure_dir my $file = $self->store_dir->file($uri->host, $uri->path_query);
-
-    Modoi->context->log(debug => "store $file");
+    Modoi::Util::ensure_dir my $file = $self->file_for_uri($uri);
 
     my $fh = $file->openw;
     $fh->print($content);
     $fh->close;
+}
+
+sub file_for_uri {
+    my ($self, $uri) = @_;
+
+    $uri = URI->new($uri) unless ref $uri;
+    $uri->path($uri->path . 'index.html') if $uri->path =~ qr'/$'; # XXX
+
+    $self->store_dir->file($uri->host, $uri->path_query);
 }
 
 1;
