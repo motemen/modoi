@@ -39,10 +39,11 @@ sub init {
 }
 
 sub fetch {
-    my ($self, $uri) = @_;
+    my ($self, $uri) = splice @_, 0, 2;
 
     URI::Fetch->fetch(
         "$uri",
+        ForceResponse => 1,
         Cache => $self->cache,
         CacheEntryGrep => sub {
             my $res = shift;
@@ -52,6 +53,18 @@ sub fetch {
             }
             1;
         },
+        @_,
+    );
+}
+
+sub request {
+    my ($self, $req) = splice @_, 0, 2;
+
+    $self->fetch(
+        $req->request_uri,
+        ETag => scalar $req->header('If-None-Match'),
+        LastModified => scalar $req->header('If-Modified-Since'),
+        @_
     );
 }
 

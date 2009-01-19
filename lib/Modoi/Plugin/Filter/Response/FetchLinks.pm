@@ -5,11 +5,11 @@ use base qw(Modoi::Plugin);
 use YAML;
 use List::MoreUtils qw(uniq);
 
-__PACKAGE__->mk_accessors(qw(find_rule));
+__PACKAGE__->mk_accessors(qw(rules));
 
 sub init {
     my $self = shift;
-    $self->find_rule({});
+    $self->rules({});
 }
 
 sub filter {
@@ -21,14 +21,14 @@ sub find_links {
     my ($self, $res) = @_;
     
     my $uri = $res->request->uri;
-    unless ($self->find_rule->{$uri->host}) {
+    unless ($self->rules->{$uri->host}) {
         my $file;
         $self->load_assets_for($uri, '*.yaml', sub {
             $file = shift unless $file;
         });
 
         if ($file) {
-            $self->find_rule->{$uri->host} = YAML::LoadFile($file);
+            $self->rules->{$uri->host} = YAML::LoadFile($file);
             Modoi->context->log(info => "found $file for $uri");
         } else {
             return;
@@ -37,7 +37,7 @@ sub find_links {
 
     my @links = ();
 
-    my $rules = $self->find_rule->{$uri->host};
+    my $rules = $self->rules->{$uri->host};
     my $content = $res->decoded_content;
     foreach my $rule (@$rules) {
         while ($content =~ /($rule->{regexp})/g) {
