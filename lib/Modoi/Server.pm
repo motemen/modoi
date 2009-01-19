@@ -3,27 +3,38 @@ use strict;
 use warnings;
 use base qw(Class::Accessor::Fast);
 use LWP::UserAgent;
+use Path::Class;
+use MIME::Types;
+use HTTP::Date;
 use HTTP::Engine;
 use HTTP::Engine::Response;
 
-__PACKAGE__->mk_accessors(qw(madoi engine));
+__PACKAGE__->mk_accessors(qw(madoi engine config static_dir template_dir));
 
 sub new {
     my ($class, %args) = @_;
     my $config = delete $args{config};
     my $self = $class->SUPER::new(%args);
-       $self->setup_engine($config);
+       $self->init_config($config);
+       $self->setup_engine;
     $self;
 }
 
+sub init_config {
+    my ($self, $config) = @_;
+    $self->config($config);
+    $self->static_dir(dir($self->config->{static_path}));
+    $self->template_dir(dir($self->config->{template_path}));
+}
+
 sub setup_engine {
-    my ($self, $args) = @_;
+    my $self = shift;
 
     $self->engine(
         HTTP::Engine->new(
             interface => {
                 module => 'ServerSimple',
-                args   => $args,
+                args   => $self->config->{engine},
                 request_handler => sub {
                     $self->handle_request(@_);
                 },
@@ -41,11 +52,21 @@ sub handle_request {
 
     Modoi->context->log(debug => join ' ', 'handle request', $req->method, $req->request_uri);
 
-    if (my $host = $req->header('Host')) {
-        $self->serve_proxy($req);
-    } else {
-        $self->serve_internal($req);
-    }
+    (my $host = $req->header('Host') || $self->config->{name} || '') =~ s/:\d+$//;
+
+    my $res = eval {
+        if ($host ne $self->config->{name}) {
+            $self->serve_proxy($req);
+        } else {
+            $self->serve_internal($req);
+        }
+    };
+    return $res if $res;
+
+    $res = HTTP::Engine::Response->new;
+    $res->status(500);
+    $res->body("<h1>Internal Server Error</h1><p>$@</p>");
+    $res;
 }
 
 sub serve_proxy {
@@ -91,6 +112,60 @@ sub serve_proxy {
 
     my $res = HTTP::Engine::Response->new;
        $res->set_http_response($_res);
+    $res;
+}
+
+sub serve_internal {
+    my ($self, $req) = @_;
+    my $uri = $req->uri;
+
+    my @segments = $uri->path_segments;
+    
+    return $self->serve_static($req) if $segments[1] eq 'static';
+
+    shift @segments;
+    $segments[-1] =~ s/\.(\w+)$//;
+    my $view = $1;
+
+    my $engine = join '::', 'Modoi::Server::Engine', map { ucfirst ($_ || 'index') } @segments;
+    $engine->require or die $@;
+    $engine->new(view => $view, segments => \@segments)->_handle($req);
+}
+
+sub serve_static {
+    my ($self, $req) = @_;
+
+    my @segments = $req->uri->path_segments;
+    splice @segments, 0, 2;
+
+    my $file = $self->static_dir->file(@segments);
+
+    my $res = HTTP::Engine::Response->new;
+
+    if (-e $file) {
+        my $size  = -s _;
+        my $mtime = (stat _)[9];
+        my ($ext) = $file =~ /\.(\w+)$/;
+
+        $res->content_type(MIME::Types->new->mimeTypeOf($ext) || 'text/plain');
+
+        if (my $if_modified_since = $req->headers->header('If-Modified-Since')) {
+            my $time = HTTP::Date::str2time($if_modified_since);
+            if ($mtime <= $time) {
+                $res->status(304);
+                return $res;
+            }
+        }
+
+        $res->headers->header(Last_Modified => HTTP::Date::time2str($mtime));
+        $res->headers->header(Content_Length => $size);
+        $res->body(scalar $file->slurp);
+    } else {
+        $res->status(404);
+        $res->content_type('text/plain');
+        $res->body('404 Not Found');
+    }
+
     $res;
 }
 

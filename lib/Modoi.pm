@@ -17,8 +17,11 @@ sub new {
 
     $self->config({}) unless $self->config;
     $self->config->{plugin_path} ||= dir($FindBin::Bin, 'lib', 'Modoi', 'Plugin');
-    $self->config->{server}->{host} ||= '';
-    $self->config->{server}->{port} ||= 3128;
+    $self->config->{server}->{engine}->{host} ||= '';
+    $self->config->{server}->{engine}->{port} ||= 3128;
+    $self->config->{server}->{name} ||= 'modoi';
+    $self->config->{server}->{static_path} ||= dir($FindBin::Bin, 'static');
+    $self->config->{server}->{template_path} ||= dir($FindBin::Bin, 'templates');
 
     $class->context($self);
 

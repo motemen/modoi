@@ -13,6 +13,9 @@ build_requires 'Exporter::Lite';
 build_requires 'Getopt::Long';
 build_requires 'YAML';
 build_requires 'MIME::Base64';
+build_requires 'Template';
+build_requires 'JSON::Syck';
+build_requires 'Module::Reload';
 
 tests 't/*.t t/*/*.t t/*/*/*.t';
 

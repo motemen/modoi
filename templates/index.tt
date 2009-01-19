@@ -1,0 +1,37 @@
+[% WRAPPER _wrapper.tt %]
+<h2>Fetcher</h2>
+<h3>Cached URIs</h3>
+<ul>
+[% FOREACH uri IN modoi.fetcher.cache.get_keys.slice %]
+<li><a href="[% uri | html %]">[% uri | html %]</a></li>
+[% END %]
+</ul>
+
+<h2>Downloader</h2>
+<h3>Downloaded files</h3>
+[% MACRO dir_tree(d) BLOCK %]
+  [% FOREACH e IN d.children %]
+    [% IF e.is_dir %]
+    <li>
+    [% e.relative(e.parent) | html %]/
+    <ul>
+      [% dir_tree(e) %]
+    </ul>
+    </li>
+    [% ELSE %]
+    <li><a href="http://[% e.relative(modoi.downloader.config.store_dir) | html %]">[% e.basename | html %]</a></li>
+    [% END %]
+  [% END %]
+[% END %]
+<p>store_dir: [% modoi.downloader.config.store_dir %]</p>
+<ul>
+[% dir_tree(modoi.downloader.config.store_dir) %]
+</ul>
+
+<h2>Logger</h2>
+[% log_file = modoi.logger.output('file').filename %]
+<textarea cols="80" rows="24" readonly="readonly">
+[% INCLUDE $log_file | html %]
+</textarea>
+
+[% END %]
