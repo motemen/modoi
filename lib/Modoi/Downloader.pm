@@ -38,18 +38,19 @@ sub download {
     my $file = $self->file_for_uri($uri);
     if (-e $file) {
         # TODO check Last-Modified or something
-        Modoi->context->log(debug => "download $uri => file exists");
+        Modoi->context->log(info => "download $uri => file exists");
         return 1;
     }
 
-    if (my $res = Modoi->context->fetcher->fetch($uri)) {
-        Modoi->context->log(debug => "download $uri => $file");
-        $self->store($uri, $res->content);
-        1;
-    } else {
-        Modoi->context->log(debug => "download $uri => failed");
-        0;
+    my $res = Modoi->context->fetcher->fetch($uri);
+    if (!$res->is_error) {
+        Modoi->context->log(info => "download $uri => failed");
+        return;
     }
+
+    Modoi->context->log(info => "download $uri => $file");
+    $self->store($uri, $res->content);
+    1;
 }
 
 sub store {
