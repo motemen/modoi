@@ -41,20 +41,30 @@ sub init {
 sub fetch {
     my ($self, $uri) = splice @_, 0, 2;
 
-    URI::Fetch->fetch(
+    my @plugins = Modoi->context->plugins('Filter::Fetcher');
+
+    my $res = URI::Fetch->fetch(
         "$uri",
         ForceResponse => 1,
         Cache => $self->cache,
         CacheEntryGrep => sub {
             my $res = shift;
-            foreach (Modoi->context->plugins('Filter::Fetcher')) {
-                $_->filter($res)
-                    or Modoi->context->log(info => "do not cache: $uri") and return;
+            foreach (@plugins) {
+                unless ($_->should_cache($res)) {
+                    Modoi->context->log(info => "will not cache $uri");
+                    return;
+                }
             }
             1;
         },
-        @_,
+        @_
     );
+
+    foreach (@plugins) {
+        $_->filter_response(\$res);
+    }
+
+    $res;
 }
 
 sub request {

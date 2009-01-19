@@ -18,6 +18,7 @@ sub filter {
     $res->code(200);
     $res->content($entry->{Content});
     $res->content_type($entry->{ContentType});
+    $res->push_header(X_Modoi_Fillter => 'Response-ServeCacheOn404');
 }
 
 1;

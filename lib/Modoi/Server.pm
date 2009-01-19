@@ -61,29 +61,28 @@ sub serve_proxy {
         return $_res;
     }
 
-    if (!$_res && uc $req->method eq 'GET') {
-        # TODO handle redirection
-        my $no_cache;
-        if (($req->header('Pragma') || '') eq 'no-cache' ||
-            ($req->header('Cache-Control') || '') eq 'no-cache' ||
-            !$req->header('If-Modified-Since')) {
-            $no_cache++;
-        }
-        if (my $fetch_res = Modoi->context->fetcher->request($req)) {
-            $_res = $fetch_res->http_response;
-            if (!$fetch_res->is_error && $no_cache) {
-                $_res->code(200);
-                $_res->content($fetch_res->content);
-                $_res->header(Content_Type => $fetch_res->content_type);
-            }
-        }
-    }
-
     unless ($_res) {
-        Modoi->context->log(debug => Modoi->context->fetcher . '->fetch failed');
-        my $_req = $req->as_http_request;
-           $_req->uri($req->request_uri);
-        $_res = LWP::UserAgent->new->simple_request($_req)
+        if (uc $req->method eq 'GET') {
+            # TODO should handle redirection
+            my $no_cache;
+            if (($req->header('Pragma') || '') eq 'no-cache' ||
+                ($req->header('Cache-Control') || '') eq 'no-cache' ||
+                !$req->header('If-Modified-Since')) {
+                $no_cache++;
+            }
+            if (my $fetch_res = Modoi->context->fetcher->request($req)) {
+                $_res = $fetch_res->http_response;
+                if (!$fetch_res->is_error && $no_cache) {
+                    $_res->code(200);
+                    $_res->content($fetch_res->content);
+                    $_res->header(Content_Type => $fetch_res->content_type);
+                }
+            }
+        } else {
+            my $_req = $req->as_http_request;
+               $_req->uri($req->request_uri);
+            $_res = LWP::UserAgent->new->simple_request($_req)
+        }
     }
 
     foreach (Modoi->context->plugins('Filter::Response')) {
