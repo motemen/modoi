@@ -3,8 +3,6 @@ use strict;
 use warnings;
 use base qw(Class::Accessor::Fast Class::Data::Inheritable);
 use Path::Class;
-use Modoi::Downloader;
-use Modoi::Server;
 require UNIVERSAL::require;
 
 our @Components = qw(downloader server fetcher logger);
@@ -81,6 +79,10 @@ sub plugins {
 
     if (not ref $filter) {
         map { $self->{plugins}->{$_} } grep /::\Q$filter\E::/, keys %{$self->{plugins}};
+    } elsif (ref $filter eq 'Regexp') {
+        map { $self->{plugins}->{$_} } grep { m/$filter/ } keys %{$self->{plugins}};
+    } elsif (ref $filter eq 'CODE') {
+        map { $self->{plugins}->{$_} } grep { $filter->($_) } keys %{$self->{plugins}};
     }
 }
 

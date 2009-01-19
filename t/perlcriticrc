@@ -1,0 +1,4 @@
+[-BuiltinFunctions::ProhibitStringyEval]
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = refs
