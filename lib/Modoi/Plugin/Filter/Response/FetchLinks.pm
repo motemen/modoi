@@ -4,16 +4,18 @@ use warnings;
 use base qw(Modoi::Plugin);
 use YAML;
 use List::MoreUtils qw(uniq);
+use URI;
 
-__PACKAGE__->mk_accessors(qw(rules));
+__PACKAGE__->mk_accessors(qw(site_config));
 
 sub init {
     my $self = shift;
-    $self->rules({});
+    $self->site_config({});
 }
 
 sub filter {
     my ($self, $res) = @_;
+
     Modoi->context->downloader->download($_) foreach $self->find_links($res);
 }
 
@@ -21,23 +23,16 @@ sub find_links {
     my ($self, $res) = @_;
     
     my $uri = $res->request->uri;
-    unless ($self->rules->{$uri->host}) {
-        my $file;
-        $self->load_assets_for($uri, '*.yaml', sub {
-            $file = shift unless $file;
-        });
 
-        if ($file) {
-            $self->rules->{$uri->host} = YAML::LoadFile($file);
-            Modoi->context->log(info => "found $file for $uri");
-        } else {
-            return;
-        }
+    my $site_config = $self->site_config_for($uri) or return;
+
+    if (my $path = $site_config->{path}) {
+        return unless $res->request->uri =~ /$path/;
     }
 
     my @links = ();
 
-    my $rules = $self->rules->{$uri->host};
+    my $rules = $site_config->{rules};
     my $content = $res->decoded_content;
     foreach my $rule (@$rules) {
         while ($content =~ /($rule->{regexp})/g) {
@@ -57,6 +52,28 @@ sub find_links {
     }
 
     uniq @links;
+}
+
+sub site_config_for {
+    my ($self, $uri) = @_;
+
+    $uri = URI->new($uri) unless ref $uri;
+
+    if (!exists $self->site_config->{$uri->host}) {
+        my $file;
+        $self->load_assets_for($uri, '*.yaml', sub {
+            $file = shift unless $file;
+        });
+
+        if ($file) {
+            $self->site_config->{$uri->host} = YAML::LoadFile($file);
+            Modoi->context->log(info => "found $file for $uri");
+        } else {
+            $self->site_config->{$uri->host} = undef;
+        }
+    }
+
+    $self->site_config->{$uri->host};
 }
 
 1;
