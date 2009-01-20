@@ -1,4 +1,8 @@
 plugins:
+  - module: Filter::Request::ServeCache
+    config:
+      content_type: image/*
+
   - module: Filter::Request::BasicAuth
     config:
       username: username

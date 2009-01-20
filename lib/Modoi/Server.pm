@@ -9,7 +9,7 @@ use HTTP::Date;
 use HTTP::Engine;
 use HTTP::Engine::Response;
 
-__PACKAGE__->mk_accessors(qw(madoi engine config static_dir template_dir));
+__PACKAGE__->mk_accessors(qw(engine config static_dir template_dir));
 
 sub new {
     my ($class, %args) = @_;
@@ -63,9 +63,10 @@ sub handle_request {
     };
     return $res if $res;
 
+    my $error = $@;
     $res = HTTP::Engine::Response->new;
     $res->status(500);
-    $res->body("<h1>Internal Server Error</h1><p>$@</p>");
+    $res->body("<h1>Internal Server Error</h1><p>$error</p>");
     $res;
 }
 
@@ -75,7 +76,7 @@ sub serve_proxy {
     my $_res;
 
     foreach (Modoi->context->plugins('Filter::Request')) {
-        $_->filter($req, \$_res);
+        $_->filter($req->as_http_request, \$_res);
     }
 
     if ($_res && $_res->isa('HTTP::Engine::Response')) {

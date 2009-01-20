@@ -43,8 +43,8 @@ sub download {
     }
 
     my $res = Modoi->context->fetcher->fetch($uri);
-    if (!$res->is_error) {
-        Modoi->context->log(info => "download $uri => failed");
+    if ($res->is_error) {
+        Modoi->context->log(info => "download $uri => failed: " . $res->http_response->message);
         return;
     }
 
