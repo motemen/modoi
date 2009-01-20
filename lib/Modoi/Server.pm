@@ -2,6 +2,7 @@ package Modoi::Server;
 use strict;
 use warnings;
 use base qw(Class::Accessor::Fast);
+use URI;
 use LWP::UserAgent;
 use Path::Class;
 use MIME::Types;
@@ -25,6 +26,11 @@ sub init_config {
     $self->config($config);
     $self->static_dir(dir($self->config->{static_path}));
     $self->template_dir(dir($self->config->{template_path}));
+}
+
+sub root_uri {
+    my $self = shift;
+    $self->{_uri} ||= URI->new('http://' . $self->config->{name} . ':' . $self->config->{engine}->{port} . '/');
 }
 
 sub setup_engine {
