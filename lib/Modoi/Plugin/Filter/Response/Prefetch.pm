@@ -1,4 +1,4 @@
-package Modoi::Plugin::Filter::Response::FetchLinks;
+package Modoi::Plugin::Filter::Response::Prefetch;
 use strict;
 use warnings;
 use base qw(Modoi::Plugin);
