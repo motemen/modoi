@@ -89,4 +89,28 @@ sub plugins {
     }
 }
 
+sub register_hook {
+    my ($self, $plugin, %hooks) = @_;
+
+    while (my ($hook, $callback) = each %hooks) {
+        push @{$self->{hooks}->{$hook}}, {
+            callback => $callback,
+            plugin   => $plugin,
+        };
+    }
+}
+
+sub run_hook {
+    my ($self, $hook, $args, $callback) = @_;
+
+    my @ret;
+    foreach my $action (@{$self->{hooks}->{$hook}}) {
+        my $plugin = $action->{plugin};
+        my $ret = $action->{callback}->($plugin, $self, $args);
+        $callback->($ret) if $callback;
+        push @ret, $ret;
+    }
+    return @ret;
+}
+
 1;

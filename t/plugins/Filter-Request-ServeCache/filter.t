@@ -20,13 +20,11 @@ Modoi->context->fetcher->cache->set($uri => Storable::freeze({ Content => 'CONTE
 Modoi->context->fetcher->cache->set($image_uri => Storable::freeze({ Content => 'CONTENT', ContentType => 'image/png' }));
 
 {
-    my $req = GET $uri;
-    $plugin->filter($req, \my $res);
+    $plugin->filter_request(Modoi->context, { request => GET($uri), response_ref => \my $res });
     ok not defined $res;
 }
 
 {
-    my $req = GET $image_uri;
-    $plugin->filter($req, \my $res);
+    $plugin->filter_request(Modoi->context, { request => GET($image_uri), response_ref => \my $res });
     ok $res;
 }

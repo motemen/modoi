@@ -6,12 +6,23 @@ use MIME::Base64;
 use HTTP::Engine::Response;
 
 sub init {
-    my $self = shift;
-    die 'username and password required' unless $self->config->{username} && $self->config->{password};
+    my ($self, $context) = @_;
+
+    unless ($self->config->{username} && $self->config->{password}) {
+        $context->log(error => 'username and password required');
+    } else {
+        $context->register_hook(
+            $self,
+            'server.request' => \&filter_request,
+        );
+    }
 }
 
-sub filter {
-    my ($self, $req, $res_ref) = @_;
+sub filter_request {
+    my ($self, $context, $args) = @_;
+
+    my $req = $args->{request};
+    my $res_ref = $args->{response_ref};
 
     my $auth_header = $req->header('Authorization');
     my $auth_expect = 'Basic ' . encode_base64($self->config->{username} . ':' . $self->config->{password}, '');

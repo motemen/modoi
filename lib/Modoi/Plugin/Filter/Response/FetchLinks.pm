@@ -9,12 +9,19 @@ use URI;
 __PACKAGE__->mk_accessors(qw(site_config));
 
 sub init {
-    my $self = shift;
+    my ($self, $context) = @_;
+
     $self->site_config({});
+
+    $context->register_hook(
+        $self,
+        'server.response' => \&filter_response,
+    );
 }
 
-sub filter {
-    my ($self, $res) = @_;
+sub filter_response {
+    my ($self, $context, $args) = @_;
+    my $res = $args->{response};
 
     Modoi->context->downloader->download($_) foreach $self->find_links($res);
 }
@@ -23,7 +30,6 @@ sub find_links {
     my ($self, $res) = @_;
     
     my $uri = $res->request->uri;
-
     my $site_config = $self->site_config_for($uri) or return;
 
     if (my $path = $site_config->{path}) {
@@ -33,7 +39,7 @@ sub find_links {
     my @links = ();
 
     my $rules = $site_config->{rules};
-    my $content = $res->decoded_content;
+    my $content = $res->decoded_content or return;
     foreach my $rule (@$rules) {
         while ($content =~ /($rule->{regexp})/g) {
             my $frag = $1;

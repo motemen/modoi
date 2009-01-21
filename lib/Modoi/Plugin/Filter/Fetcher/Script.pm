@@ -8,8 +8,15 @@ use Path::Class qw(file);
 __PACKAGE__->mk_accessors('asset_modules');
 
 sub init {
-    my $self = shift;
+    my ($self, $context) = @_;
+
     $self->asset_modules({});
+
+    $context->register_hook(
+        $self,
+        'fetcher.should_cache'    => \&should_cache,
+        'fetcher.filter_response' => \&filter_response,
+    );
 }
 
 sub load_asset_module_for {
@@ -45,8 +52,9 @@ sub load_asset_module_for {
 }
 
 sub should_cache {
-    my ($self, $res) = @_;
+    my ($self, $context, $args) = @_;
 
+    my $res = $args->{response};
     my $module = $self->load_asset_module_for($res->uri) or return 1;
     my $code = $module->can('should_cache') or return 1;
     
@@ -54,12 +62,13 @@ sub should_cache {
 }
 
 sub filter_response {
-    my ($self, $res_ref) = @_;
+    my ($self, $context, $args) = @_;
 
-    my $module = $self->load_asset_module_for($$res_ref->uri) or return;
+    my $res = $args->{response};
+    my $module = $self->load_asset_module_for($res->uri) or return;
     my $code = $module->can('filter_response') or return;
     
-    $code->($res_ref);
+    $code->($res);
 }
 
 1;

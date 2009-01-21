@@ -4,8 +4,19 @@ use warnings;
 use base qw(Modoi::Plugin);
 use Storable;
 
-sub filter {
-    my ($self, $res) = @_;
+sub init {
+    my ($self, $context) = @_;
+
+    $context->register_hook(
+        $self,
+        'server.response' => \&filter_response,
+    );
+}
+
+sub filter_response {
+    my ($self, $context, $args) = @_;
+    my $res = $args->{response};
+
     return unless $res->code == 404;
 
     my $cache = Modoi->context->fetcher->cache;

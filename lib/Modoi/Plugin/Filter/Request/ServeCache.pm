@@ -5,8 +5,19 @@ use base qw(Modoi::Plugin);
 use Storable;
 use HTTP::Engine::Response;
 
-sub filter {
-    my ($self, $req, $res_ref) = @_;
+sub init {
+    my ($self, $context) = @_;
+    $context->register_hook(
+        $self,
+        'server.request' => \&filter_request,
+    );
+}
+
+sub filter_request {
+    my ($self, $context, $args) = @_;
+
+    my $req = $args->{request};
+    my $res_ref = $args->{response_ref};
 
     my $uri = $req->uri;
     my $cache = Modoi->context->fetcher->cache;

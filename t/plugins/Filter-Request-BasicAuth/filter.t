@@ -14,12 +14,22 @@ Modoi->new;
 my $plugin = $module->new(config => { username => 'username', password => 'password' });
 
 {
-    $plugin->filter(GET('http://img.2chan.net/b/'), \my $res);
+    $plugin->filter_request(
+        Modoi->context, {
+            request => GET('http://img.2chan.net/b/'),
+            response_ref => \my $res,
+        }
+    );
     is $res->code, 401;
     like $res->header('WWW-Authenticate'), qr/^Basic /;
 }
 
 {
-    $plugin->filter(GET('http://img.2chan.net/b/', Authorization => 'Basic dXNlcm5hbWU6cGFzc3dvcmQ='), \my $res);
+    $plugin->filter_request(
+        Modoi->context, {
+            request => GET('http://img.2chan.net/b/', Authorization => 'Basic dXNlcm5hbWU6cGFzc3dvcmQ='),
+            response_ref => \my $res,
+        }
+    );
     ok not defined $res;
 }

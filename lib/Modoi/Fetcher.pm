@@ -4,6 +4,7 @@ use warnings;
 use base qw(Class::Accessor::Fast);
 use URI::Fetch;
 use Modoi::Util;
+use List::MoreUtils qw(any);
 
 __PACKAGE__->mk_accessors(qw(config cache));
 
@@ -49,20 +50,14 @@ sub fetch {
         Cache => $self->cache,
         CacheEntryGrep => sub {
             my $res = shift;
-            foreach (@plugins) {
-                unless ($_->should_cache($res)) {
-                    Modoi->context->log(info => "will not cache $uri");
-                    return;
-                }
-            }
+            my @should_cache = Modoi->context->run_hook('fetcher.should_cache', { response => $res });
+            return if any { not $_ } @should_cache;
             1;
         },
         @_
     );
 
-    foreach (@plugins) {
-        $_->filter_response(\$res);
-    }
+    Modoi->context->run_hook('fetcher.filter_response', { response => $res });
 
     $res;
 }

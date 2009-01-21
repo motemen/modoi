@@ -81,9 +81,7 @@ sub serve_proxy {
 
     my $_res;
 
-    foreach (Modoi->context->plugins('Filter::Request')) {
-        $_->filter($req->as_http_request, \$_res);
-    }
+    Modoi->context->run_hook('server.request', { request => $req->as_http_request, response_ref => \$_res });
 
     if ($_res && $_res->isa('HTTP::Engine::Response')) {
         return $_res;
@@ -113,9 +111,7 @@ sub serve_proxy {
         }
     }
 
-    foreach (Modoi->context->plugins('Filter::Response')) {
-        $_->filter($_res);
-    }
+    Modoi->context->run_hook('server.response', { response => $_res });
 
     my $res = HTTP::Engine::Response->new;
        $res->set_http_response($_res);
