@@ -23,7 +23,7 @@ sub filter_response {
     my ($self, $context, $args) = @_;
     my $res = $args->{response};
 
-    $context->downloader->download($_) foreach $self->find_links($res);
+    $context->fetcher->fetch($_) foreach $self->find_links($res);
 }
 
 sub find_links {

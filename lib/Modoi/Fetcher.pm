@@ -42,7 +42,7 @@ sub init {
 sub fetch {
     my ($self, $uri) = splice @_, 0, 2;
 
-    my @plugins = Modoi->context->plugins('Filter::Fetcher');
+    Modoi->context->log(debug => "fetch $uri");
 
     my $res = URI::Fetch->fetch(
         "$uri",

@@ -39,7 +39,7 @@ sub download {
     if (-e $file) {
         # TODO check Last-Modified or something
         Modoi->context->log(info => "download $uri => file exists");
-        return 1;
+        return 0;
     }
 
     my $res = Modoi->context->fetcher->fetch($uri);
@@ -48,8 +48,9 @@ sub download {
         return;
     }
 
-    Modoi->context->log(info => "download $uri => $file");
+    Modoi->context->log(info => "download $uri");
     $self->store($uri, $res->content);
+
     1;
 }
 
@@ -57,6 +58,14 @@ sub store {
     my ($self, $uri, $content) = @_;
 
     Modoi::Util::ensure_dir my $file = $self->file_for_uri($uri);
+
+    if (-e $file) {
+        # TODO check Last-Modified or something
+        Modoi->context->log(info => "store $uri => file exists");
+        return;
+    }
+
+    Modoi->context->log(info => "store $uri => $file");
 
     my $fh = $file->openw;
     $fh->print($content);
