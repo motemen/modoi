@@ -1,16 +1,22 @@
 plugins:
-  - module: Filter::Request::ServeCache
-    config:
-      content_type: image/*
-
   - module: Filter::Request::BasicAuth
     config:
       username: username
       password: password
 
-  - module: Filter::Response::Store
-  - module: Filter::Response::FetchLinks
-  - module: Filter::Response::ServeCacheOn404
+  - module: Filter::ServeCache
+    config:
+      content_type: image/*
+
+  - module: Filter::Response::Prefetch
+
+  - module: Filter::Fetcher::Store
+    config:
+      regexp:
+        - 2chan.net(?::\d+)?/\w+/(?:src|res|thumb)/
+        - www.nijibox5.com/futabafiles/tubu/src/
+
+  - module: Filter::Fetcher::Script
 
 logger:
   - module: Screen
