@@ -1,4 +1,4 @@
-package Modoi::Plugin::Filter::Request::ServeCache;
+package Modoi::Plugin::Filter::ServeCache;
 use strict;
 use warnings;
 use base qw(Modoi::Plugin);
@@ -9,7 +9,8 @@ sub init {
     my ($self, $context) = @_;
     $context->register_hook(
         $self,
-        'server.request' => \&filter_request,
+        'server.request'  => \&filter_request,
+        'server.response' => \&filter_response,
     );
 }
 
@@ -20,7 +21,7 @@ sub filter_request {
     my $res_ref = $args->{response_ref};
 
     my $uri = $req->uri;
-    my $cache = Modoi->context->fetcher->cache;
+    my $cache = $context->fetcher->cache;
     my $entry = $cache->get($uri) or return;
        $entry = Storable::thaw($entry);
 
@@ -30,7 +31,7 @@ sub filter_request {
         $content_type =~ s/\\\*/\\w+/g;
 
         if ($entry->{ContentType} =~ /$content_type/) {
-            Modoi->context->log(info => "serve cache for $uri");
+            $context->log(info => "serve cache for $uri");
 
             $$res_ref = HTTP::Engine::Response->new;
             $$res_ref->headers->header(Content_Type => $entry->{ContentType});
@@ -44,6 +45,25 @@ sub filter_request {
             }
         }
     }
+}
+
+sub filter_response {
+    my ($self, $context, $args) = @_;
+    my $res = $args->{response};
+
+    return unless $res->code == 404;
+
+    my $cache = $context->fetcher->cache;
+    my $entry = $cache->get($res->request->uri) or return;
+
+    $context->log(info => 'serve cache for ' . $res->request->uri);
+
+    $entry = Storable::thaw($entry);
+
+    $res->code(200);
+    $res->content($entry->{Content});
+    $res->content_type($entry->{ContentType});
+    $res->push_header(X_Modoi_Fillter => 'Response-ServeCacheOn404');
 }
 
 1;

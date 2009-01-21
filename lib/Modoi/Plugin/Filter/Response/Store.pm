@@ -17,7 +17,7 @@ sub filter_response {
     my $res = $args->{response};
 
     return if $res->is_error;
-    Modoi->context->downloader->store($res->request->uri, $res->content);
+    $context->downloader->store($res->request->uri, $res->content);
 }
 
 1;
