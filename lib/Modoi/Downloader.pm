@@ -61,7 +61,7 @@ sub store {
 
     if (-e $file) {
         # TODO check Last-Modified or something
-        Modoi->context->log(info => "store $uri => file exists");
+        Modoi->context->log(debug => "store $uri => file exists");
         return;
     }
 

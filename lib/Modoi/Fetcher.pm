@@ -92,15 +92,14 @@ sub fetch {
             # TODO Modoi::Rule
             if ($uri->path =~ /$rule->{path}/) {
                 Modoi->context->log(debug => "save thread info $uri");
-                my $info = Modoi->context->parser->parse_response($res);
+                my $info = Modoi->context->parser->parse_response($res->http_response);
                 my $thread = Modoi::DB::Thread->new(
                     uri           => $uri,
                     thumbnail_uri => $info->{thumbnail},
                     datetime      => $info->{datetime},
                     summary       => $info->{summary},
                 );
-                eval { $thread->load };
-                $thread->save;
+                eval { $thread->load } or $thread->save;
             }
         }
     }

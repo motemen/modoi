@@ -3,6 +3,6 @@ thumbnail:
 summary:
   xpath: //form/blockquote
 datetime:
-  xpath: //form/input[@type="checkbox"]/following-sibling::text()
+  xpath: //form/input[@type="checkbox"]/following-sibling::node()[1]
   pattern: (\d+)/(\d+)/(\d+).*?(\d+):(\d+):(\d+)
   capture: year month day hour minute second

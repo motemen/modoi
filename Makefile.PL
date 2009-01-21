@@ -14,6 +14,7 @@ build_requires 'Getopt::Long';
 build_requires 'YAML';
 build_requires 'MIME::Base64';
 build_requires 'Template';
+build_requires 'Template::Plugin::Filter::VisualTruncate';
 build_requires 'JSON::Syck';
 build_requires 'Module::Reload';
 build_requires 'Rose::DB';

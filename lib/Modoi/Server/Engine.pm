@@ -29,7 +29,7 @@ sub _handle {
 
 sub render_html {
     my ($self, $object) = @_;
-    $object = { } unless ref $object;
+    $object = {} unless ref $object;
     $object->{modoi} = Modoi->context;
 
     my $tt = Template->new({

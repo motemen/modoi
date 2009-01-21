@@ -56,7 +56,7 @@ sub run {
 sub log {
     my ($self, $level, $message) = @_;
     my ($pkg) = caller;
-    $self->logger->log(level => $level, message => "[$level] $pkg $message\n");
+    $self->logger->log(level => $level, message => "$pkg [$level] $message\n");
 }
 
 sub load_plugins {
