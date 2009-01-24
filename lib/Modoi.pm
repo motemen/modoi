@@ -5,7 +5,7 @@ use base qw(Class::Accessor::Fast Class::Data::Inheritable);
 use Path::Class;
 require UNIVERSAL::require;
 
-our @Components = qw(downloader server fetcher logger);
+our @Components = qw(downloader server fetcher logger parser);
 
 __PACKAGE__->mk_accessors(qw(config), @Components);
 

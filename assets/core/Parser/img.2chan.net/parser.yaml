@@ -1,0 +1,8 @@
+thumbnail:
+  xpath: //form/a/img
+summary:
+  xpath: //form/blockquote
+datetime:
+  xpath: //form/input[@type="checkbox"]/following-sibling::text()
+  pattern: (\d+)/(\d+)/(\d+).*?(\d+):(\d+):(\d+)
+  capture: year month day hour minute second

@@ -16,6 +16,9 @@ build_requires 'MIME::Base64';
 build_requires 'Template';
 build_requires 'JSON::Syck';
 build_requires 'Module::Reload';
+build_requires 'Rose::DB';
+build_requires 'Rose::DB::Object';
+build_requires 'HTML::TreeBuilder::XPath';
 
 tests 't/*.t t/*/*.t t/*/*/*.t';
 

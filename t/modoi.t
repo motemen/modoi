@@ -1,8 +1,9 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 10;
 use FindBin;
-use Modoi;
+
+use_ok 'Modoi';
 
 my $modoi = Modoi->new(
     config => {
