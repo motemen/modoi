@@ -80,8 +80,10 @@ sub serve_proxy {
     my ($self, $req) = @_;
 
     my $_res;
+    my $_req = $req->as_http_request;
+       $_req->uri($req->request_uri);
 
-    Modoi->context->run_hook('server.request', { request => $req->as_http_request, response_ref => \$_res });
+    Modoi->context->run_hook('server.request', { request => $_req, response_ref => \$_res });
 
     if ($_res && $_res->isa('HTTP::Engine::Response')) {
         return $_res;
@@ -106,13 +108,13 @@ sub serve_proxy {
                 }
             }
         } else {
-            my $_req = $req->as_http_request;
-               $_req->uri($req->request_uri);
             $_res = LWP::UserAgent->new->simple_request($_req)
         }
     }
 
     Modoi->context->run_hook('server.response', { response => $_res });
+
+    Modoi->context->log(debug => sprintf '%s %s => %s', $req->method, $req->request_uri, $_res->code);
 
     my $res = HTTP::Engine::Response->new;
        $res->set_http_response($_res);
