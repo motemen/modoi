@@ -9,6 +9,8 @@ build_requires 'HTTP::Engine';
 build_requires 'Class::Accessor::Fast';
 build_requires 'Class::Data::Inheritable';
 build_requires 'Path::Class';
+build_requires 'URI::Fetch';
+build_requires 'Compress::Zlib';
 build_requires 'Exporter::Lite';
 build_requires 'Getopt::Long';
 build_requires 'YAML';

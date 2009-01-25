@@ -98,6 +98,7 @@ sub serve_proxy {
             }
             if (my $fetch_res = Modoi->context->fetcher->request($req)) {
                 $_res = $fetch_res->http_response;
+                $_res->remove_header('Content-Encoding'); # XXX
                 if (!$fetch_res->is_error && $no_cache) {
                     $_res->code(200);
                     $_res->content($fetch_res->content);

@@ -18,6 +18,11 @@ plugins:
 
   - module: Filter::Fetcher::Script
 
+server:
+  name: modoi
+  engine:
+    port: 3128
+
 logger:
   - module: Screen
     config:
