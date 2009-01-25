@@ -1,13 +1,11 @@
 package Modoi::Fetcher;
 use strict;
 use warnings;
-use base qw(Class::Accessor::Fast);
+use base qw(Modoi::Component);
 use URI;
 use URI::Fetch;
 use DateTime;
 use List::MoreUtils qw(any);
-use Path::Class qw(dir);
-use Scalar::Util qw(blessed);
 use Modoi::Util;
 use Modoi::DB::Thread;
 
@@ -118,54 +116,6 @@ sub request {
         LastModified => scalar $req->header('If-Modified-Since'),
         @_
     );
-}
-
-# XXX XXX XXX
-sub class_id {
-    my $self = shift;
-    my $pkg = ref $self || $self;
-       $pkg =~ s/Modoi:://;
-
-    join '-', split /::/, $pkg;
-}
-
-sub assets_dir {
-    my $self = shift;
-    my $context = Modoi->context;
-
-    if ($self->config->{assets_path}) {
-        return $self->config->{assets_path};
-    }
-
-    my $assets_base = dir($context->config->{assets_path} || ($FindBin::Bin, 'assets'));
-    $assets_base->subdir('core', $self->class_id);
-}
-
-sub assets_dir_for {
-    my ($self, $uri) = @_;
-
-    $uri = URI->new($uri) unless blessed $uri;
-
-    $self->assets_dir->subdir($uri->host);
-}
-
-sub load_assets_for {
-    my ($self, $uri, $rule, $callback) = @_;
-
-    $uri = URI->new($uri) unless blessed $uri;
-
-    unless (blessed($rule) && $rule->isa('File::Find::Rule')) {
-        $rule = File::Find::Rule->name($rule)->extras({ follow => 1 });
-    }
-
-    my @segments = $uri->path_segments;
-    while (@segments) {
-        pop @segments;
-        foreach my $file ($rule->in($self->assets_dir_for($uri)->subdir(@segments))) {
-            my $base = File::Basename::basename($file);
-            $callback->($file, $base);
-        }
-    }
 }
 
 1;

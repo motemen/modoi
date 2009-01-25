@@ -51,7 +51,7 @@ sub filter_response {
     my ($self, $context, $args) = @_;
     my $res = $args->{response};
 
-    return unless $res->code == 404;
+    return unless $res->is_error;
 
     my $cache = $context->fetcher->cache;
     my $entry = $cache->get($res->request->uri) or return;
@@ -63,7 +63,6 @@ sub filter_response {
     $res->code(200);
     $res->content($entry->{Content});
     $res->content_type($entry->{ContentType});
-    $res->push_header(X_Modoi_Fillter => 'Response-ServeCacheOn404');
 }
 
 1;

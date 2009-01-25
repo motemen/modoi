@@ -1,10 +1,9 @@
 [% USE Filter.VisualTruncate %]
 [% WRAPPER _wrapper.tt %]
-<h2>Threads</h2>
 <ul id="threads">
 [% FOREACH t IN threads %]
 <li>
-<span class="meta">[% t.datetime | html %]</span>
+<span class="meta">[% t.datetime | html %]</span><br />
 <a href="[% t.uri | html %]">
 <img src="[% t.thumbnail_uri | html %]" class="thumbnail" /><br />
 [% t.summary | visual_truncate(100, '...') | html %]
