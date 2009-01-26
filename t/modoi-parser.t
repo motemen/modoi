@@ -1,6 +1,6 @@
 use strict;
 use utf8;
-use Test::More tests => 13;
+use Test::More tests => 14;
 use HTTP::Response;
 use FindBin;
 use Path::Class qw(file);
@@ -23,6 +23,18 @@ my $parser = Modoi::Parser->new;
     isa_ok $result->{datetime}, 'DateTime';
     is $result->{datetime}, '2009-01-24T21:03:43';
     is $result->{summary}, '荒れ狂ういもげにベッカーズのハンバーガーが降臨 ';
+    is "$result->{body}\n", <<__BODY__;
+荒れ狂ういもげにベッカーズのハンバーガーが降臨 
+ﾅﾆｺﾚ 
+Ｇ 
+ガッツのGか 
+ご注文後に焼き上げるとか当たり前のこと言われても… 
+ベッカーズはＪＲ東日本系列だから関東にしかないよ 
+値段が高いちょっとあらびき過ぎる 
+安いと思った俺は 
+ベッカーズのパンズは店で焼いてるからえらく美味しいあれだけで食う価値はある 
+>ベッカーズのパンズは店で焼いてるからえらく美味しい>あれだけで食う価値はあるホントかよ　スゲー店があったもんだな 
+__BODY__
 }
 
 {

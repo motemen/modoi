@@ -27,46 +27,37 @@ sub init_config {
 sub parse_response {
     my ($self, $res) = @_;
 
-    my $rule = $self->parse_rule_for($res->request->uri) or return;
-    my $tree = HTML::TreeBuilder::XPath->new_from_content($res->decoded_content);
-    my $result = {};
-
-    foreach (keys %$rule) {
-        my $xpath = $rule->{$_}->{xpath} or next;
-        my $nodes = $tree->findnodes($xpath) or next;
-        my $node  = $nodes->get_node(0);
-        $result->{$_} = $node;
+    my $builder = $self->scraper_builder_for($res->request->uri) or return;
+    my $scraper = $builder->build_scraper;
+    my $result = $scraper->scrape($res);
+    if (not exists $result->{body} and ref $result->{bodies} eq 'ARRAY') {
+        $result->{body} = join "\n", @{$result->{bodies}};
     }
-
-    $result->{thumbnail} = $result->{thumbnail}->attr('src');
-    $result->{summary}   = $result->{summary}->as_text;
-    my %dt; @dt{split /\s+/, $rule->{datetime}->{capture}} = $result->{datetime}->getValue =~ /$rule->{datetime}->{pattern}/;
-    $dt{year} = sprintf '20%02d', $dt{year} if length $dt{year} <= 2;
-    $result->{datetime}  = DateTime->new(%dt);
-
+    $result->{uri} = $res->request->uri;
     $result;
 }
 
-sub parse_rule_for {
+sub scraper_builder_for {
     my ($self, $uri) = @_;
 
     $uri = URI->new($uri) unless ref $uri;
     
-    unless (exists $self->parse_rule->{$uri->host}) {
+    unless (exists $self->{scraper}->{$uri->host}) {
         my $file;
-        $self->load_assets_for($uri, '*.yaml', sub {
+        $self->load_assets_for($uri, '*.pl', sub {
             $file = shift unless $file;
         });
 
         if ($file) {
-            $self->parse_rule->{$uri->host} = YAML::LoadFile($file);
-            Modoi->context->log(info => "found $file for $uri");
+            $self->{scraper}->{$uri->host} = $self->load_asset_module($file, $uri);
         } else {
-            $self->parse_rule->{$uri->host} = undef;
+            $self->{scraper}->{$uri->host} = undef;
         }
     }
 
-    $self->parse_rule->{$uri->host};
+    $self->{scraper}->{$uri->host};
 }
+
+sub asset_code_pre { 'use Web::Scraper' }
 
 1;

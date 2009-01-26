@@ -4,7 +4,7 @@ use warnings;
 use base qw(Class::Accessor::Fast);
 use URI;
 use Scalar::Util qw(blessed);
-use Path::Class qw(dir);
+use Path::Class;
 use File::Find::Rule;
 
 __PACKAGE__->mk_accessors(qw(config));
@@ -63,6 +63,31 @@ sub load_assets_for {
             $callback->($file, $base);
         }
     }
+}
+
+sub asset_code_pre { }
+
+sub load_asset_module {
+    my ($self, $file, $uri) = @_;
+    my $class = ref $self || $self;
+
+    $uri = URI->new($uri) unless blessed $uri;
+
+    my $code = file($file)->slurp;
+    my $pkg = $uri->host;
+       $pkg =~ tr/A-Za-z0-9_/_/c;
+       $pkg = "$class\::$pkg";
+    my $code_pre = $class->asset_code_pre || '';
+
+    eval qq(
+        package $pkg;
+        $code_pre;
+        $code;
+        1;
+    );
+    die $@ if $@;
+
+    $pkg;
 }
 
 1;

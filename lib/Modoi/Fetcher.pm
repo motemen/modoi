@@ -85,24 +85,25 @@ sub fetch {
         @_
     );
 
+    my $thread_info;
     if ($res->is_success) {
         if (my $rule = $self->thread_rule_for($uri)) {
             # TODO Modoi::Rule
             if ($uri->path =~ /$rule->{path}/) {
                 Modoi->context->log(debug => "save thread info $uri");
-                my $info = Modoi->context->parser->parse_response($res->http_response);
+                $thread_info = Modoi->context->parser->parse_response($res->http_response);
                 my $thread = Modoi::DB::Thread->new(
                     uri           => $uri,
-                    thumbnail_uri => $info->{thumbnail},
-                    datetime      => $info->{datetime},
-                    summary       => $info->{summary},
+                    thumbnail_uri => $thread_info->{thumbnail},
+                    datetime      => $thread_info->{datetime},
+                    summary       => $thread_info->{summary},
                 );
                 eval { $thread->load } or $thread->save;
             }
         }
     }
 
-    Modoi->context->run_hook('fetcher.filter_response', { response => $res });
+    Modoi->context->run_hook('fetcher.filter_response', { response => $res, thread => $thread_info });
 
     $res;
 }

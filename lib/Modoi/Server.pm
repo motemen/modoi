@@ -70,6 +70,9 @@ sub handle_request {
     return $res if $res;
 
     my $error = $@;
+
+    Modoi->context->log(error => $error);
+
     $res = HTTP::Engine::Response->new;
     $res->status(500);
     $res->body("<h1>Internal Server Error</h1><p>$error</p>");
