@@ -1,22 +1,22 @@
 plugins:
-  - module: Filter::Request::BasicAuth
+  - module: Request::BasicAuth
     config:
       username: username
       password: password
 
-  - module: Filter::ServeCache
+  - module: ServeCache
     config:
       content_type: image/*
 
-  - module: Filter::Response::Prefetch
+  - module: Prefetch
 
-  - module: Filter::Fetcher::Store
+  - module: Fetcher::Store
     config:
       regexp:
         - 2chan.net(?::\d+)?/\w+/(?:src|res|thumb)/
         - www.nijibox5.com/futabafiles/tubu/src/
 
-  - module: Filter::Fetcher::Script
+  - module: Fetcher::Script
 
 server:
   name: modoi

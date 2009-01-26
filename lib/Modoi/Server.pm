@@ -137,7 +137,13 @@ sub serve_internal {
     my $view = $1;
 
     my $engine = join '::', 'Modoi::Server::Engine', map { ucfirst ($_ || 'index') } @segments;
-    $engine->require or die $@;
+    unless ($engine->require) {
+        my $res = HTTP::Engine::Response->new;
+        $res->status(404);
+        $res->content_type('text/plain');
+        $res->body('404 Not Found');
+        return $res;
+    }
     $engine->new(view => $view, segments => \@segments)->_handle($req);
 }
 
