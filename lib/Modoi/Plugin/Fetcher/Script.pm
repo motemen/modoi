@@ -1,4 +1,4 @@
-package Modoi::Plugin::Filter::Fetcher::Script;
+package Modoi::Plugin::Fetcher::Script;
 use strict;
 use warnings;
 use base qw(Modoi::Plugin);

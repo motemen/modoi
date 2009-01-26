@@ -6,7 +6,7 @@ use Storable;
 use Cache::Memory;
 use Modoi;
 
-my $module = 'Modoi::Plugin::Filter::ServeCache';
+my $module = 'Modoi::Plugin::ServeCache';
 
 use_ok $module;
 

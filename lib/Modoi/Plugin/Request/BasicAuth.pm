@@ -1,4 +1,4 @@
-package Modoi::Plugin::Filter::Request::BasicAuth;
+package Modoi::Plugin::Request::BasicAuth;
 use strict;
 use warnings;
 use base qw(Modoi::Plugin);

@@ -1,4 +1,4 @@
-package Modoi::Plugin::Filter::Response::Prefetch;
+package Modoi::Plugin::Prefetch;
 use strict;
 use warnings;
 use base qw(Modoi::Plugin);

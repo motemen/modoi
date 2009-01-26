@@ -1,4 +1,4 @@
-package Modoi::Plugin::Filter::ServeCache;
+package Modoi::Plugin::ServeCache;
 use strict;
 use warnings;
 use base qw(Modoi::Plugin);

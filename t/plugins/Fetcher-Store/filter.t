@@ -4,7 +4,7 @@ use HTTP::Response;
 use HTTP::Request::Common;
 use Modoi;
 
-my $module = 'Modoi::Plugin::Filter::Fetcher::Store';
+my $module = 'Modoi::Plugin::Fetcher::Store';
 
 use_ok $module;
 

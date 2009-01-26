@@ -4,7 +4,7 @@ use HTTP::Response;
 use HTTP::Request::Common;
 use Modoi;
 
-my $module = 'Modoi::Plugin::Filter::Request::BasicAuth';
+my $module = 'Modoi::Plugin::Request::BasicAuth';
 
 use_ok $module;
 
