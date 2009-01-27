@@ -4,7 +4,7 @@ use warnings;
 use base qw(Modoi::Server::Engine);
 use Module::Reload;
 
-__PACKAGE__->default_view('json');
+__PACKAGE__->default_view('txt');
 
 $Module::Reload::Debug = 1;
 

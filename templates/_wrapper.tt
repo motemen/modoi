@@ -7,6 +7,12 @@
     </head>
     <body>
         <h1><a href="/">Modoi</a>[% IF title %] / <a href="[% link OR '/' | html %]">[% title | html %]</a>[% END %]</h1>
+        <div class="menu">
+[%- FOREACH e IN engine.engines %]
+<a href="[% e.path | html %]">[% e.name | html %]</a>
+[% UNLESS loop.last %] | [% END %]
+[%- END %]
+        </div>
 [% content %]
     </body>
 </html>

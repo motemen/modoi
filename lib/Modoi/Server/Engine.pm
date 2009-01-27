@@ -6,6 +6,7 @@ use Template;
 use JSON::Syck;
 use YAML;
 use HTTP::Engine::Response;
+use Class::Inspector;
 use FindBin;
 use Modoi;
 
@@ -39,10 +40,30 @@ sub template {
     Modoi->context->server->template_dir->file(@segments)->stringify,
 }
 
+sub name {
+    my $self = shift;
+    my $class = ref $self || $self;
+    $class =~ s/^Modoi::Server::Engine:://;
+    $class;
+}
+
+sub path {
+    my $self = shift;
+    my $name = $self->name;
+    $name =~ s/Index$//;
+    $name =~ s'::'/'g;
+    lc "/$name";
+}
+
+sub engines {
+    map { bless \my $e, $_ } grep { not /::SUPER$/ } @{Class::Inspector->subclasses(__PACKAGE__)};
+}
+
 sub render_html {
     my ($self, $object) = @_;
     $object = {} unless ref $object;
     $object->{modoi} = Modoi->context;
+    $object->{engine} = $self;
 
     my $tt = Template->new({
         INCLUDE_PATH => [ Modoi->context->server->template_dir, $FindBin::Bin ],

@@ -1,7 +1,7 @@
 body {
     color: #EBDBBA;
     background-color: #3B312D;
-    padding: 0.5em;
+    padding: 5px;
     font-size: small;
 }
 
@@ -38,7 +38,7 @@ ul#threads li {
     border: 1px solid #736859;
     float: left;
     list-style: none;
-    margin: 5px;
+    margin: 0 8px 8px 0;
     padding: 5px;
     width: 180px;
     height: 180px;
@@ -62,12 +62,28 @@ a:hover {
     color: #732420;
 }
 
+strong {
+    color: #A1753A;
+    padding: 0 0.2em;
+}
+
 .title {
     font-size: 120%;
 }
 
+.menu {
+    background-color: #877A75;
+    padding: 0.5em;
+}
+
+.menu a {
+    color: #3B312D;
+    text-decoration: none;
+}
+
 #search-result .thumbnail {
     float: right;
+    margin-left: 1em;
 }
 
 #search-result .thumbnail img {
@@ -76,4 +92,5 @@ a:hover {
 }
 
 #search-result .search-result-entry {
+    clear: both;
 }
