@@ -8,13 +8,18 @@ __PACKAGE__->default_view('json');
 
 $Module::Reload::Debug = 1;
 
-our @files = keys %INC;
-
-unshift @INC, sub { push @files, $_[1] };
-
 sub handle {
     my ($self, $req) = @_;
-    { reloaded => Module::Reload->check };
+
+    my $warn = '';
+    local $SIG{__WARN__} = sub { $warn .= "$_[0]\n" };
+
+    my $result = {
+        reloaed => Module::Reload->check
+    };
+
+    $result->{_text} = $warn;
+    $result;
 }
 
 1;

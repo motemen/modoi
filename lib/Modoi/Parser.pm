@@ -29,7 +29,7 @@ sub parse_response {
 
     my $builder = $self->scraper_builder_for($res->request->uri) or return;
     my $scraper = $builder->build_scraper;
-    my $result = $scraper->scrape($res);
+    my $result = $scraper->scrape($res->decoded_content);
     if (not exists $result->{body} and ref $result->{bodies} eq 'ARRAY') {
         $result->{body} = join "\n", @{$result->{bodies}};
     }
@@ -44,7 +44,7 @@ sub scraper_builder_for {
     
     unless (exists $self->{scraper}->{$uri->host}) {
         my $file;
-        $self->load_assets_for($uri, '*.pl', sub {
+        $self->load_assets_for($uri, 'scraper.pl', sub {
             $file = shift unless $file;
         });
 

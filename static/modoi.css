@@ -61,3 +61,19 @@ a {
 a:hover {
     color: #732420;
 }
+
+.title {
+    font-size: 120%;
+}
+
+#search-result .thumbnail {
+    float: right;
+}
+
+#search-result .thumbnail img {
+    max-width: 100px;
+    max-height: 100px;
+}
+
+#search-result .search-result-entry {
+}

@@ -103,11 +103,11 @@ sub serve_proxy {
             }
             if (my $fetch_res = Modoi->context->fetcher->request($req)) {
                 $_res = $fetch_res->http_response;
-                $_res->remove_header('Content-Encoding'); # XXX
                 if (!$fetch_res->is_error && $no_cache) {
                     $_res->code(200);
                     $_res->content($fetch_res->content);
                     $_res->header(Content_Type => $fetch_res->content_type);
+                    $_res->remove_header('Content-Encoding'); # XXX
                 }
             }
         } else {
@@ -137,7 +137,7 @@ sub serve_internal {
     my $view = $1;
 
     my $engine = join '::', 'Modoi::Server::Engine', map { ucfirst ($_ || 'index') } @segments;
-    unless ($engine->require) {
+    unless ($engine->isa('Modoi::Server::Engine') || $engine->require) {
         my $res = HTTP::Engine::Response->new;
         $res->status(404);
         $res->content_type('text/plain');

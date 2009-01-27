@@ -81,13 +81,15 @@ sub plugins {
     return values %{$self->{plugins}} unless $filter;
 
     if (not ref $filter) {
-        map { $self->{plugins}->{$_} } grep /::\Q$filter\E::/, keys %{$self->{plugins}};
+        $self->{plugins}->{"Modoi::Plugin::$filter"};
     } elsif (ref $filter eq 'Regexp') {
         map { $self->{plugins}->{$_} } grep { m/$filter/ } keys %{$self->{plugins}};
     } elsif (ref $filter eq 'CODE') {
         map { $self->{plugins}->{$_} } grep { $filter->($_) } keys %{$self->{plugins}};
     }
 }
+
+*plugin = \&plugins;
 
 sub register_hook {
     my ($self, $plugin, %hooks) = @_;

@@ -1,0 +1,3 @@
+path: /(?:res|src|thumb)/\d+\.\w+$
+rules:
+  - regexp: http://\w+\.4chan\.org/\w+/src/\d+\.\w+

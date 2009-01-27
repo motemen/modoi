@@ -1,6 +1,6 @@
 use strict;
 use utf8;
-use Test::More tests => 14;
+use Test::More tests => 18;
 use HTTP::Response;
 use FindBin;
 use Path::Class qw(file);
@@ -61,4 +61,17 @@ __BODY__
     isa_ok $result->{datetime}, 'DateTime';
     is $result->{datetime}, '2009-01-25T06:04:13';
     is $result->{summary}, 'ｷﾀ━━━━━━(ﾟ∀ﾟ)━━━━━━ !!!!! ';
+}
+
+{
+    my $res = HTTP::Response->new(200);
+       $res->content(scalar file("$FindBin::Bin/samples/zip.4chan.org-a-res-18369055.html")->slurp);
+       $res->content_type('text/html');
+       $res->request(GET 'http://zip.4chan.org/a/res/18369055.html');
+
+    my $result = $parser->parse_response($res);
+    isa_ok $result, 'HASH';
+    isa_ok $result->{datetime}, 'DateTime';
+    is $result->{datetime}, '2009-01-27T05:07:00';
+    is $result->{summary}, 'soysource';
 }

@@ -4,6 +4,7 @@ use warnings;
 use base qw(Class::Data::Inheritable Class::Accessor::Fast);
 use Template;
 use JSON::Syck;
+use YAML;
 use HTTP::Engine::Response;
 use FindBin;
 use Modoi;
@@ -27,6 +28,17 @@ sub _handle {
     $self->$render_method($result);
 }
 
+sub template {
+    my $self = shift;
+
+    my @segments = @{$self->segments};
+    shift @segments;
+    @segments = ('index') unless @segments;
+    $segments[-1] .= '.tt';
+
+    Modoi->context->server->template_dir->file(@segments)->stringify,
+}
+
 sub render_html {
     my ($self, $object) = @_;
     $object = {} unless ref $object;
@@ -38,20 +50,19 @@ sub render_html {
         PERL => 1,
     });
 
-    my @segments = @{$self->segments};
-    shift @segments;
-
-    @segments = ('index') unless @segments;
-    $segments[-1] .= '.tt';
-
-    $tt->process(
-        Modoi->context->server->template_dir->file(@segments)->stringify,
-        $object,
-        \my $output,
-    ) or die $tt->error;
+    $tt->process($self->template, $object, \my $output) or die $tt->error;
 
     my $res = HTTP::Engine::Response->new;
     $res->body($output);
+    $res;
+}
+
+sub render_txt {
+    my ($self, $object) = @_;
+    my $res = HTTP::Engine::Response->new;
+    $res->body($object->{_text});
+    $res->body(YAML::Dump($object)) unless defined $res->body;
+    $res->content_type('text/plain');
     $res;
 }
 

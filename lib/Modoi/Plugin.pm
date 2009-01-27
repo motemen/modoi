@@ -66,10 +66,19 @@ sub load_assets_for {
         $rule = File::Find::Rule->name($rule)->extras({ follow => 1 });
     }
 
-    my @segments = $uri->path_segments;
-    while (@segments) {
-        pop @segments;
-        foreach my $file ($rule->in($self->assets_dir_for($uri)->subdir(@segments))) {
+    my @host_segments = split /\./, $uri->host;
+    my @path_segments = $uri->path_segments;
+    while (@host_segments > 2) {
+        if (@path_segments) {
+            pop @path_segments;
+        } else {
+            shift @host_segments;
+        }
+
+        my $dir = $self->assets_dir->subdir(join '.', @host_segments)->subdir(@path_segments);
+        next unless -d $dir;
+
+        foreach my $file ($rule->in($dir)) {
             my $base = File::Basename::basename($file);
             $callback->($file, $base);
         }
