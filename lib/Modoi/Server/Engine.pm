@@ -12,7 +12,7 @@ use Modoi;
 
 __PACKAGE__->mk_classdata(default_view => 'html');
 
-__PACKAGE__->mk_accessors(qw(view segments));
+__PACKAGE__->mk_accessors(qw(view segments request));
 
 sub new {
     my $class = shift;
@@ -23,8 +23,8 @@ sub new {
 
 sub _handle {
     my ($self, $req) = @_;
+    $self->request($req);
     my $result = $self->handle($req);
-
     my $render_method = 'render_' . $self->view;
     $self->$render_method($result);
 }

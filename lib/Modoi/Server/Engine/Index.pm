@@ -6,7 +6,8 @@ use Modoi::DB::Thread;
 
 sub handle {
     my ($self, $req) = @_;
-    +{ threads => Modoi::DB::Thread::Manager->get_threads(sort_by => 'datetime DESC') };
+    my $page = $req->param('page') || 1;
+    +{ threads => Modoi::DB::Thread::Manager->get_threads(sort_by => 'datetime DESC', limit => 50, offset => 50 * ($page - 1)) };
 }
 
 1;
