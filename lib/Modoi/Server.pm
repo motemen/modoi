@@ -9,6 +9,7 @@ use MIME::Types;
 use HTTP::Date;
 use HTTP::Engine;
 use HTTP::Engine::Response;
+use Modoi::Response;
 
 __PACKAGE__->mk_accessors(qw(engine config static_dir template_dir));
 
@@ -30,7 +31,12 @@ sub init_config {
 
 sub root_uri {
     my $self = shift;
-    $self->{_uri} ||= URI->new('http://' . $self->config->{name} . ':' . $self->config->{engine}->{port} . '/');
+    $self->{_uri} ||= URI->new('http://' . $self->host_port . '/');
+}
+
+sub host_port {
+    my $self = shift;
+    $self->config->{name} . ':' . $self->config->{engine}->{port};
 }
 
 sub setup_engine {
@@ -115,7 +121,7 @@ sub serve_proxy {
         }
     }
 
-    Modoi->context->run_hook('server.response', { response => $_res });
+    Modoi->context->run_hook('server.response', { response => bless $_res, 'Modoi::Response' });
 
     Modoi->context->log(debug => sprintf '%s %s => %s', $req->method, $req->request_uri, $_res->code);
 
