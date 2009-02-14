@@ -24,7 +24,7 @@ sub filter_request {
     my $req = $args->{request};
     my $res_ref = $args->{response_ref};
 
-    my $auth_header = $req->header('Authorization');
+    my ($auth_header) = $req->remove_header('Authorization');
     my $auth_expect = 'Basic ' . encode_base64($self->config->{username} . ':' . $self->config->{password}, '');
 
     if (!$auth_header || $auth_header ne $auth_expect) {

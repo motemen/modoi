@@ -8,6 +8,8 @@ sub init {
 
     $context->plugin('jQuery')->require_plugin('timer');
 
+    $self->config->{interval} ||= 10;
+
     $context->register_hook(
         $self,
         'server.response' => \&filter_response,
@@ -21,7 +23,7 @@ sub filter_response {
     return unless $res->code == 200 && $res->request->uri =~ m'/res/';
     return if $res->header('X-Modoi-Plugin-ServeCache');
 
-    $res->insert_script('$.timer(10 * 60 * 1000, function () { location.reload() })');
+    $res->insert_script(sprintf '$.timer(%d * 60 * 1000, function () { location.reload() })', $self->config->{interval});
 }
 
 1;
