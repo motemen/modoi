@@ -22,7 +22,7 @@ sub filter_response {
     my $content = $res->content;
        $content =~ s!(?=</head>)!\n<script type="text/javascript" src="http://$host/static/jquery-1.3.1.min.js"></script>!i;
     foreach (@{$self->config->{plugins} ||= []}) {
-       $content =~ s!(?=</head>)!\n<script type="text/javascript" src="http://$host/static/$_"></script>!i;
+       $content =~ s!(?=</head>)!\n<script type="text/javascript" src="http://$host/static/jquery.$_.js"></script>!i;
     }
     $res->content($content);
 }

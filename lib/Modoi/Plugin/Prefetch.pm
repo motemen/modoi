@@ -36,28 +36,31 @@ sub find_links {
         return unless $res->request->uri =~ /$path/;
     }
 
-    my @links = ();
+    my %links = ();
 
     my $rules = $site_config->{rules};
     my $content = $res->decoded_content or return;
     foreach my $rule (@$rules) {
         while ($content =~ /($rule->{regexp})/g) {
             my $frag = $1;
+            my $uri;
 
             if ($rule->{rewrite}) {
                 my @m = ($frag, $frag =~ /$rule->{regexp}/);
                 $frag = $rule->{rewrite};
                 $frag =~ s/\$(\d+)/$m[$1]/ge;
-                push @links, $frag;
+                $uri = $frag;
             } else {
-                push @links, URI->new_abs($frag, $res->base);
+                $uri = URI->new_abs($frag, $res->base);
             }
 
-            Modoi->context->log(info => "found link: $links[-1]");
+            if ($uri && !$links{$uri}++) {
+                Modoi->context->log(info => "found link: $uri");
+            }
         }
     }
 
-    uniq @links;
+    keys %links;
 }
 
 sub site_config_for {

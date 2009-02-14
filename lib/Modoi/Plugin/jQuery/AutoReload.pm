@@ -6,7 +6,7 @@ use base qw(Modoi::Plugin);
 sub init {
     my ($self, $context) = @_;
 
-    $context->plugin('jQuery')->require_plugin('jquery.timer.js');
+    $context->plugin('jQuery')->require_plugin('timer');
 
     $context->register_hook(
         $self,
@@ -19,10 +19,9 @@ sub filter_response {
     my $res = $args->{response};
 
     return unless $res->code == 200 && $res->request->uri =~ m'/res/';
+    return if $res->header('X-Modoi-Plugin-ServeCache');
 
-    $res->insert_script(<<'__SCRIPT__');
-$.timer(3 * 60 * 1000, function () { location.reload() });
-__SCRIPT__
+    $res->insert_script('$.timer(10 * 60 * 1000, function () { location.reload() })');
 }
 
 1;

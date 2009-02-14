@@ -31,15 +31,13 @@ sub filter_request {
         $content_type =~ s/\\\*/\\w+/g;
 
         if ($entry->{ContentType} =~ /$content_type/) {
-            $context->log(info => "serve cache for $uri");
-
             $$res_ref = HTTP::Engine::Response->new;
             $$res_ref->headers->header(Content_Type => $entry->{ContentType});
-            $$res_ref->headers->push_header(X_Modoi_Fillter => 'Request-ServeCache');
 
             if ($req->header('If-Modified-Since') || $req->header('If-None-Match')) {
                 $$res_ref->status(304);
             } else {
+                $context->log(info => "serve cache for $uri");
                 $$res_ref->status(200);
                 $$res_ref->content($entry->{Content});
             }
@@ -56,13 +54,14 @@ sub filter_response {
     my $cache = $context->fetcher->cache;
     my $entry = $cache->get($res->request->uri) or return;
 
-    $context->log(info => 'serve cache for ' . $res->request->uri);
+    $context->log(notice => 'request for ' . $res->request->uri . ' failed: ' . $res->message);
 
     $entry = Storable::thaw($entry);
 
     $res->code(200);
     $res->content($entry->{Content});
     $res->content_type($entry->{ContentType});
+    $res->header(X_Modoi_Plugin_ServeCache => 'served');
 }
 
 1;
