@@ -25,7 +25,7 @@ sub filter_response {
     my $res = $args->{response};
 
     return if $res->is_error;
-    return unless $res->uri =~ $self->{uri_regexp};
+    return unless $res->uri && $res->uri =~ $self->{uri_regexp};
 
     $context->downloader->store($res->uri, $res->content);
 }

@@ -22,6 +22,8 @@ sub init {
 sub load_asset_module_for {
     my ($self, $uri) = @_;
 
+    return unless $uri;
+
     $uri = URI->new($uri) unless ref $uri;
 
     my $host = $uri->host;

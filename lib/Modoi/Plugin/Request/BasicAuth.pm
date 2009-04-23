@@ -24,6 +24,8 @@ sub filter_request {
     my $req = $args->{request};
     my $res_ref = $args->{response_ref};
 
+    return if $req->uri =~ /\.(jpe?g|png|gif)$/;
+
     my ($auth_header) = $req->remove_header('Authorization');
     my $auth_expect = 'Basic ' . encode_base64($self->config->{username} . ':' . $self->config->{password}, '');
 

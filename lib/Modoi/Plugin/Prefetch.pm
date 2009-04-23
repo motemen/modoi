@@ -6,6 +6,8 @@ use YAML;
 use List::MoreUtils qw(uniq);
 use URI;
 
+use constant ONE_HOUR => 60 * 60;
+
 __PACKAGE__->mk_accessors(qw(site_config));
 
 sub init {
@@ -23,7 +25,7 @@ sub filter_response {
     my ($self, $context, $args) = @_;
     my $res = $args->{response};
 
-    $context->fetcher->fetch($_) foreach $self->find_links($res);
+    $context->fetcher->fetch($_, NoNetwork => ONE_HOUR) foreach $self->find_links($res);
 }
 
 sub find_links {

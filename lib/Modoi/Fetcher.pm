@@ -4,12 +4,15 @@ use warnings;
 use base qw(Modoi::Component);
 use URI;
 use URI::Fetch;
+use LWP::UserAgent;
 use DateTime;
 use List::MoreUtils qw(any);
 use Modoi::Util;
 use Modoi::DB::Thread;
 
 __PACKAGE__->mk_accessors(qw(config cache thread_rule));
+
+our $UserAgent = LWP::UserAgent->new(timeout => 10);
 
 sub new {
     my ($class, %args) = @_;
@@ -75,6 +78,7 @@ sub fetch {
     my $res = URI::Fetch->fetch(
         "$uri",
         ForceResponse => 1,
+        UserAgent => $UserAgent,
         Cache => $self->cache,
         CacheEntryGrep => sub {
             my $res = shift;
