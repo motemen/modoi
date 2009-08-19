@@ -109,7 +109,7 @@ sub fetch {
             }
         }
     } else {
-        Modoi->context->log(debug => "fetching $uri failed: " $res->message);
+        Modoi->context->log(debug => "fetching $uri failed: " . $res->message);
     }
 
     Modoi->context->run_hook('fetcher.filter_response', { response => $res, thread => $thread_info });
