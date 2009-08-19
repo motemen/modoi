@@ -30,7 +30,7 @@ sub filter_response {
 
 sub find_links {
     my ($self, $res) = @_;
-    
+
     my $uri = $res->request->uri;
     my $site_config = $self->site_config_for($uri) or return;
 

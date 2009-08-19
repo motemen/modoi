@@ -83,7 +83,10 @@ sub fetch {
         CacheEntryGrep => sub {
             my $res = shift;
             my @should_cache = Modoi->context->run_hook('fetcher.should_cache', { response => $res });
-            return if any { not $_ } @should_cache;
+            if (any { not $_ } @should_cache) {
+                Modoi->context->log(debug => "fetcher.should_cache $uri returned false: not going to cache.");
+                return;
+            }
             1;
         },
         @_
@@ -105,6 +108,8 @@ sub fetch {
                 eval { $thread->load } or $thread->save;
             }
         }
+    } else {
+        Modoi->context->log(debug => "fetching $uri failed: " $res->message);
     }
 
     Modoi->context->run_hook('fetcher.filter_response', { response => $res, thread => $thread_info });
