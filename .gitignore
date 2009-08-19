@@ -9,3 +9,5 @@ store
 .*
 log/
 config.yaml
+modoi.db
+t/modoi.db
