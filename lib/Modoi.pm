@@ -1,4 +1,4 @@
-package Madoi;
+package Modoi;
 use strict;
 use warnings;
 

@@ -1,5 +1,6 @@
 META.yml
 Makefile
+Makefile.old
 TAGS
 blib/
 inc/

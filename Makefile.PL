@@ -1,6 +1,6 @@
 use inc::Module::Install;
 
-name 'Madoi';
+name 'Modoi';
 license 'perl';
 build_requires 'Test::More';
 
