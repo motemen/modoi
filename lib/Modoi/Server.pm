@@ -1,6 +1,7 @@
 package Modoi::Server;
 use Any::Moose;
 
+use Modoi;
 use Modoi::Proxy;
 use HTTP::Engine;
 use AnyEvent;
@@ -28,25 +29,15 @@ no Any::Moose;
 sub handle_request {
     my ($self, $req) = @_;
 
-    (my $host = $req->header('Host') || '') =~ s/:\d+$//;
-
-    if ($host) {
-        return $self->serve_proxy($req);
-    } else {
-    }
+    Modoi->log(debug => sprintf 'handle %s %s', $req->method, $req->request_uri);
+    $self->serve_proxy($req);
 }
 
 sub serve_proxy {
     my ($self, $req) = @_;
 
-    my $_req = $req->as_http_request;
-       $_req->uri($req->request_uri);
-
-    my $_res = $self->proxy->_process($req->as_http_request);
-
     my $res = HTTP::Engine::Response->new;
-       $res->set_http_response($_res);
-
+    $res->set_http_response($self->proxy->_process($req->as_http_request));
     $res;
 }
 

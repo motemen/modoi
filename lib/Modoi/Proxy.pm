@@ -1,5 +1,7 @@
 package Modoi::Proxy;
 use Any::Moose;
+
+use Modoi;
 use LWP::UserAgent;
 
 has 'ua', (
