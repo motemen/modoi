@@ -36,8 +36,11 @@ sub handle_request {
 sub serve_proxy {
     my ($self, $req) = @_;
 
+    my $_req = $req->as_http_request;
+    $_req->uri($req->request_uri);
+
     my $res = HTTP::Engine::Response->new;
-    $res->set_http_response($self->proxy->_process($req->as_http_request));
+    $res->set_http_response($self->proxy->_process($_req));
     $res;
 }
 
