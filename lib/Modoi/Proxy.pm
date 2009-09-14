@@ -30,7 +30,7 @@ sub _build_ua {
     LWP::UserAgent->new(env_proxy => 1);
 }
 
-sub _process {
+sub process {
     my ($self, $req) = @_;
 
     if (uc $req->method eq 'GET') {

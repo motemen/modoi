@@ -40,7 +40,7 @@ sub serve_proxy {
     $_req->uri($req->request_uri);
 
     my $res = HTTP::Engine::Response->new;
-    $res->set_http_response($self->proxy->_process($_req));
+    $res->set_http_response($self->proxy->process($_req));
     $res;
 }
 
