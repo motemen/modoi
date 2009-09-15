@@ -1,7 +1,7 @@
 package Modoi::Extractor;
 use Any::Moose;
 
-use HTML::TreeBuilder::XPath;
+use Web::Scraper;
 
 __PACKAGE__->meta->make_immutable;
 
@@ -11,12 +11,11 @@ no Any::Moose;
 sub extract {
     my ($self, $res) = @_;
 
-    my $tree = HTML::TreeBuilder::XPath->new;
-    $tree->parse($res->content);
+    my $scraper = scraper {
+        process '//img', 'images[]' => '@src';
+    };
 
-    my @images = map { $_->string_value } $tree->findnodes('//img/@src');
-
-    +{ images => \@images };
+    $scraper->scrape($res);
 }
 
 1;

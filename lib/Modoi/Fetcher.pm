@@ -40,8 +40,6 @@ no Any::Moose;
 sub fetch_async {
     my ($self, $uri, %args) = @_;
 
-    Modoi->log(debug => "fetch $uri");
-
     my $cv = delete $args{Condvar};
 
     async {
@@ -60,6 +58,8 @@ sub fetch_async {
 sub fetch {
     my ($self, $req) = @_;
 
+    Modoi->log(debug => 'fetch ' . $req->uri);
+
     my $cv = AnyEvent->condvar;
 
     $self->fetch_async(
@@ -70,14 +70,16 @@ sub fetch {
     );
 
     my $fetch_res = $cv->recv;
-    $self->do_prefetch($fetch_res->http_response);
 
     my $res = $fetch_res->http_response;
+    $res->content($fetch_res->content);
+    $res->remove_header('Content-Encoding'); # XXX
+
+    $self->do_prefetch($res);
+
     if (!$fetch_res->is_error && _should_serve_content($req)) {
         $res->code(200);
-        $res->content($fetch_res->content);
         $res->header(Content_Type => $fetch_res->content_type);
-        $res->remove_header('Content-Encoding'); # XXX
     }
     $res;
 }
