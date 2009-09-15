@@ -4,6 +4,9 @@ use Any::Moose;
 use Modoi;
 use Modoi::Extractor;
 
+use Coro;
+use Coro::AnyEvent;
+
 use URI::Fetch;
 use UNIVERSAL::require;
 
@@ -18,8 +21,9 @@ has 'cache', (
 
 has 'ua', (
     is  => 'rw',
+    isa => 'LWP::UserAgent',
     default => sub {
-        LWP::UserAgent::AnyEvent->new;
+        LWP::UserAgent::AnyEvent::Coro->new;
     },
 );
 
@@ -33,32 +37,40 @@ __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
 
-sub fetch_uri {
-    my ($self, $uri) = splice @_, 0, 2;
+sub fetch_async {
+    my ($self, $uri, %args) = @_;
 
     Modoi->log(debug => "fetch $uri");
 
-    my $fetch_res;
-    $fetch_res = URI::Fetch->fetch(
-        "$uri",
-        ForceResponse => 1,
-        UserAgent     => $self->ua,
-        Cache         => $self->cache,
-        @_,
-    );
+    my $cv = delete $args{Condvar};
 
-#   $self->do_prefetch($fetch_res->http_response);
-    $fetch_res;
+    async {
+        my $res = URI::Fetch->fetch(
+            "$uri",
+            ForceResponse => 1,
+            UserAgent     => $self->ua,
+            Cache         => $self->cache,
+            %args,
+        );
+        Modoi->log(debug => "$uri -> " . $res->http_status);
+        $cv->send($res) if $cv;
+    };
 }
 
 sub fetch {
     my ($self, $req) = @_;
 
-    my $fetch_res = $self->fetch_uri(
+    my $cv = AnyEvent->condvar;
+
+    $self->fetch_async(
         $req->uri,
         ETag         => scalar $req->header('If-None-Match'),
         LastModified => scalar $req->header('If-Modified-Since'),
+        Condvar      => $cv,
     );
+
+    my $fetch_res = $cv->recv;
+    $self->do_prefetch($fetch_res->http_response);
 
     my $res = $fetch_res->http_response;
     if (!$fetch_res->is_error && _should_serve_content($req)) {
@@ -72,10 +84,13 @@ sub fetch {
 
 sub do_prefetch {
     my ($self, $res) = @_;
+
+    return unless $res->content_type =~ m'^text/';
+
     my $result = $self->extractor->extract($res);
     foreach (@{$result->{images}}) {
         Modoi->log(debug => "prefetch $_");
-        $self->fetch_uri($_);
+        $self->fetch_async($_);
     }
 }
 
@@ -87,33 +102,27 @@ sub _should_serve_content {
     !$req->header('If-Modified-Since');
 }
 
-# From Remedie, lib/Plagger/UserAgent.pm
-package LWP::UserAgent::AnyEvent;
-use base qw(Class::Accessor::Fast);
-__PACKAGE__->mk_accessors(qw( agent timeout ));
+package LWP::UserAgent::AnyEvent::Coro;
+use base 'LWP::UserAgent';
 
-use AnyEvent::HTTP;
 use AnyEvent;
+use AnyEvent::HTTP;
+use Coro;
+use Coro::AnyEvent;
 
 $AnyEvent::HTTP::MAX_PER_HOST = 16; # :->
 
-sub new {
-    my $class = shift;
-    bless {@_}, $class;
-}
+sub send_request {
+    my ($self, $request, $arg, $size) = @_;
 
-sub request {
-    my($self, $request) = @_;
-
-    my $headers = $request->headers;
-    $headers->{'user-agent'} = $self->agent;
-
-    my $w = AnyEvent->condvar;
     http_request $request->method, $request->uri,
-        timeout => 30, headers => $headers, sub { $w->send(@_) };
-    my($data, $header) = $w->recv;
+        timeout => $self->timeout, headers => $request->headers, recurse => 0, Coro::rouse_cb;
 
-    return HTTP::Response->new($header->{Status}, $header->{Reason}, [ %$header ], $data);
+    my ($data, $header) = Coro::rouse_wait;
+
+    my $response = HTTP::Response->new($header->{Status}, $header->{Reason}, [ %$header ], $data);
+    $response->request($request);
+    $response;
 }
 
 1;

@@ -14,7 +14,7 @@ sub extract {
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse($res->content);
 
-    my @images = $tree->findnodes_as_string('//img/@src');
+    my @images = map { $_->string_value } $tree->findnodes('//img/@src');
 
     +{ images => \@images };
 }
