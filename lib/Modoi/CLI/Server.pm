@@ -19,6 +19,13 @@ has 'host', (
     default => '0.0.0.0',
 );
 
+has 'coro_debug_port', (
+    traits => [ 'Getopt' ],
+    is  => 'rw',
+    isa => 'Int',
+    default => 0,
+);
+
 has 'server', (
     is  => 'rw',
     isa => 'Modoi::Server',
@@ -36,6 +43,10 @@ sub _build_server {
 
 sub run {
     my $self = shift;
+    if ($self->coro_debug_port) {
+        Coro::Debug->require or die $@;
+        our $coro_debug_server = Coro::Debug->new_tcp_server($self->coro_debug_port);
+    }
     $self->server->run;
 }
 

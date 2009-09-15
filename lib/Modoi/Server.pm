@@ -5,7 +5,7 @@ use Modoi;
 use Modoi::Proxy;
 
 use AnyEvent;
-#use Coro;
+use Coro;
 
 use HTTP::Engine;
 
@@ -60,10 +60,8 @@ sub _build_engine {
 
 sub run {
     my $self = shift;
-    Modoi->condvar(AnyEvent->condvar);
     $self->engine->run;
-#   Modoi->condvar->recv;
-    AnyEvent->one_event while 1;
+    AnyEvent->condvar->wait;
 }
 
 1;
