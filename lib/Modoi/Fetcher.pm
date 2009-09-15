@@ -54,6 +54,18 @@ sub fetch_async {
     };
 }
 
+sub fetch_sync {
+    my ($self, $uri, %args) = @_;
+
+    URI::Fetch->fetch(
+        "$uri",
+        ForceResponse => 1,
+        UserAgent     => LWP::UserAgent::AnyEvent->new,
+        Cache         => $self->cache,
+        %args,
+    );
+}
+
 sub fetch {
     my ($self, $req) = @_;
 
@@ -70,6 +82,14 @@ sub fetch {
 #
 #   my $fetch_res = $cv->recv;
 
+    if ($LWP::UserAgent::AnyEvent::Coro::Fetching{$req->uri}) {
+        Modoi->log(debug => $req->uri . ' -> already fetching');
+        until (defined $LWP::UserAgent::AnyEvent::Coro::Fetching{$req->uri}) {
+            cede;
+        }
+        return $LWP::UserAgent::AnyEvent::Coro::Fetching{$req->uri};
+    }
+
     # XXX なんか fetch_async() 中にここで AnyEvent 通すと固まる
     my $fetch_res = URI::Fetch->fetch(
         $req->uri,
@@ -78,6 +98,8 @@ sub fetch {
         ETag          => scalar $req->header('If-None-Match'),
         LastModified  => scalar $req->header('If-Modified-Since'),
     );
+
+#   my $fetch_res = $self->fetch_sync($req->uri);
 
     my $res = $fetch_res->http_response;
     $res->content($fetch_res->content);
@@ -116,7 +138,7 @@ sub _should_serve_content {
 }
 
 sub logger_name {
-    __PACKAGE__ . " [$LWP::UserAgent::AnyEvent::Coro::Count]";
+    sprintf '%s [%d]', __PACKAGE__, scalar grep { !defined } values %LWP::UserAgent::AnyEvent::Coro::Fetching;
 }
 
 package LWP::UserAgent::AnyEvent;
@@ -147,21 +169,21 @@ use AnyEvent::HTTP;
 use Coro;
 use Coro::AnyEvent;
 
-our $Count = 0;
+our %Fetching;
 
 sub send_request {
     my ($self, $request, $arg, $size) = @_;
 
-    $Count++;
+    $Fetching{$request->uri} = undef;
     http_request $request->method, $request->uri,
         timeout => $self->timeout, headers => $request->headers, recurse => 0, Coro::rouse_cb;
 
     my ($data, $header) = Coro::rouse_wait;
-    $Count--;
 
     my $response = HTTP::Response->new($header->{Status}, $header->{Reason}, [ %$header ], $data);
     $response->request($request);
-    $response;
+
+    $Fetching{$request->uri} = $response;
 }
 
 1;
