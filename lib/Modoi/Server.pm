@@ -61,10 +61,9 @@ sub _build_engine {
 sub run {
     my $self = shift;
     Modoi->condvar(AnyEvent->condvar);
-#   async {
-        $self->engine->run;
-#   };
-    Modoi->condvar->recv;
+    $self->engine->run;
+#   Modoi->condvar->recv;
+    AnyEvent->one_event while 1;
 }
 
 1;

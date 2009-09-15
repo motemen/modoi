@@ -4,9 +4,6 @@ use Any::Moose;
 use Modoi;
 use Modoi::Extractor;
 
-use Coro;
-use Coro::LWP;
-
 use URI::Fetch;
 use UNIVERSAL::require;
 
@@ -21,7 +18,9 @@ has 'cache', (
 
 has 'ua', (
     is  => 'rw',
-    isa => 'LWP::UserAgent',
+    default => sub {
+        LWP::UserAgent::AnyEvent->new;
+    },
 );
 
 has 'extractor', (
@@ -39,29 +38,16 @@ sub fetch_uri {
 
     Modoi->log(debug => "fetch $uri");
 
-    my $cv = AnyEvent->condvar;
-
     my $fetch_res;
-    async {
-        $cv->begin;
-        warn 'a';
-        $fetch_res = URI::Fetch->fetch(
-            "$uri",
-            ForceResponse => 1,
-            UserAgent     => $self->ua,
-            Cache         => $self->cache,
-            @_,
-        );
-        warn 'b';
-        $cv->end;
-#       $cv->send;
-    };
+    $fetch_res = URI::Fetch->fetch(
+        "$uri",
+        ForceResponse => 1,
+        UserAgent     => $self->ua,
+        Cache         => $self->cache,
+        @_,
+    );
 
-#   cede;
-
-    $cv->recv;
-
-    $self->do_prefetch($fetch_res->http_response);
+#   $self->do_prefetch($fetch_res->http_response);
     $fetch_res;
 }
 
@@ -87,7 +73,6 @@ sub fetch {
 sub do_prefetch {
     my ($self, $res) = @_;
     my $result = $self->extractor->extract($res);
-    return; # XXX
     foreach (@{$result->{images}}) {
         Modoi->log(debug => "prefetch $_");
         $self->fetch_uri($_);
@@ -100,6 +85,35 @@ sub _should_serve_content {
     ($req->header('Pragma')        || '') eq 'no-cache' ||
     ($req->header('Cache-Control') || '') eq 'no-cache' ||
     !$req->header('If-Modified-Since');
+}
+
+# From Remedie, lib/Plagger/UserAgent.pm
+package LWP::UserAgent::AnyEvent;
+use base qw(Class::Accessor::Fast);
+__PACKAGE__->mk_accessors(qw( agent timeout ));
+
+use AnyEvent::HTTP;
+use AnyEvent;
+
+$AnyEvent::HTTP::MAX_PER_HOST = 16; # :->
+
+sub new {
+    my $class = shift;
+    bless {@_}, $class;
+}
+
+sub request {
+    my($self, $request) = @_;
+
+    my $headers = $request->headers;
+    $headers->{'user-agent'} = $self->agent;
+
+    my $w = AnyEvent->condvar;
+    http_request $request->method, $request->uri,
+        timeout => 30, headers => $headers, sub { $w->send(@_) };
+    my($data, $header) = $w->recv;
+
+    return HTTP::Response->new($header->{Status}, $header->{Reason}, [ %$header ], $data);
 }
 
 1;

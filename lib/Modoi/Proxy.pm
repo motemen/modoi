@@ -23,7 +23,7 @@ no Any::Moose;
 
 sub _build_fetcher {
     my $self = shift;
-    Modoi::Fetcher->new(ua => $self->ua);
+    Modoi::Fetcher->new;
 }
 
 sub _build_ua {
