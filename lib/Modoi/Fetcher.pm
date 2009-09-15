@@ -97,6 +97,7 @@ sub fetch {
 sub do_prefetch {
     my ($self, $res) = @_;
 
+    return unless $res->is_success;
     return unless $res->content_type =~ m'^text/';
 
     my $result = $self->extractor->extract($res);
