@@ -3,6 +3,10 @@ use Any::Moose;
 
 use Modoi;
 use Modoi::Extractor;
+
+use Coro;
+use Coro::LWP;
+
 use URI::Fetch;
 use UNIVERSAL::require;
 
@@ -35,13 +39,28 @@ sub fetch_uri {
 
     Modoi->log(debug => "fetch $uri");
 
-    my $fetch_res = URI::Fetch->fetch(
-        "$uri",
-        ForceResponse => 1,
-        UserAgent     => $self->ua,
-        Cache         => $self->cache,
-        @_,
-    );
+    my $cv = AnyEvent->condvar;
+
+    my $fetch_res;
+    async {
+        $cv->begin;
+        warn 'a';
+        $fetch_res = URI::Fetch->fetch(
+            "$uri",
+            ForceResponse => 1,
+            UserAgent     => $self->ua,
+            Cache         => $self->cache,
+            @_,
+        );
+        warn 'b';
+        $cv->end;
+#       $cv->send;
+    };
+
+#   cede;
+
+    $cv->recv;
+
     $self->do_prefetch($fetch_res->http_response);
     $fetch_res;
 }
@@ -51,8 +70,8 @@ sub fetch {
 
     my $fetch_res = $self->fetch_uri(
         $req->uri,
-        ETag          => scalar $req->header('If-None-Match'),
-        LastModified  => scalar $req->header('If-Modified-Since'),
+        ETag         => scalar $req->header('If-None-Match'),
+        LastModified => scalar $req->header('If-Modified-Since'),
     );
 
     my $res = $fetch_res->http_response;
@@ -68,7 +87,11 @@ sub fetch {
 sub do_prefetch {
     my ($self, $res) = @_;
     my $result = $self->extractor->extract($res);
-    # TODO
+    return; # XXX
+    foreach (@{$result->{images}}) {
+        Modoi->log(debug => "prefetch $_");
+        $self->fetch_uri($_);
+    }
 }
 
 sub _should_serve_content {

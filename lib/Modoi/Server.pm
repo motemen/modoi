@@ -3,8 +3,11 @@ use Any::Moose;
 
 use Modoi;
 use Modoi::Proxy;
-use HTTP::Engine;
+
 use AnyEvent;
+#use Coro;
+
+use HTTP::Engine;
 
 has 'config', (
     is => 'rw',
@@ -57,8 +60,11 @@ sub _build_engine {
 
 sub run {
     my $self = shift;
-    $self->engine->run;
-    AnyEvent->condvar->recv;
+    Modoi->condvar(AnyEvent->condvar);
+#   async {
+        $self->engine->run;
+#   };
+    Modoi->condvar->recv;
 }
 
 1;
