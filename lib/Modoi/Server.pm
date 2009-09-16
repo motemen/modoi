@@ -7,6 +7,7 @@ use Modoi::Proxy;
 use AnyEvent;
 use Coro;
 use Coro::AnyEvent;
+use Coro::State;
 
 use HTTP::Engine;
 
@@ -61,6 +62,7 @@ sub _build_engine {
 
 sub run {
     my $self = shift;
+    my $w = AnyEvent->timer(after => 0, interval => 1, cb => sub { warn join ',', map $_->desc, Coro::State::list });
     $self->engine->run;
     AnyEvent->condvar->wait;
 }

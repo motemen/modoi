@@ -23,7 +23,8 @@ no Any::Moose;
 
 sub _build_fetcher {
     my $self = shift;
-    Modoi::Fetcher->new;
+    require Cache::FileCache;
+    Modoi::Fetcher->new(cache => Cache::FileCache->new);
 }
 
 sub _build_ua {

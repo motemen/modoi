@@ -43,8 +43,7 @@ sub fetch_async {
     my $cv = delete $args{CondVar};
 
     async {
-        Coro::on_enter { warn "* enter $uri" };
-        Coro::on_leave { warn "* leave $uri" };
+        $Coro::current->desc($uri);
 
         my $res;
         if ($Fetching{$uri}) {
@@ -179,27 +178,27 @@ sub logger_name {
     sprintf '%s [%d]', __PACKAGE__, scalar grep { $_->count == 0 } values %Fetching;
 }
 
-package LWP::UserAgent::AnyEvent;
-use base 'LWP::UserAgent';
-
-use AnyEvent;
-use AnyEvent::HTTP;
-use Coro::AnyEvent;
-
-sub send_request {
-    my ($self, $request, $arg, $size) = @_;
-
-    my $cv = AnyEvent->condvar;
-
-    http_request $request->method, $request->uri,
-        timeout => $self->timeout, headers => $request->headers, recurse => 0, sub { $cv->send(@_) };
-
-    my ($data, $header) = $cv->recv;
-
-    my $response = HTTP::Response->new($header->{Status}, $header->{Reason}, [ %$header ], $data);
-    $response->request($request);
-    $response;
-}
+# package LWP::UserAgent::AnyEvent;
+# use base 'LWP::UserAgent';
+# 
+# use AnyEvent;
+# use AnyEvent::HTTP;
+# use Coro::AnyEvent;
+# 
+# sub send_request {
+#     my ($self, $request, $arg, $size) = @_;
+# 
+#     my $cv = AnyEvent->condvar;
+# 
+#     http_request $request->method, $request->uri,
+#         timeout => $self->timeout, headers => $request->headers, recurse => 0, sub { $cv->send(@_) };
+# 
+#     my ($data, $header) = $cv->recv;
+# 
+#     my $response = HTTP::Response->new($header->{Status}, $header->{Reason}, [ %$header ], $data);
+#     $response->request($request);
+#     $response;
+# }
 
 package LWP::UserAgent::AnyEvent::Coro;
 use base 'LWP::UserAgent';
@@ -209,6 +208,8 @@ use AnyEvent::HTTP;
 use Coro;
 use Coro::AnyEvent;
 use Coro::Semaphore;
+
+# $AnyEvent::HTTP::MAX_PER_HOST = 1;
 
 sub send_request {
     my ($self, $request, $arg, $size) = @_;
