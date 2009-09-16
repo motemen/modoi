@@ -22,8 +22,7 @@ has 'cache', (
 
 has 'ua', (
     is  => 'rw',
-    isa => 'LWP::UserAgent::AnyEvent::Coro',
-    default => sub { LWP::UserAgent::AnyEvent::Coro->new(timeout => 10) },
+    default => sub { LWP::UserAgent::AnyEvent::Coro->new },
 );
 
 has 'extractor', (
@@ -36,20 +35,40 @@ __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
 
+our %Fetching;
+
 sub fetch_async {
     my ($self, $uri, %args) = @_;
 
     my $cv = delete $args{CondVar};
 
     async {
-        my $res = URI::Fetch->fetch(
-            "$uri",
-            ForceResponse => 1,
-            UserAgent     => $self->ua,
-            Cache         => $self->cache,
-            %args,
-        );
-        Modoi->log(debug => "$uri -> " . $res->http_status);
+        Coro::on_enter { warn "* enter $uri" };
+        Coro::on_leave { warn "* leave $uri" };
+
+        my $res;
+        if ($Fetching{$uri}) {
+            Modoi->log(debug => "$uri: currently fetching");
+            $Fetching{$uri}->wait;
+
+            $res = URI::Fetch->fetch(
+                "$uri",
+                ForceResponse => 1,
+                Cache         => $self->cache,
+                NoNetwork     => 1,
+                %args,
+            );
+            Modoi->log(debug => "<<< $uri (cache)");
+        } else {
+            $res = URI::Fetch->fetch(
+                "$uri",
+                ForceResponse => 1,
+                UserAgent     => LWP::UserAgent::AnyEvent::Coro->new,
+                Cache         => $self->cache,
+                %args,
+            );
+            Modoi->log(debug => "<<< $uri (" . $res->http_status . ')');
+        }
         $cv->send($res) if $cv;
     };
 }
@@ -57,19 +76,35 @@ sub fetch_async {
 sub fetch_sync {
     my ($self, $uri, %args) = @_;
 
-    URI::Fetch->fetch(
-        "$uri",
-        ForceResponse => 1,
-        UserAgent     => LWP::UserAgent::AnyEvent->new,
-        Cache         => $self->cache,
-        %args,
-    );
+    my $res;
+    if ($Fetching{$uri}) {
+        Modoi->log(debug => "$uri: currently fetching");
+        $Fetching{$uri}->wait;
+
+        $res = URI::Fetch->fetch(
+            "$uri",
+            ForceResponse => 1,
+            Cache         => $self->cache,
+            NoNetwork     => 1,
+            %args,
+        );
+        Modoi->log(debug => "<<< $uri (cache)");
+    } else {
+        $res = URI::Fetch->fetch(
+            "$uri",
+            ForceResponse => 1,
+            Cache         => $self->cache,
+            %args,
+        );
+        Modoi->log(debug => "<<< $uri (" . $res->http_status . ')');
+    }
+    $res;
 }
 
 sub fetch {
     my ($self, $req) = @_;
 
-    Modoi->log(debug => 'fetch ' . $req->uri);
+    Modoi->log(debug => '>>> fetch ' . $req->uri);
 
 #   my $cv = AnyEvent->condvar;
 #
@@ -82,30 +117,33 @@ sub fetch {
 #
 #   my $fetch_res = $cv->recv;
 
-    if ($LWP::UserAgent::AnyEvent::Coro::Fetching{$req->uri}) {
-        Modoi->log(debug => $req->uri . ' -> already fetching');
-        until (defined $LWP::UserAgent::AnyEvent::Coro::Fetching{$req->uri}) {
-            cede;
-        }
-        return $LWP::UserAgent::AnyEvent::Coro::Fetching{$req->uri};
-    }
-
     # XXX なんか fetch_async() 中にここで AnyEvent 通すと固まる
-    my $fetch_res = URI::Fetch->fetch(
+#   my $fetch_res = URI::Fetch->fetch(
+#       $req->uri,
+#       ForceResponse => 1,
+#       Cache         => $self->cache,
+#       ETag          => scalar $req->header('If-None-Match'),
+#       LastModified  => scalar $req->header('If-Modified-Since'),
+#   );
+ 
+    my $fetch_res = $self->fetch_sync(
         $req->uri,
-        ForceResponse => 1,
-        Cache         => $self->cache,
-        ETag          => scalar $req->header('If-None-Match'),
-        LastModified  => scalar $req->header('If-Modified-Since'),
+        ETag         => scalar $req->header('If-None-Match'),
+        LastModified => scalar $req->header('If-Modified-Since'),
     );
 
-#   my $fetch_res = $self->fetch_sync($req->uri);
-
-    my $res = $fetch_res->http_response;
+    my $res = $fetch_res->http_response || do {
+        my $res = HTTP::Response->new($fetch_res->http_status);
+        $res->header(ETag => $fetch_res->etag);
+        $res->header(Last_Modified => $fetch_res->last_modified);
+        $res->header(Content_Type => $fetch_res->content_type);
+        $res;
+    };
     $res->content($fetch_res->content);
     $res->remove_header('Content-Encoding');
+    $res->remove_header('Transfer-Encoding');
 
-    Modoi->log(debug => $req->uri . " -> " . $fetch_res->http_status);
+#   Modoi->log(debug => '<<< ' . $req->uri . ' (' . $fetch_res->http_status . ')');
 
     $self->do_prefetch($res);
 
@@ -138,7 +176,7 @@ sub _should_serve_content {
 }
 
 sub logger_name {
-    sprintf '%s [%d]', __PACKAGE__, scalar grep { !defined } values %LWP::UserAgent::AnyEvent::Coro::Fetching;
+    sprintf '%s [%d]', __PACKAGE__, scalar grep { $_->count == 0 } values %Fetching;
 }
 
 package LWP::UserAgent::AnyEvent;
@@ -146,11 +184,13 @@ use base 'LWP::UserAgent';
 
 use AnyEvent;
 use AnyEvent::HTTP;
+use Coro::AnyEvent;
 
 sub send_request {
     my ($self, $request, $arg, $size) = @_;
 
     my $cv = AnyEvent->condvar;
+
     http_request $request->method, $request->uri,
         timeout => $self->timeout, headers => $request->headers, recurse => 0, sub { $cv->send(@_) };
 
@@ -168,13 +208,14 @@ use AnyEvent;
 use AnyEvent::HTTP;
 use Coro;
 use Coro::AnyEvent;
-
-our %Fetching;
+use Coro::Semaphore;
 
 sub send_request {
     my ($self, $request, $arg, $size) = @_;
 
-    $Fetching{$request->uri} = undef;
+    $Modoi::Fetcher::Fetching{$request->uri} ||= Coro::Semaphore->new;
+    $Modoi::Fetcher::Fetching{$request->uri}->down;
+
     http_request $request->method, $request->uri,
         timeout => $self->timeout, headers => $request->headers, recurse => 0, Coro::rouse_cb;
 
@@ -183,7 +224,8 @@ sub send_request {
     my $response = HTTP::Response->new($header->{Status}, $header->{Reason}, [ %$header ], $data);
     $response->request($request);
 
-    $Fetching{$request->uri} = $response;
+    $Modoi::Fetcher::Fetching{$request->uri}->up;
+    $response;
 }
 
 1;

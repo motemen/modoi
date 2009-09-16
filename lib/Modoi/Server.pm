@@ -6,6 +6,7 @@ use Modoi::Proxy;
 
 use AnyEvent;
 use Coro;
+use Coro::AnyEvent;
 
 use HTTP::Engine;
 
