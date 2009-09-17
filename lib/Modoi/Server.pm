@@ -7,7 +7,6 @@ use Modoi::Proxy;
 use AnyEvent;
 use Coro;
 use Coro::AnyEvent;
-use Coro::State;
 
 use HTTP::Engine;
 use HTTP::Engine::Middleware;
@@ -62,6 +61,7 @@ sub _build_middleware {
     my $middleware = HTTP::Engine::Middleware->new;
 #   $middleware->install(qw(HTTP::Engine::Middleware::DebugRequest HTTP::Engine::Middleware::ModuleReload));
 #   $middleware->instance_of('HTTP::Engine::Middleware::DebugRequest')->logger(sub { warn @_ });
+    $middleware->install(qw(HTTP::Engine::Middleware::ModuleReload));
     $middleware
 }
 
@@ -79,13 +79,16 @@ sub _build_engine {
 
 sub request_handler {
     my $self = shift;
-    $self->middleware->handler(sub { $self->handle_request(@_) });
+    my $handler = $self->middleware->handler(sub { $self->handle_request(@_) });
+    unblock_sub {
+        my ($req, $cb) = @_;
+        my $res = $handler->($req);
+        $cb->($res);
+    };
 }
 
 sub run {
     my $self = shift;
-#   my $w = AnyEvent->timer(after => 0, interval => 1, cb => sub { warn join ',', map $_->desc, Coro::State::list });
-    $Coro::idle = sub { warn 'idle' };
     $self->engine->run;
     AnyEvent->condvar->wait;
 }

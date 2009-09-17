@@ -43,10 +43,10 @@ sub _build_server {
 
 sub run {
     my $self = shift;
-    if ($self->coro_debug_port) {
-        Coro::Debug->require or die $@;
-        our $coro_debug_server = Coro::Debug->new_tcp_server($self->coro_debug_port);
-    }
+#   if ($self->coro_debug_port) {
+#       Coro::Debug->require or die $@;
+#       our $coro_debug_server = Coro::Debug->new_tcp_server($self->coro_debug_port);
+#   }
     $self->server->run;
 }
 

@@ -63,7 +63,7 @@ sub fetch_async {
             $res = URI::Fetch->fetch(
                 "$uri",
                 ForceResponse => 1,
-                UserAgent     => LWP::UserAgent::AnyEvent::Coro->new,
+                UserAgent     => $self->ua,
                 Cache         => $self->cache,
                 %args,
             );
@@ -79,6 +79,7 @@ sub fetch_sync {
     my %fetch_args = (
         ForceResponse => 1,
         Cache         => $self->cache,
+        UserAgent     => $self->ua,
         %args,
     );
 
@@ -98,26 +99,6 @@ sub fetch {
 
     Modoi->log(debug => '>>> fetch ' . $req->uri);
 
-#   my $cv = AnyEvent->condvar;
-#
-#   $self->fetch_async(
-#       $req->uri,
-#       ETag         => scalar $req->header('If-None-Match'),
-#       LastModified => scalar $req->header('If-Modified-Since'),
-#       CondVar      => $cv,
-#   );
-#
-#   my $fetch_res = $cv->recv;
-
-    # XXX なんか fetch_async() 中にここで AnyEvent 通すと固まる
-#   my $fetch_res = URI::Fetch->fetch(
-#       $req->uri,
-#       ForceResponse => 1,
-#       Cache         => $self->cache,
-#       ETag          => scalar $req->header('If-None-Match'),
-#       LastModified  => scalar $req->header('If-Modified-Since'),
-#   );
- 
     my $fetch_res = $self->fetch_sync(
         $req->uri,
         ETag         => scalar $req->header('If-None-Match'),
@@ -171,26 +152,26 @@ sub logger_name {
     sprintf '%s [%d/%d]', __PACKAGE__, (scalar grep { $_->count == 0 } values %Fetching), (scalar values %Fetching);
 }
 
-package LWP::UserAgent::AnyEvent;
-use base 'LWP::UserAgent';
-
-use AnyEvent;
-use AnyEvent::HTTP;
-
-sub send_request {
-    my ($self, $request, $arg, $size) = @_;
-
-    my $cv = AnyEvent->condvar;
-
-    http_request $request->method, $request->uri,
-        timeout => $self->timeout, headers => $request->headers, recurse => 0, sub { $cv->send(@_) };
-
-    my ($data, $header) = $cv->recv;
-
-    my $response = HTTP::Response->new($header->{Status}, $header->{Reason}, [ %$header ], $data);
-    $response->request($request);
-    $response;
-}
+# package LWP::UserAgent::AnyEvent;
+# use base 'LWP::UserAgent';
+# 
+# use AnyEvent;
+# use AnyEvent::HTTP;
+# 
+# sub send_request {
+#     my ($self, $request, $arg, $size) = @_;
+# 
+#     my $cv = AnyEvent->condvar;
+# 
+#     http_request $request->method, $request->uri,
+#         timeout => $self->timeout, headers => $request->headers, recurse => 0, sub { $cv->send(@_) };
+# 
+#     my ($data, $header) = $cv->recv;
+# 
+#     my $response = HTTP::Response->new($header->{Status}, $header->{Reason}, [ %$header ], $data);
+#     $response->request($request);
+#     $response;
+# }
 
 package LWP::UserAgent::AnyEvent::Coro;
 use base 'LWP::UserAgent';
