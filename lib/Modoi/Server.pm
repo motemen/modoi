@@ -10,6 +10,7 @@ use Coro::AnyEvent;
 use Coro::State;
 
 use HTTP::Engine;
+use HTTP::Engine::Middleware;
 
 has 'config', (
     is => 'rw',
@@ -18,6 +19,12 @@ has 'config', (
 has 'engine', (
     is  => 'rw',
     isa => 'HTTP::Engine',
+    lazy_build => 1,
+);
+
+has 'middleware', (
+    is  => 'rw',
+    isa => 'HTTP::Engine::Middleware',
     lazy_build => 1,
 );
 
@@ -49,20 +56,36 @@ sub serve_proxy {
     $res;
 }
 
+sub _build_middleware {
+    my $self = shift;
+
+    my $middleware = HTTP::Engine::Middleware->new;
+#   $middleware->install(qw(HTTP::Engine::Middleware::DebugRequest HTTP::Engine::Middleware::ModuleReload));
+#   $middleware->instance_of('HTTP::Engine::Middleware::DebugRequest')->logger(sub { warn @_ });
+    $middleware
+}
+
 sub _build_engine {
     my $self = shift;
+
     HTTP::Engine->new(
         interface => {
             module => 'AnyEvent',
             args   => $self->config,
-            request_handler => sub { $self->handle_request(@_) },
+            request_handler => $self->request_handler,
         }
     );
 }
 
+sub request_handler {
+    my $self = shift;
+    $self->middleware->handler(sub { $self->handle_request(@_) });
+}
+
 sub run {
     my $self = shift;
-    my $w = AnyEvent->timer(after => 0, interval => 1, cb => sub { warn join ',', map $_->desc, Coro::State::list });
+#   my $w = AnyEvent->timer(after => 0, interval => 1, cb => sub { warn join ',', map $_->desc, Coro::State::list });
+    $Coro::idle = sub { warn 'idle' };
     $self->engine->run;
     AnyEvent->condvar->wait;
 }

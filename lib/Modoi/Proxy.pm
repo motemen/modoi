@@ -34,12 +34,20 @@ sub _build_ua {
 sub process {
     my ($self, $req) = @_;
 
-    # TODO should not use fetcher for pages that may redirect
-    if (uc $req->method eq 'GET') {
-        $self->fetcher->fetch($req);
-    } else {
-        $self->ua->simple_request($req);
-    }
+#   Modoi->log(debug => 'request: ' . $req->as_string);
+
+    my $res = do {
+        # TODO should not use fetcher for pages that may redirect
+        if (uc $req->method eq 'GET') {
+            $self->fetcher->fetch($req);
+        } else {
+            $self->ua->simple_request($req);
+        }
+    };
+
+#   Modoi->log(debug => 'response: ' . $res->as_string);
+
+    $res;
 }
 
 1;

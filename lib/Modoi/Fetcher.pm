@@ -7,6 +7,7 @@ use Modoi::Extractor;
 use Coro;
 use Coro::AnyEvent;
 
+use List::MoreUtils qw(uniq);
 use HTTP::Status;
 use URI::Fetch;
 use UNIVERSAL::require;
@@ -75,28 +76,20 @@ sub fetch_async {
 sub fetch_sync {
     my ($self, $uri, %args) = @_;
 
-    my $res;
+    my %fetch_args = (
+        ForceResponse => 1,
+        Cache         => $self->cache,
+        %args,
+    );
+
     if ($Fetching{$uri}) {
         Modoi->log(debug => "$uri: currently fetching");
+        $fetch_args{NoNetwork} = 1;
         $Fetching{$uri}->wait;
-
-        $res = URI::Fetch->fetch(
-            "$uri",
-            ForceResponse => 1,
-            Cache         => $self->cache,
-            NoNetwork     => 1,
-            %args,
-        );
-        Modoi->log(debug => "<<< $uri (cache)");
-    } else {
-        $res = URI::Fetch->fetch(
-            "$uri",
-            ForceResponse => 1,
-            Cache         => $self->cache,
-            %args,
-        );
-        Modoi->log(debug => "<<< $uri (" . $res->http_status . ')');
     }
+
+    my $res = URI::Fetch->fetch("$uri", %fetch_args);
+    Modoi->log(debug => "<<< $uri (" . ($res->http_status || 'cache') . ')');
     $res;
 }
 
@@ -132,7 +125,7 @@ sub fetch {
     );
 
     my $res = $fetch_res->http_response || do {
-        my $res = HTTP::Response->new($fetch_res->http_status);
+        my $res = HTTP::Response->new($fetch_res->http_status || RC_OK);
         $res->header(ETag => $fetch_res->etag);
         $res->header(Last_Modified => $fetch_res->last_modified);
         $res->header(Content_Type => $fetch_res->content_type);
@@ -160,7 +153,7 @@ sub do_prefetch {
     return unless $res->content_type =~ m'^text/';
 
     my $result = $self->extractor->extract($res);
-    foreach (@{$result->{images}}) {
+    foreach (uniq @{$result->{images}}) {
         Modoi->log(debug => "prefetch $_");
         $self->fetch_async($_);
     }
@@ -175,30 +168,29 @@ sub _should_serve_content {
 }
 
 sub logger_name {
-    sprintf '%s [%d]', __PACKAGE__, scalar grep { $_->count == 0 } values %Fetching;
+    sprintf '%s [%d/%d]', __PACKAGE__, (scalar grep { $_->count == 0 } values %Fetching), (scalar values %Fetching);
 }
 
-# package LWP::UserAgent::AnyEvent;
-# use base 'LWP::UserAgent';
-# 
-# use AnyEvent;
-# use AnyEvent::HTTP;
-# use Coro::AnyEvent;
-# 
-# sub send_request {
-#     my ($self, $request, $arg, $size) = @_;
-# 
-#     my $cv = AnyEvent->condvar;
-# 
-#     http_request $request->method, $request->uri,
-#         timeout => $self->timeout, headers => $request->headers, recurse => 0, sub { $cv->send(@_) };
-# 
-#     my ($data, $header) = $cv->recv;
-# 
-#     my $response = HTTP::Response->new($header->{Status}, $header->{Reason}, [ %$header ], $data);
-#     $response->request($request);
-#     $response;
-# }
+package LWP::UserAgent::AnyEvent;
+use base 'LWP::UserAgent';
+
+use AnyEvent;
+use AnyEvent::HTTP;
+
+sub send_request {
+    my ($self, $request, $arg, $size) = @_;
+
+    my $cv = AnyEvent->condvar;
+
+    http_request $request->method, $request->uri,
+        timeout => $self->timeout, headers => $request->headers, recurse => 0, sub { $cv->send(@_) };
+
+    my ($data, $header) = $cv->recv;
+
+    my $response = HTTP::Response->new($header->{Status}, $header->{Reason}, [ %$header ], $data);
+    $response->request($request);
+    $response;
+}
 
 package LWP::UserAgent::AnyEvent::Coro;
 use base 'LWP::UserAgent';
@@ -208,13 +200,16 @@ use AnyEvent::HTTP;
 use Coro;
 use Coro::AnyEvent;
 use Coro::Semaphore;
-
-# $AnyEvent::HTTP::MAX_PER_HOST = 1;
+use Time::HiRes;
 
 sub send_request {
     my ($self, $request, $arg, $size) = @_;
 
-    $Modoi::Fetcher::Fetching{$request->uri} ||= Coro::Semaphore->new;
+    die if $Modoi::Fetcher::Fetching{$request->uri};
+
+    my $t = [ Time::HiRes::gettimeofday ];
+
+    $Modoi::Fetcher::Fetching{$request->uri} = Coro::Semaphore->new;
     $Modoi::Fetcher::Fetching{$request->uri}->down;
 
     http_request $request->method, $request->uri,
@@ -226,6 +221,9 @@ sub send_request {
     $response->request($request);
 
     $Modoi::Fetcher::Fetching{$request->uri}->up;
+
+    Modoi->log(debug => sprintf '%s %.2fs', $request->uri, Time::HiRes::tv_interval $t);
+
     $response;
 }
 
