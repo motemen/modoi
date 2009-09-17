@@ -23,6 +23,7 @@ has 'cache', (
 
 has 'ua', (
     is  => 'rw',
+    isa => 'LWP::UserAgent',
     default => sub { LWP::UserAgent::AnyEvent::Coro->new },
 );
 
@@ -36,44 +37,9 @@ __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
 
-our %Fetching;
+our %UriSemaphore;
 
-sub fetch_async {
-    my ($self, $uri, %args) = @_;
-
-    my $cv = delete $args{CondVar};
-
-    async {
-        $Coro::current->desc($uri);
-
-        my $res;
-        if ($Fetching{$uri}) {
-            Modoi->log(debug => "$uri: currently fetching");
-            $Fetching{$uri}->wait;
-
-            $res = URI::Fetch->fetch(
-                "$uri",
-                ForceResponse => 1,
-                Cache         => $self->cache,
-                NoNetwork     => 1,
-                %args,
-            );
-            Modoi->log(debug => "<<< $uri (cache)");
-        } else {
-            $res = URI::Fetch->fetch(
-                "$uri",
-                ForceResponse => 1,
-                UserAgent     => $self->ua,
-                Cache         => $self->cache,
-                %args,
-            );
-            Modoi->log(debug => "<<< $uri (" . $res->http_status . ')');
-        }
-        $cv->send($res) if $cv;
-    };
-}
-
-sub fetch_sync {
+sub fetch_uri {
     my ($self, $uri, %args) = @_;
 
     my %fetch_args = (
@@ -83,14 +49,20 @@ sub fetch_sync {
         %args,
     );
 
-    if ($Fetching{$uri}) {
+    if ($UriSemaphore{$uri}) {
         Modoi->log(debug => "$uri: currently fetching");
+        $UriSemaphore{$uri}->down;
         $fetch_args{NoNetwork} = 1;
-        $Fetching{$uri}->wait;
+    } else {
+        $UriSemaphore{$uri} = Coro::Semaphore->new(0);
     }
 
     my $res = URI::Fetch->fetch("$uri", %fetch_args);
+
+    $UriSemaphore{$uri}->up;
+
     Modoi->log(debug => "<<< $uri (" . ($res->http_status || 'cache') . ')');
+
     $res;
 }
 
@@ -99,7 +71,7 @@ sub fetch {
 
     Modoi->log(debug => '>>> fetch ' . $req->uri);
 
-    my $fetch_res = $self->fetch_sync(
+    my $fetch_res = $self->fetch_uri(
         $req->uri,
         ETag         => scalar $req->header('If-None-Match'),
         LastModified => scalar $req->header('If-Modified-Since'),
@@ -115,8 +87,6 @@ sub fetch {
     $res->content($fetch_res->content);
     $res->remove_header('Content-Encoding');
     $res->remove_header('Transfer-Encoding');
-
-#   Modoi->log(debug => '<<< ' . $req->uri . ' (' . $fetch_res->http_status . ')');
 
     $self->do_prefetch($res);
 
@@ -134,9 +104,9 @@ sub do_prefetch {
     return unless $res->content_type =~ m'^text/';
 
     my $result = $self->extractor->extract($res);
-    foreach (uniq @{$result->{images}}) {
-        Modoi->log(debug => "prefetch $_");
-        $self->fetch_async($_);
+    foreach my $uri (uniq @{$result->{images}}) {
+        Modoi->log(debug => "prefetch $uri");
+        async { $self->fetch_uri($uri) };
     }
 }
 
@@ -149,29 +119,8 @@ sub _should_serve_content {
 }
 
 sub logger_name {
-    sprintf '%s [%d/%d]', __PACKAGE__, (scalar grep { $_->count == 0 } values %Fetching), (scalar values %Fetching);
+    sprintf '%s [%d]', __PACKAGE__, (scalar grep { $_->count == 0 } values %UriSemaphore);
 }
-
-# package LWP::UserAgent::AnyEvent;
-# use base 'LWP::UserAgent';
-# 
-# use AnyEvent;
-# use AnyEvent::HTTP;
-# 
-# sub send_request {
-#     my ($self, $request, $arg, $size) = @_;
-# 
-#     my $cv = AnyEvent->condvar;
-# 
-#     http_request $request->method, $request->uri,
-#         timeout => $self->timeout, headers => $request->headers, recurse => 0, sub { $cv->send(@_) };
-# 
-#     my ($data, $header) = $cv->recv;
-# 
-#     my $response = HTTP::Response->new($header->{Status}, $header->{Reason}, [ %$header ], $data);
-#     $response->request($request);
-#     $response;
-# }
 
 package LWP::UserAgent::AnyEvent::Coro;
 use base 'LWP::UserAgent';
@@ -179,19 +128,12 @@ use base 'LWP::UserAgent';
 use AnyEvent;
 use AnyEvent::HTTP;
 use Coro;
-use Coro::AnyEvent;
-use Coro::Semaphore;
 use Time::HiRes;
 
 sub send_request {
     my ($self, $request, $arg, $size) = @_;
 
-    die if $Modoi::Fetcher::Fetching{$request->uri};
-
     my $t = [ Time::HiRes::gettimeofday ];
-
-    $Modoi::Fetcher::Fetching{$request->uri} = Coro::Semaphore->new;
-    $Modoi::Fetcher::Fetching{$request->uri}->down;
 
     http_request $request->method, $request->uri,
         timeout => $self->timeout, headers => $request->headers, recurse => 0, Coro::rouse_cb;
@@ -200,8 +142,6 @@ sub send_request {
 
     my $response = HTTP::Response->new($header->{Status}, $header->{Reason}, [ %$header ], $data);
     $response->request($request);
-
-    $Modoi::Fetcher::Fetching{$request->uri}->up;
 
     Modoi->log(debug => sprintf '%s %.2fs', $request->uri, Time::HiRes::tv_interval $t);
 

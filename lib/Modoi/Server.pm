@@ -59,8 +59,6 @@ sub _build_middleware {
     my $self = shift;
 
     my $middleware = HTTP::Engine::Middleware->new;
-#   $middleware->install(qw(HTTP::Engine::Middleware::DebugRequest HTTP::Engine::Middleware::ModuleReload));
-#   $middleware->instance_of('HTTP::Engine::Middleware::DebugRequest')->logger(sub { warn @_ });
     $middleware->install(qw(HTTP::Engine::Middleware::ModuleReload));
     $middleware
 }
