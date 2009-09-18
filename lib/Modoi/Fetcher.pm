@@ -110,6 +110,8 @@ use AnyEvent::HTTP;
 use Coro;
 use Time::HiRes;
 
+sub _agent { $AnyEvent::HTTP::USERAGENT }
+
 sub send_request {
     my ($self, $request, $arg, $size) = @_;
 
