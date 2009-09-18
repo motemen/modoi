@@ -42,6 +42,8 @@ our %UriSemaphore;
 sub fetch_uri {
     my ($self, $uri, %args) = @_;
 
+    Modoi->log(debug => '>>> fetch ' . $uri);
+
     my %fetch_args = (
         ForceResponse => 1,
         Cache         => $self->cache,
@@ -49,13 +51,13 @@ sub fetch_uri {
         %args,
     );
 
-    if ($UriSemaphore{$uri}) {
-        Modoi->log(debug => "$uri: currently fetching");
-        $UriSemaphore{$uri}->down;
+    $UriSemaphore{$uri} ||= Coro::Semaphore->new;
+    if ($UriSemaphore{$uri}->count == 0) {
+        Modoi->log(debug => "$uri: currently fetching") if $UriSemaphore{$uri}->count == 0;
         $fetch_args{NoNetwork} = 1;
-    } else {
-        $UriSemaphore{$uri} = Coro::Semaphore->new(0);
     }
+
+    $UriSemaphore{$uri}->down;
 
     my $res = URI::Fetch->fetch("$uri", %fetch_args);
 
@@ -68,8 +70,6 @@ sub fetch_uri {
 
 sub fetch {
     my ($self, $req) = @_;
-
-    Modoi->log(debug => '>>> fetch ' . $req->uri);
 
     my $fetch_res = $self->fetch_uri(
         $req->uri,
@@ -84,6 +84,7 @@ sub fetch {
         $res->header(Content_Type => $fetch_res->content_type);
         $res;
     };
+    $res->request($req) unless $res->request;
     $res->content($fetch_res->content);
     $res->remove_header('Content-Encoding');
     $res->remove_header('Transfer-Encoding');
