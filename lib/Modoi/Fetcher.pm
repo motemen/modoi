@@ -104,8 +104,7 @@ sub do_prefetch {
     return unless $res->is_success;
     return unless $res->content_type =~ m'^text/';
 
-    my $result = $self->extractor->extract($res);
-    foreach my $uri (uniq @{$result->{images}}) {
+    foreach my $uri ($self->extractor->extract($res)) {
         Modoi->log(debug => "prefetch $uri");
         async { $self->fetch_uri($uri) };
     }
