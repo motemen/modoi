@@ -27,12 +27,6 @@ has 'ua', (
     default => sub { LWP::UserAgent::AnyEvent::Coro->new },
 );
 
-has 'extractor', (
-    is  => 'rw',
-    isa => 'Modoi::Extractor',
-    default => sub { Modoi::Extractor->new },
-);
-
 __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
@@ -89,25 +83,11 @@ sub fetch {
     $res->remove_header('Content-Encoding');
     $res->remove_header('Transfer-Encoding');
 
-    $self->do_prefetch($res);
-
     if (!$fetch_res->is_error && _should_serve_content($req)) {
         $res->code(RC_OK);
         $res->header(Content_Type => $fetch_res->content_type);
     }
     $res;
-}
-
-sub do_prefetch {
-    my ($self, $res) = @_;
-
-    return unless $res->is_success;
-    return unless $res->content_type =~ m'^text/';
-
-    foreach my $uri ($self->extractor->extract($res)) {
-        Modoi->log(debug => "prefetch $uri");
-        async { $self->fetch_uri($uri) };
-    }
 }
 
 sub _should_serve_content {

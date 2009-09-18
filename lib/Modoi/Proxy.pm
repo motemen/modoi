@@ -3,12 +3,19 @@ use Any::Moose;
 
 use Modoi;
 use Modoi::Fetcher;
+use Coro;
 use LWP::UserAgent;
 
 has 'fetcher', (
     is  => 'rw',
     isa => 'Modoi::Fetcher',
     lazy_build => 1,
+);
+
+has 'extractor', (
+    is  => 'rw',
+    isa => 'Modoi::Extractor',
+    default => sub { Modoi::Extractor->new },
 );
 
 has 'ua', (
@@ -34,8 +41,6 @@ sub _build_ua {
 sub process {
     my ($self, $req) = @_;
 
-#   Modoi->log(debug => 'request: ' . $req->as_string);
-
     my $res = do {
         # TODO should not use fetcher for pages that may redirect
         if (uc $req->method eq 'GET') {
@@ -45,9 +50,21 @@ sub process {
         }
     };
 
-#   Modoi->log(debug => 'response: ' . $res->as_string);
+    $self->do_prefetch($res);
 
     $res;
+}
+
+sub do_prefetch {
+    my ($self, $res) = @_;
+
+    return unless $res->is_success;
+    return unless $res->content_type =~ m'^text/';
+
+    foreach my $uri ($self->extractor->extract($res)) {
+        Modoi->log(debug => "prefetch $uri");
+        async { $self->fetcher->fetch_uri($uri) };
+    }
 }
 
 1;
