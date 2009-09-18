@@ -1,6 +1,8 @@
 package Modoi::Extractor;
 use Any::Moose;
 
+with 'Modoi::Role::HasAsset';
+
 use HTML::TreeBuilder::XPath;
 use YAML;
 use Path::Class qw(file);
@@ -10,11 +12,13 @@ __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
 
+sub asset_name { 'extractor' }
+
 sub extract {
     my ($self, $res) = @_;
 
     my $content = $res->content;
-    my $config = $self->site_config;
+    my $config = $self->load_asset_yaml($res);
     my @result;
 
     my $tree;
@@ -42,12 +46,6 @@ sub extract {
     }
 
     uniq @result;
-}
-
-# TODO
-sub site_config {
-    my ($self, $uri) = @_;
-    YAML::LoadFile file(qw(assets 2chan.net extractor.yaml));
 }
 
 1;
