@@ -12,3 +12,4 @@ TODO
  * 本文の保存
  * 静的ファイルは永続的にキャッシュ
  * スレ消えてもキャッシュを渡す
+ * $fetcher->fetch_uri は HTTP::Reponse 返すように

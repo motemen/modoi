@@ -65,13 +65,25 @@ sub fetch_uri {
 sub fetch {
     my ($self, $req) = @_;
 
-    my $fetch_res = $self->fetch_uri(
-        $req->uri,
+    my %args = (
         ETag         => scalar $req->header('If-None-Match'),
         LastModified => scalar $req->header('If-Modified-Since'),
+        Cache        => $self->cache,
     );
 
-    if (($fetch_res->http_status || RC_OK) == RC_NOT_FOUND) {
+    if ($args{Etags} || $args{LastModified}) {
+        my $cache_res = URI::Fetch->fetch($req->uri, %args, NoNetwork => 1);
+        if ($cache_res && $cache_res->content_type =~ /^image\//) { # TODO
+            Modoi->log(debug => 'return NOT MODIFIED for ' . $req->uri);
+            return HTTP::Response->new(RC_NOT_MODIFIED);
+        }
+    }
+
+    my $fetch_res = $self->fetch_uri($req->uri, %args);
+
+    my $http_status = $fetch_res->http_status || RC_OK;
+
+    if ($http_status == RC_NOT_FOUND) {
         # serve cache
         Modoi->log(info => 'serving cache for ' . $req->uri);
         $fetch_res = $self->fetch_uri(
@@ -81,10 +93,12 @@ sub fetch {
     }
 
     my $res = $fetch_res->http_response || do {
-        my $res = HTTP::Response->new($fetch_res->http_status || RC_OK);
-        $res->header(ETag => $fetch_res->etag);
-        $res->header(Last_Modified => $fetch_res->last_modified);
-        $res->header(Content_Type => $fetch_res->content_type);
+        my $res = HTTP::Response->new($http_status);
+        $res->header(
+            ETag          => $fetch_res->etag,
+            Last_Modified => $fetch_res->last_modified,
+            Content_Type  => $fetch_res->content_type,
+        );
         $res;
     };
     $res->request($req) unless $res->request;
