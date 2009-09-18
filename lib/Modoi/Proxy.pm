@@ -50,6 +50,10 @@ sub process {
         }
     };
 
+    if ($res->is_success && $req->uri =~ m<2chan\.net/b/res/>) { # TODO
+        $self->watch($req->uri);
+    }
+
     $self->do_prefetch($res);
 
     $res;
@@ -65,6 +69,25 @@ sub do_prefetch {
         Modoi->log(debug => "prefetch $uri");
         async { $self->fetcher->fetch_uri($uri) };
     }
+}
+
+sub watch {
+    my ($self, $uri) = @_;
+
+    Modoi->log(info => "watch $uri");
+
+    my $w; $w = AnyEvent->timer(
+        after    => 180,
+        interval => 180,
+        cb => sub {
+            Modoi->log(info => "crawl $uri");
+            my $res = $self->fetcher->fetch_uri($uri);
+            if ($res->is_error) {
+                Modoi->log(info => "unwatch $uri");
+                undef $w;
+            }
+        },
+    );
 }
 
 1;
