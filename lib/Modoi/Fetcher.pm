@@ -47,7 +47,7 @@ sub fetch_uri {
 
     $UriSemaphore{$uri} ||= Coro::Semaphore->new;
     if ($UriSemaphore{$uri}->count == 0) {
-        Modoi->log(debug => "$uri: currently fetching") if $UriSemaphore{$uri}->count == 0;
+        Modoi->log(debug => "$uri: currently fetching");
         $fetch_args{NoNetwork} = 1;
     }
 
