@@ -71,6 +71,15 @@ sub fetch {
         LastModified => scalar $req->header('If-Modified-Since'),
     );
 
+    if (($fetch_res->http_status || RC_OK) == RC_NOT_FOUND) {
+        # serve cache
+        Modoi->log(info => 'serving cache for ' . $req->uri);
+        $fetch_res = $self->fetch_uri(
+            $req->uri,
+            NoNetwork => 1,
+        );
+    }
+
     my $res = $fetch_res->http_response || do {
         my $res = HTTP::Response->new($fetch_res->http_status || RC_OK);
         $res->header(ETag => $fetch_res->etag);
@@ -87,6 +96,7 @@ sub fetch {
         $res->code(RC_OK);
         $res->header(Content_Type => $fetch_res->content_type);
     }
+
     $res;
 }
 
