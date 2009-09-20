@@ -20,4 +20,6 @@ requires 'UNIVERSAL::require';
 requires 'URI::Fetch';
 requires 'YAML';
 
+requires_any_moose 'X::Getopt';
+
 WriteAll;

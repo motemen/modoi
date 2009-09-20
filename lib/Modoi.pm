@@ -1,14 +1,13 @@
 package Modoi;
 use strict;
 use warnings;
-use Modoi::Logger;
+use Modoi::Context;
+
+sub context { our $Context ||= Modoi::Context->new }
 
 sub log {
-    my ($class, $level, $message) = @_;
-    our $Logger ||= Modoi::Logger->new;
-    my $pkg = caller;
-    $pkg = $pkg->logger_name if $pkg->can('logger_name');
-    $Logger->log($level, "[$level] $pkg $message");
+    my $class = shift;
+    $class->context->log(@_);
 }
 
 1;

@@ -57,11 +57,15 @@ sub fetch {
         ForceResponse => 1,
     );
 
-    if ($fetch_args{Etags} || $fetch_args{LastModified}) {
-        my $cache_res = $self->fetch_cache($req->uri);
-        if ($cache_res && $cache_res->content_type =~ /^image\//) { # TODO
-            Modoi->log(debug => 'return NOT MODIFIED for ' . $req->uri);
-            return HTTP::Response->new(RC_NOT_MODIFIED);
+    if (my $cache_res = $self->fetch_cache($req->uri)) {
+        if (($cache_res->content_type || '') =~ /^image\//) { # TODO
+            if ($fetch_args{Etags} || $fetch_args{LastModified}) {
+                Modoi->log(debug => 'return NOT MODIFIED for ' . $req->uri);
+                return HTTP::Response->new(RC_NOT_MODIFIED);
+            } else {
+                Modoi->log(debug => 'server cache for ' . $req->uri);
+                return $cache_res->as_http_response;
+            }
         }
     }
 
@@ -89,19 +93,7 @@ sub fetch {
         $fetch_res = $self->fetch_cache($req->uri) || $fetch_res;
     }
 
-    my $res = $fetch_res->http_response || do {
-        my $res = HTTP::Response->new($http_status);
-        $res->header(
-            ETag          => $fetch_res->etag,
-            Last_Modified => $fetch_res->last_modified,
-            Content_Type  => $fetch_res->content_type,
-        );
-        $res;
-    };
-    $res->request($req) unless $res->request;
-    $res->content($fetch_res->content);
-    $res->remove_header('Content-Encoding');
-    $res->remove_header('Transfer-Encoding');
+    my $res = $fetch_res->as_http_response($req);
 
     if (!$fetch_res->is_error && _should_serve_content($req)) {
         $res->code(RC_OK);
@@ -121,6 +113,24 @@ sub _should_serve_content {
 
 sub logger_name {
     sprintf '%s [%d]', __PACKAGE__, (scalar grep { $_->count == 0 } values %UriSemaphore);
+}
+
+sub URI::Fetch::Response::as_http_response {
+    my ($self, $req) = @_;
+    my $res = $self->http_response || do {
+        my $res = HTTP::Response->new($self->http_status || RC_OK);
+        $res->header(
+            ETag          => $self->etag,
+            Last_Modified => $self->last_modified,
+            Content_Type  => $self->content_type,
+        );
+        $res;
+    };
+    $res->content($self->content);
+    $res->remove_header('Content-Encoding');
+    $res->remove_header('Transfer-Encoding');
+    $res->request($req) unless $res->request;
+    $res;
 }
 
 package LWP::UserAgent::AnyEvent::Coro;
