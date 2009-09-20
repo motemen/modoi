@@ -9,7 +9,7 @@ test_tcp
 
 server => sub {
     my $port = shift;
-    HTTPEcho->new($port)->run;
+    HTTPMock->new($port)->run;
 },
 
 client => sub {
@@ -40,19 +40,21 @@ client => sub {
     
     my $res;
 
+    ok !$fetcher->fetch_cache($uri);
     set_next code => 404;
     $res = $fetcher->fetch(GET $uri);
     is $res->code, 404, 'キャッシュなしで 404 なら 404';
 
     $res = $fetcher->fetch(GET $uri);
     is $res->code, 200, '一度 200 をキャッシュすると…';
+    ok $fetcher->fetch_cache($uri);
 
     set_next code => 404;
     $res = $fetcher->fetch(GET $uri);
     is $res->code, 200, '404 が返ってきてもキャッシュを返却';
 };
 
-package HTTPEcho;
+package HTTPMock;
 use base 'HTTP::Server::Simple::CGI';
 use HTTP::Response;
 

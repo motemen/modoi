@@ -9,9 +9,9 @@ use Coro::AnyEvent;
 
 use List::MoreUtils qw(uniq);
 use HTTP::Status;
+use HTTP::Request::Common qw(GET);
 use URI::Fetch;
 use UNIVERSAL::require;
-use Carp::Always;
 
 has 'cache', (
     is  => 'rw',
@@ -34,63 +34,59 @@ no Any::Moose;
 
 our %UriSemaphore;
 
-sub fetch_uri {
-    my ($self, $uri, %args) = @_;
-
-    Modoi->log(debug => '>>> fetch ' . $uri);
-
-    my %fetch_args = (
-        ForceResponse => 1,
-        Cache         => $self->cache,
-        UserAgent     => $self->ua,
-        %args,
-    );
-
-    $UriSemaphore{$uri} ||= Coro::Semaphore->new;
-    if ($UriSemaphore{$uri}->count == 0) {
-        Modoi->log(debug => "$uri: currently fetching");
-        $fetch_args{NoNetwork} = 1;
-    }
-
-    $UriSemaphore{$uri}->down;
-
-    my $res = URI::Fetch->fetch("$uri", %fetch_args);
-
-    $UriSemaphore{$uri}->up;
-
-    Modoi->log(debug => "<<< $uri (" . ($res ? $res->http_status || 'cache' : 404) . ')');
-
-    $res;
+# XXX returns Fetch::URI::Response
+sub fetch_cache {
+    my ($self, $uri) = @_;
+    URI::Fetch->fetch("$uri", Cache => $self->cache, ForceResponse => 1, NoNetwork => 1);
 }
 
+sub fetch_uri {
+    my ($self, $uri) = @_;
+    $self->fetch(GET $uri);
+}
+
+# TODO ながい
 sub fetch {
     my ($self, $req) = @_;
 
-    my %args = (
-        ETag         => scalar $req->header('If-None-Match'),
-        LastModified => scalar $req->header('If-Modified-Since'),
-        Cache        => $self->cache,
+    my %fetch_args = (
+        ETag          => scalar $req->header('If-None-Match'),
+        LastModified  => scalar $req->header('If-Modified-Since'),
+        Cache         => $self->cache,
+        UserAgent     => $self->ua,
+        ForceResponse => 1,
     );
 
-    if ($args{Etags} || $args{LastModified}) {
-        my $cache_res = URI::Fetch->fetch($req->uri, %args, NoNetwork => 1);
+    if ($fetch_args{Etags} || $fetch_args{LastModified}) {
+        my $cache_res = $self->fetch_cache($req->uri);
         if ($cache_res && $cache_res->content_type =~ /^image\//) { # TODO
             Modoi->log(debug => 'return NOT MODIFIED for ' . $req->uri);
             return HTTP::Response->new(RC_NOT_MODIFIED);
         }
     }
 
-    my $fetch_res = $self->fetch_uri($req->uri, %args);
+    Modoi->log(debug => '>>> fetch ' . $req->uri);
+
+    $UriSemaphore{$req->uri} ||= Coro::Semaphore->new;
+    if ($UriSemaphore{$req->uri}->count == 0) {
+        Modoi->log(debug => $req->uri . ': currently fetching');
+        $fetch_args{NoNetwork} = 1;
+    }
+
+    $UriSemaphore{$req->uri}->down;
+
+    my $fetch_res = URI::Fetch->fetch($req->uri, %fetch_args);
+
+    $UriSemaphore{$req->uri}->up;
+
+    Modoi->log(debug => '<<< ' . $req->uri . ' (' . ($fetch_res ? $fetch_res->http_status || 'cache' : 404) . ')');
 
     my $http_status = $fetch_res->http_status || RC_OK;
 
     if ($http_status == RC_NOT_FOUND) {
         # serve cache
         Modoi->log(info => 'serving cache for ' . $req->uri);
-        $fetch_res = $self->fetch_uri(
-            $req->uri,
-            NoNetwork => 1,
-        ) || $fetch_res;
+        $fetch_res = $self->fetch_cache($req->uri) || $fetch_res;
     }
 
     my $res = $fetch_res->http_response || do {
