@@ -11,6 +11,7 @@ use List::MoreUtils qw(uniq);
 use HTTP::Status;
 use URI::Fetch;
 use UNIVERSAL::require;
+use Carp::Always;
 
 has 'cache', (
     is  => 'rw',
@@ -57,7 +58,7 @@ sub fetch_uri {
 
     $UriSemaphore{$uri}->up;
 
-    Modoi->log(debug => "<<< $uri (" . ($res->http_status || 'cache') . ')');
+    Modoi->log(debug => "<<< $uri (" . ($res ? $res->http_status || 'cache' : 404) . ')');
 
     $res;
 }
@@ -89,7 +90,7 @@ sub fetch {
         $fetch_res = $self->fetch_uri(
             $req->uri,
             NoNetwork => 1,
-        );
+        ) || $fetch_res;
     }
 
     my $res = $fetch_res->http_response || do {
