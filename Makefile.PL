@@ -2,7 +2,10 @@ use inc::Module::Install;
 
 name 'Modoi';
 license 'perl';
-build_requires 'Test::More';
+
+test_requires 'Test::More';
+test_requires 'Test::TCP';
+test_requires 'HTTP::Server::Simple::CGI';
 
 requires 'Any::Moose';
 requires 'AnyEvent';

@@ -5,6 +5,7 @@ use Modoi;
 use Modoi::Fetcher;
 use Coro;
 use LWP::UserAgent;
+use HTTP::Request::Common 'GET';
 
 has 'fetcher', (
     is  => 'rw',
@@ -67,7 +68,7 @@ sub do_prefetch {
 
     foreach my $uri ($self->extractor->extract($res)) {
         Modoi->log(debug => "prefetch $uri");
-        async { $self->fetcher->fetch_uri($uri) };
+        async { $self->fetcher->fetch(GET $uri) };
     }
 }
 
@@ -82,7 +83,7 @@ sub watch {
         interval => 180,
         cb => sub {
             Modoi->log(info => "crawl $uri");
-            my $res = $self->fetcher->fetch_uri($uri);
+            my $res = $self->fetcher->fetch(GET $uri, Cache_Control => 'no-cache');
             if ($res->is_error) {
                 Modoi->log(notice => "unwatch $uri");
                 undef $w;

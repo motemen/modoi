@@ -6,6 +6,7 @@ use Modoi::Extractor;
 
 use Coro;
 use Coro::AnyEvent;
+use Coro::Semaphore;
 
 use List::MoreUtils qw(uniq);
 use HTTP::Status;
@@ -37,12 +38,18 @@ our %UriSemaphore;
 # XXX returns Fetch::URI::Response
 sub fetch_cache {
     my ($self, $uri) = @_;
-    URI::Fetch->fetch("$uri", Cache => $self->cache, ForceResponse => 1, NoNetwork => 1);
+    $self->_fetch_simple($uri, NoNetwork => 1);
 }
 
-sub fetch_uri {
-    my ($self, $uri) = @_;
-    $self->fetch(GET $uri);
+sub _fetch_simple {
+    my ($self, $uri, %args) = @_;
+    URI::Fetch->fetch(
+        "$uri",
+        Cache         => $self->cache,
+        ForceResponse => 1,
+        UserAgent     => $self->ua,
+        %args,
+    );
 }
 
 # TODO ながい
@@ -52,19 +59,18 @@ sub fetch {
     my %fetch_args = (
         ETag          => scalar $req->header('If-None-Match'),
         LastModified  => scalar $req->header('If-Modified-Since'),
-        Cache         => $self->cache,
-        UserAgent     => $self->ua,
-        ForceResponse => 1,
     );
 
-    if (my $cache_res = $self->fetch_cache($req->uri)) {
-        if (($cache_res->content_type || '') =~ /^image\//) { # TODO
-            if ($fetch_args{Etags} || $fetch_args{LastModified}) {
-                Modoi->log(debug => 'return NOT MODIFIED for ' . $req->uri);
-                return HTTP::Response->new(RC_NOT_MODIFIED);
-            } else {
-                Modoi->log(debug => 'server cache for ' . $req->uri);
-                return $cache_res->as_http_response;
+    if (_may_serve_cache($req)) {
+        if (my $cache_res = $self->fetch_cache($req->uri)) {
+            if (($cache_res->content_type || '') =~ /^image\//) { # TODO
+                if (_may_return_not_modified($req)) {
+                    Modoi->log(debug => 'return NOT MODIFIED for ' . $req->uri);
+                    return HTTP::Response->new(RC_NOT_MODIFIED);
+                } else {
+                    Modoi->log(debug => 'serve cache for ' . $req->uri);
+                    return $cache_res->as_http_response;
+                }
             }
         }
     }
@@ -72,16 +78,13 @@ sub fetch {
     Modoi->log(debug => '>>> fetch ' . $req->uri);
 
     $UriSemaphore{$req->uri} ||= Coro::Semaphore->new;
-    if ($UriSemaphore{$req->uri}->count == 0) {
+    if ($UriSemaphore{$req->uri}->count <= 0) {
         Modoi->log(debug => $req->uri . ': currently fetching');
-        $fetch_args{NoNetwork} = 1;
+        $fetch_args{NoNetwork} = 1; # キャッシュを期待する
     }
 
-    $UriSemaphore{$req->uri}->down;
-
-    my $fetch_res = URI::Fetch->fetch($req->uri, %fetch_args);
-
-    $UriSemaphore{$req->uri}->up;
+    my $guard = $UriSemaphore{$req->uri}->guard;
+    my $fetch_res = $self->_fetch_simple($req->uri, %fetch_args);
 
     Modoi->log(debug => '<<< ' . $req->uri . ' (' . ($fetch_res ? $fetch_res->http_status || 'cache' : 404) . ')');
 
@@ -104,11 +107,19 @@ sub fetch {
 }
 
 sub _should_serve_content {
-    my ($req) = @_;
+    my $req = shift;
+    !_may_serve_cache($req) && !_may_return_not_modified($req);
+}
 
-    ($req->header('Pragma')        || '') eq 'no-cache' ||
-    ($req->header('Cache-Control') || '') eq 'no-cache' ||
-    !$req->header('If-Modified-Since');
+sub _may_return_not_modified {
+    my $req = shift;
+    $req->header('If-None-Match') || $req->header('If-Modified-Since');
+}
+
+sub _may_serve_cache {
+    my $req = shift;
+    ($req->header('Pragma')        || '') ne 'no-cache' &&
+    ($req->header('Cache-Control') || '') ne 'no-cache';
 }
 
 sub logger_name {
