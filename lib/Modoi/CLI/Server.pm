@@ -3,6 +3,7 @@ use Any::Moose;
 
 with any_moose('X::Getopt');
 
+use Modoi;
 use Modoi::Server;
 
 has 'port', (
@@ -47,7 +48,9 @@ sub run {
 #       Coro::Debug->require or die $@;
 #       our $coro_debug_server = Coro::Debug->new_tcp_server($self->coro_debug_port);
 #   }
-    $self->server->run;
+    my $server = $self->server;
+    Modoi->context->server($server);
+    $server->run;
 }
 
 1;

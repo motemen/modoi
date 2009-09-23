@@ -9,6 +9,11 @@ has 'logger', (
     default => sub { Modoi::Logger->new },
 );
 
+has 'server', (
+    is  => 'rw',
+    isa => 'Modoi::Server',
+);
+
 __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
