@@ -106,6 +106,30 @@ sub fetch {
     $res;
 }
 
+# XXX
+sub cancel {
+    my ($class, $uri) = @_;
+    Modoi->log(info => "fetching $uri will be cancelled");
+    # TODO セマフォ削除…というかセマフォは LWP::UA::Coro にもっていくべきなのでは
+    LWP::UserAgent::AnyEvent::Coro->cancel($uri);
+}
+
+# XXX
+sub status {
+    my %status;
+    while (my ($uri, $sem) = each %UriSemaphore) {
+        next unless $sem->count == 0;
+        my $progress = LWP::UserAgent::AnyEvent::Coro->progress($uri);
+        my $status = $status{$uri} = {
+            current => $progress && $progress->[0] || 0,
+            total   => $progress && $progress->[1] || 0,
+        };
+        $status->{percentage} = 100 * $status->{current} / $status->{total} if $status->{current} && $status->{total};
+    }
+    \%status;
+}
+
+# TODO 別モジュールに？
 sub _should_serve_content {
     my $req = shift;
     !_may_serve_cache($req) && !_may_return_not_modified($req);
@@ -152,17 +176,41 @@ use AnyEvent::HTTP;
 use Coro;
 use Time::HiRes;
 
+our %Session;
+
 sub _agent { $AnyEvent::HTTP::USERAGENT }
+
+sub cancel {
+    my ($class, $uri) = @_;
+    if (my $guard = delete $Session{$uri}{guard}) {
+        undef $guard;
+    }
+}
+
+sub progress {
+    my ($class, $uri) = @_;
+    $Session{$uri}{progress};
+}
 
 sub send_request {
     my ($self, $request, $arg, $size) = @_;
 
     my $t = [ Time::HiRes::gettimeofday ];
 
-    http_request $request->method, $request->uri,
-        timeout => $self->timeout, headers => $request->headers, recurse => 0, Coro::rouse_cb;
+    my $uri = $request->uri;
+    my $data;
 
-    my ($data, $header) = Coro::rouse_wait;
+    $Session{$uri}{guard} = http_request $request->method, $uri,
+        timeout => $self->timeout, headers => $request->headers, recurse => 0,
+        on_body => sub {
+            my ($partial_data, $header) = @_;
+            $data .= $partial_data;
+            $Session{$uri}{progress} = [ length $data, $header->{'content-length'} ];
+            1;
+        },
+        Coro::rouse_cb;
+
+    (undef, my $header) = Coro::rouse_wait;
 
     my $response = HTTP::Response->new($header->{Status}, $header->{Reason}, [ %$header ], $data);
     $response->request($request);

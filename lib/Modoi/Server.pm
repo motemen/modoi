@@ -90,7 +90,7 @@ sub serve_internal {
         my $file = $req->uri->path;
         $file =~ s</$></index>;
         $file =~ s<^/+><>;
-        $res->content($mt->render_file("$file.mt", $self)->as_string);
+        $res->content($mt->render_file("$file.mt", Modoi->context)->as_string);
     }
     elsif ($req->uri->path eq '/fetcher/cancel') {
         if (my $uri = $req->param('uri')) {
