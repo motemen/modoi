@@ -65,7 +65,7 @@ sub handle_request {
         $res->content($@);
     }
     unless ($res->content) {
-        $res->content($res->code . ' ' . status_message($res->code));
+        $res->content($res->code . ' ' . (status_message($res->code) || $res->headers->header('Reason')));
     }
     $res;
 }
@@ -156,6 +156,20 @@ sub request_handler {
 sub run {
     my $self = shift;
     $self->engine->run;
+
+    # from Remedie
+    {
+        my $t; $t = AnyEvent->timer(
+            after    => 0,
+            interval => 1,
+            cb => sub {
+                scalar $t;
+                # just loop forever to avoid runaway processes
+                schedule;
+            },
+        );
+    }
+
     AnyEvent->condvar->wait;
 }
 

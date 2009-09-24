@@ -26,7 +26,7 @@ has 'cache', (
 has 'ua', (
     is  => 'rw',
     isa => 'LWP::UserAgent',
-    default => sub { LWP::UserAgent::AnyEvent::Coro->new },
+    default => sub { LWP::UserAgent::AnyEvent::Coro->new(timeout => 30) },
 );
 
 __PACKAGE__->meta->make_immutable;
@@ -175,6 +175,8 @@ use AnyEvent;
 use AnyEvent::HTTP;
 use Coro;
 use Time::HiRes;
+
+$AnyEvent::HTTP::MAX_PER_HOST = 8; # as Firefox default
 
 our %Session;
 
