@@ -90,7 +90,7 @@ sub fetch {
 
     my $http_status = $fetch_res->http_status || RC_OK;
 
-    if ($http_status == RC_NOT_FOUND) {
+    if ($http_status == RC_NOT_FOUND && _may_serve_cache($req)) {
         # serve cache
         Modoi->log(info => 'serving cache for ' . $req->uri);
         $fetch_res = $self->fetch_cache($req->uri) || $fetch_res;

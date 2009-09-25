@@ -45,7 +45,7 @@ sub watch {
                 Modoi->log(info => "crawl $uri");
                 my $res = $self->fetcher->fetch(GET $uri, Cache_Control => 'no-cache');
                 $self->on_response->($res);
-                $self->unwatch($uri) if $res->is_error;
+                $self->unwatch($uri) unless $res->is_success;
             },
         );
     };
