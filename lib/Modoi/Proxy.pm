@@ -73,6 +73,7 @@ sub do_prefetch {
 }
 
 # TODO 二重に監視しない
+# TODO Watcher へ
 sub watch {
     my ($self, $uri) = @_;
 
@@ -81,9 +82,10 @@ sub watch {
     my $w; $w = AnyEvent->timer(
         after    => 180,
         interval => 180,
-        cb => sub {
+        cb => unblock_sub {
             Modoi->log(info => "crawl $uri");
             my $res = $self->fetcher->fetch(GET $uri, Cache_Control => 'no-cache');
+  
             $self->do_prefetch($res);
             if ($res->is_error) {
                 Modoi->log(notice => "unwatch $uri");
