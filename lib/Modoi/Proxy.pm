@@ -3,6 +3,7 @@ use Any::Moose;
 
 use Modoi;
 use Modoi::Fetcher;
+use Modoi::Watcher;
 use Coro;
 use LWP::UserAgent;
 use HTTP::Request::Common 'GET';
@@ -19,6 +20,13 @@ has 'extractor', (
     default => sub { Modoi::Extractor->new },
 );
 
+has 'watcher', (
+    is  => 'rw',
+    isa => 'Modoi::Watcher',
+    lazy_build => 1,
+);
+
+# XXX これいるかなー
 has 'ua', (
     is  => 'rw',
     isa => 'LWP::UserAgent',
@@ -33,6 +41,11 @@ sub _build_fetcher {
     my $self = shift;
     require Cache::FileCache;
     Modoi::Fetcher->new(cache => Cache::FileCache->new);
+}
+
+sub _build_watcher {
+    my $self = shift;
+    Modoi::Watcher->new(fetcher => $self->fetcher, on_response => sub { $self->do_prefetch($_[0]) });
 }
 
 sub _build_ua {
@@ -52,7 +65,7 @@ sub process {
     };
 
     if ($res->is_success && $req->uri =~ m<2chan\.net/b/res/>) { # TODO
-        $self->watch($req->uri);
+        $self->watcher->watch($req->uri);
     }
 
     $self->do_prefetch($res);
@@ -70,29 +83,6 @@ sub do_prefetch {
         Modoi->log(debug => "prefetch $uri");
         async { $self->fetcher->fetch(GET $uri) };
     }
-}
-
-# TODO 二重に監視しない
-# TODO Watcher へ
-sub watch {
-    my ($self, $uri) = @_;
-
-    Modoi->log(notice => "watch $uri");
-
-    my $w; $w = AnyEvent->timer(
-        after    => 180,
-        interval => 180,
-        cb => unblock_sub {
-            Modoi->log(info => "crawl $uri");
-            my $res = $self->fetcher->fetch(GET $uri, Cache_Control => 'no-cache');
-  
-            $self->do_prefetch($res);
-            if ($res->is_error) {
-                Modoi->log(notice => "unwatch $uri");
-                undef $w;
-            }
-        },
-    );
 }
 
 1;
