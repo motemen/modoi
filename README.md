@@ -14,3 +14,5 @@ TODO
  * 静的ファイルは永続的にキャッシュ
  * スレ消えてもキャッシュを渡す
  * HTTP::Message にマッチできるルール
+
+vim: set filetype=markdown:

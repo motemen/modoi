@@ -3,6 +3,7 @@ use Any::Moose;
 
 use Modoi;
 use Modoi::Extractor;
+use Modoi::Util::HTTP qw(should_serve_content may_return_not_modified may_serve_cache);
 
 use Coro;
 use Coro::AnyEvent;
@@ -61,10 +62,10 @@ sub fetch {
         LastModified  => scalar $req->header('If-Modified-Since'),
     );
 
-    if (_may_serve_cache($req)) {
+    if (may_serve_cache($req)) {
         if (my $cache_res = $self->fetch_cache($req->uri)) {
             if (($cache_res->content_type || '') =~ /^image\//) { # TODO
-                if (_may_return_not_modified($req)) {
+                if (may_return_not_modified($req)) {
                     Modoi->log(debug => 'return NOT MODIFIED for ' . $req->uri);
                     return HTTP::Response->new(RC_NOT_MODIFIED);
                 } else {
@@ -90,7 +91,7 @@ sub fetch {
 
     my $http_status = $fetch_res->http_status || RC_OK;
 
-    if ($http_status == RC_NOT_FOUND && _may_serve_cache($req)) {
+    if ($http_status == RC_NOT_FOUND && may_serve_cache($req)) {
         # serve cache
         Modoi->log(info => 'serving cache for ' . $req->uri);
         $fetch_res = $self->fetch_cache($req->uri) || $fetch_res;
@@ -98,7 +99,7 @@ sub fetch {
 
     my $res = $fetch_res->as_http_response($req);
 
-    if (!$fetch_res->is_error && _should_serve_content($req)) {
+    if (!$fetch_res->is_error && should_serve_content($req)) {
         $res->code(RC_OK);
         $res->header(Content_Type => $fetch_res->content_type);
     }
@@ -127,23 +128,6 @@ sub status {
         $status->{percentage} = 100 * $status->{current} / $status->{total} if $status->{current} && $status->{total};
     }
     \%status;
-}
-
-# TODO 別モジュールに？
-sub _should_serve_content {
-    my $req = shift;
-    !_may_serve_cache($req) && !_may_return_not_modified($req);
-}
-
-sub _may_return_not_modified {
-    my $req = shift;
-    $req->header('If-None-Match') || $req->header('If-Modified-Since');
-}
-
-sub _may_serve_cache {
-    my $req = shift;
-    ($req->header('Pragma')        || '') ne 'no-cache' &&
-    ($req->header('Cache-Control') || '') ne 'no-cache';
 }
 
 sub logger_name {
