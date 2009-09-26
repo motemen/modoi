@@ -18,6 +18,7 @@ sub log {
     $self->logger->log(level => $level, message => "$message\n");
 }
 
+# TODO
 sub _build_logger {
     my $self = shift;
     my $logger = Log::Dispatch->new;

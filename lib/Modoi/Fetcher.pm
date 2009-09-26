@@ -64,6 +64,7 @@ sub fetch {
 
     if (may_serve_cache($req)) {
         if (my $cache_res = $self->fetch_cache($req->uri)) {
+            # if ($self->config->cond('serve_cache')->pass($cache_res)) {
             if (($cache_res->content_type || '') =~ /^image\//) { # TODO
                 if (may_return_not_modified($req)) {
                     Modoi->log(debug => 'return NOT MODIFIED for ' . $req->uri);

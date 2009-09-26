@@ -2,6 +2,7 @@ package Modoi::Watcher;
 use Any::Moose;
 
 use Modoi;
+use AnyEvent;
 use Coro;
 use HTTP::Request::Common;
 

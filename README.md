@@ -14,5 +14,7 @@ TODO
  * 静的ファイルは永続的にキャッシュ
  * スレ消えてもキャッシュを渡す
  * HTTP::Message にマッチできるルール
+ * URI::Fetch->fetch でリダイレクトされた場合の検出
+   * リダイレクトのあったものはキャッシュしない
 
 vim: set filetype=markdown:

@@ -26,4 +26,8 @@ sub log {
     $self->logger->log($level, "[$level] $pkg $message");
 }
 
+sub proxy   { shift->server->proxy  }
+sub fetcher { shift->proxy->fetcher }
+sub watcher { shift->proxy->watcher }
+
 1;
