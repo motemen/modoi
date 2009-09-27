@@ -65,7 +65,7 @@ sub handle_request {
         $res->content($@);
     }
     unless ($res->content) {
-        $res->content($res->code . ' ' . (status_message($res->code) || $res->headers->header('Reason')));
+        $res->content($res->code . ' ' . status_message($res->code));
     }
     $res;
 }

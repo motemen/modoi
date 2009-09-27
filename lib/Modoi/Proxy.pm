@@ -64,6 +64,10 @@ sub process {
         }
     };
 
+    if ($res->code =~ /^59\d$/) {
+        die $res->headers->header('Reason');
+    }
+
     # if ($res->is_success && $self->config->cond('watch')->pass($res)) {
     if ($res->is_success && $req->uri =~ m<2chan\.net/b/res/>) { # TODO
         $self->watcher->watch($req->uri);

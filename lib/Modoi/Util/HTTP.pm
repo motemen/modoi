@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(
 
 sub should_serve_content {
     my $req = shift;
-    !_may_serve_cache($req) && !_may_return_not_modified($req);
+    !may_serve_cache($req) && !may_return_not_modified($req);
 }
 
 sub may_return_not_modified {
