@@ -15,7 +15,7 @@
 <ul>
 ? $status = $context->server->proxy->watcher->status;
 ? foreach my $uri (keys %$status) {
-    <li><a href="<?= $uri ?>"><?= $uri ?></a></li>
+    <li><a href="<?= $uri ?>"><?= $uri ?></a> <?= Modoi::DB::Thread->new(uri => $uri)->load->summary ?></li>
 ? }
 </ul>
 

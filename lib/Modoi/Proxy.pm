@@ -90,7 +90,7 @@ sub process {
                 map { $_ => $thread_info->{$_} } @{Modoi::DB::Thread->meta->columns}
             );
             $thread->uri($req->uri);
-            $thread->save;
+            $thread->save($thread->load(speculative => 1) ?  ( update => 1 ) : ());
         }
     }
 

@@ -8,9 +8,9 @@ __PACKAGE__->register_db(
     type     => 'main',
     driver   => 'sqlite',
     database => './modoi.db', # TODO
-    connect_options => {
-        unicode => 1,
-    },
+#   connect_options => {
+#       unicode => 1,
+#   },
 );
 
 __PACKAGE__->default_domain('development');
