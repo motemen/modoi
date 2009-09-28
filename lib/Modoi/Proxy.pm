@@ -4,6 +4,9 @@ use Any::Moose;
 use Modoi;
 use Modoi::Fetcher;
 use Modoi::Watcher;
+use Modoi::Extractor;
+use Modoi::Parser;
+use Modoi::DB::Thread;
 use Coro;
 use LWP::UserAgent;
 use HTTP::Request::Common 'GET';
@@ -18,6 +21,12 @@ has 'extractor', (
     is  => 'rw',
     isa => 'Modoi::Extractor',
     default => sub { Modoi::Extractor->new },
+);
+
+has 'parser', (
+    is  => 'rw',
+    isa => 'Modoi::Parser',
+    default => sub { Modoi::Parser->new },
 );
 
 has 'watcher', (
@@ -71,6 +80,18 @@ sub process {
     # if ($res->is_success && $self->config->cond('watch')->pass($res)) {
     if ($res->is_success && $req->uri =~ m<2chan\.net/b/res/>) { # TODO
         $self->watcher->watch($req->uri);
+    }
+
+    # if ($res->is_success && $self->config->cond('store')->pass($res)) {
+    if ($res->is_success && $req->uri =~ m<2chan\.net/b/res/>) { # TODO
+        if (my $thread_info = $self->parser->parse($res)) {
+            # TODO ここでいい？
+            my $thread = Modoi::DB::Thread->new(
+                map { $_ => $thread_info->{$_} } @{Modoi::DB::Thread->meta->columns}
+            );
+            $thread->uri($req->uri);
+            $thread->save;
+        }
     }
 
     $self->do_prefetch($res);
