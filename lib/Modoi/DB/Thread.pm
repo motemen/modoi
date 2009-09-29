@@ -15,6 +15,14 @@ __PACKAGE__->meta->column('updated_on')->add_trigger(
     }
 );
 
+# XXX 虹裏限定じゃないですか!!
+sub catalog_thumbnail_uri {
+    my $self = shift;
+    my $uri = $self->thumbnail_uri;
+    $uri =~ s/thumb/cat/;
+    $uri;
+}
+
 package Modoi::DB::Thread::Manager;
 use base 'Rose::DB::Object::Manager';
 

@@ -1,7 +1,7 @@
 ? my ($content, %params) = @_;
 <html>
   <head>
-    <title>Modoi</title>
+    <title>Modoi<?= $params{title} ? " - $params{title}" : '' ?></title>
     <link rel="stylesheet" type="text/css" href="/css/futaba.css" />
   </head>
   <body>
