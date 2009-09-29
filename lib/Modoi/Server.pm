@@ -17,10 +17,11 @@ use LWP::MediaTypes;
 use Path::Class;
 use HTTP::Status;
 
-has 'config', (
-    is => 'rw',
-    default => sub { package_config(default => { host => '0.0.0.0' }) },
-);
+with 'Modoi::Role::Configurable';
+
+sub DEFAULT_CONFIG {
+    +{ host => '0.0.0.0' };
+}
 
 has 'engine', (
     is  => 'rw',

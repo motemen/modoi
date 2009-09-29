@@ -16,14 +16,16 @@ use HTTP::Request::Common qw(GET);
 use URI::Fetch;
 use UNIVERSAL::require;
 
+with 'Modoi::Role::Configurable';
+
+sub DEFAULT_CONFIG {
+    +{ cache => { module => 'Cache::MemoryCache' } };
+}
+
 has 'cache', (
     is  => 'rw',
     isa => 'Cache::Cache',
-    default => sub {
-        my $cache_config = package_config('cache');
-        $cache_config->{module}->require or die $@;
-        $cache_config->{module}->new($cache_config->{args});
-    },
+    lazy_build => 1,
 );
 
 has 'ua', (
@@ -35,6 +37,13 @@ has 'ua', (
 __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
+
+sub _build_cache {
+    my $self = shift;
+    my $cache_config = $self->config->{cache};
+    $cache_config->{module}->require or die $@;
+    $cache_config->{module}->new($cache_config->{args});
+}
 
 our %UriSemaphore;
 

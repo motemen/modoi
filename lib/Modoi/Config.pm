@@ -8,7 +8,9 @@ use Hash::Merge 'merge';
 our @EXPORT    = qw(package_config);
 our @EXPORT_OK = qw(config package_config);
 
-our $Config;
+our $Config = {};
+
+our $Caller;
 
 sub initialize {
     my $class = shift;
@@ -16,12 +18,11 @@ sub initialize {
 }
 
 sub config () {
-    croak 'Modoi::Config is not initialized' unless defined $Config;
     $Config;
 }
 
 sub package_config (@) {
-    my ($package) = caller;
+    my ($package) = $Caller || caller;
     $package =~ s/^Modoi:://;
 
     my $config = config->{lc $package} || {};
