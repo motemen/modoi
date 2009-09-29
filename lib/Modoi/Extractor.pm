@@ -49,3 +49,9 @@ sub extract {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Modoi::Extractor - スレッドからメディアを探しだす

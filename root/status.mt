@@ -28,6 +28,8 @@ h2 {
 ?   my $thread = Modoi::DB::Thread->new(uri => $uri)->load;
     <li>
     <a href="<?= $uri ?>"><span class="catalog-thumbnail-container"><img src="<?= $thread->catalog_thumbnail_uri ?>" /></span> <?= $thread->summary ?></a>
+    (<?= $thread->response_count ?>)
+    <?= $thread->created_on ?>
     </li>
 ? }
 </ul>

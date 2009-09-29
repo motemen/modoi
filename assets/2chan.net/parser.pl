@@ -4,11 +4,11 @@ sub build_scraper {
         process '//form/blockquote', summary       => 'TEXT';
         process '//form/input[@type="checkbox"]/following-sibling::node()[1]', created_on => [
             TEXT => sub {
-                my %dt; @dt{qw(year month day hour minute second)} = $_ =~ m"(\d+)/(\d+)/(\d+).*?(\d+):(\d+):(\d+)";
+                my %dt; @dt{qw(year month day hour minute second)} = m<(\d+)/(\d+)/(\d+).*?(\d+):(\d+):(\d+)>;
                 $dt{year} += 2000;
                 DateTime->new(%dt);
             }
         ];
-        process '//form//blockquote', 'bodies[]' => 'TEXT';
+        process '//form//blockquote', 'responses[]' => 'TEXT';
     };
 }
