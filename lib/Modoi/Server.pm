@@ -3,6 +3,7 @@ use Any::Moose;
 use Any::Moose 'X::Types::Path::Class';
 
 use Modoi;
+use Modoi::Config;
 use Modoi::Proxy;
 
 use AnyEvent;
@@ -18,6 +19,7 @@ use HTTP::Status;
 
 has 'config', (
     is => 'rw',
+    default => sub { package_config(default => { host => '0.0.0.0' }) },
 );
 
 has 'engine', (
@@ -41,7 +43,7 @@ has 'proxy', (
 has 'root', (
     is  => 'rw',
     isa => 'Path::Class::Dir',
-    default => sub { dir('root') },
+    default => sub { dir('root') }, # TODO
 );
 
 __PACKAGE__->meta->make_immutable;

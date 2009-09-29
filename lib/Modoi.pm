@@ -3,6 +3,8 @@ use strict;
 use warnings;
 use Modoi::Context;
 
+# XXX このパッケージなんなの…
+
 sub context { our $Context ||= Modoi::Context->new }
 
 sub log {

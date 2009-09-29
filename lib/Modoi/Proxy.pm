@@ -14,7 +14,7 @@ use HTTP::Request::Common 'GET';
 has 'fetcher', (
     is  => 'rw',
     isa => 'Modoi::Fetcher',
-    lazy_build => 1,
+    default => sub { Modoi::Fetcher->new },
 );
 
 has 'extractor', (
@@ -45,12 +45,6 @@ has 'ua', (
 __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
-
-sub _build_fetcher {
-    my $self = shift;
-    require Cache::FileCache;
-    Modoi::Fetcher->new(cache => Cache::FileCache->new);
-}
 
 sub _build_watcher {
     my $self = shift;

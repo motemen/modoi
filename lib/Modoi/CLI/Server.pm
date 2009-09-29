@@ -1,56 +1,59 @@
 package Modoi::CLI::Server;
 use Any::Moose;
 
-with any_moose('X::Getopt');
+with any_moose('X::Getopt::Strict');
 
 use Modoi;
+use Modoi::Config;
 use Modoi::Server;
 
-has 'port', (
-    traits => [ 'Getopt' ],
-    is  => 'rw',
-    isa => 'Int',
-    default => '3128',
-);
+use YAML;
 
-has 'host', (
-    traits => [ 'Getopt' ],
+has 'config_file', (
     is  => 'rw',
     isa => 'Str',
-    default => '0.0.0.0',
+    default => 'config.yaml',
+    metaclass   => 'Getopt',
+    cmd_flag    => 'config',
+    cmd_aliases => [ 'c' ],
 );
 
 has 'coro_debug_port', (
-    traits => [ 'Getopt' ],
     is  => 'rw',
     isa => 'Int',
     default => 0,
+    metaclass => 'Getopt',
+    cmd_flag  => 'coro-debug-port',
 );
 
 has 'server', (
     is  => 'rw',
     isa => 'Modoi::Server',
-    lazy_build => 1,
+    default => sub { Modoi::Server->new },
+    lazy    => 1,
 );
 
 __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
 
-sub _build_server {
+sub initialize_config {
     my $self = shift;
-    Modoi::Server->new(config => { host => $self->host, port => $self->port });
+    Modoi::Config->initialize(YAML::LoadFile $self->config_file);
 }
 
 sub run {
     my $self = shift;
+
     if ($self->coro_debug_port) {
         Coro::Debug->require or die $@;
         our $coro_debug_server = Coro::Debug->new_tcp_server($self->coro_debug_port);
     }
-    my $server = $self->server;
-    Modoi->context->server($server);
-    $server->run;
+
+    $self->initialize_config;
+
+    Modoi->context->server($self->server);
+    Modoi->context->server->run;
 }
 
 1;

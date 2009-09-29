@@ -10,6 +10,7 @@ test_requires 'HTTP::Server::Simple::CGI';
 requires 'Any::Moose';
 requires 'AnyEvent';
 requires 'Coro';
+requires 'Hash::Merge';
 requires 'HTML::TreeBuilder::XPath';
 requires 'HTTP::Engine';
 requires 'HTTP::Request::Common';
@@ -23,6 +24,6 @@ requires 'UNIVERSAL::require';
 requires 'URI::Fetch';
 requires 'YAML';
 
-requires_any_moose 'X::Getopt';
+requires_any_moose 'X::Getopt::Strict';
 
 WriteAll;

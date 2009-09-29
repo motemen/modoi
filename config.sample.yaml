@@ -1,0 +1,7 @@
+server:
+  port: 3128
+fetcher:
+  cache:
+    module: Cache::FileCache
+    args:
+      cache_root: .cache

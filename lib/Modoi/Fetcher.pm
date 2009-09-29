@@ -2,6 +2,7 @@ package Modoi::Fetcher;
 use Any::Moose;
 
 use Modoi;
+use Modoi::Config;
 use Modoi::Extractor;
 use Modoi::Util::HTTP qw(should_serve_content may_return_not_modified may_serve_cache);
 
@@ -19,8 +20,9 @@ has 'cache', (
     is  => 'rw',
     isa => 'Cache::Cache',
     default => sub {
-        Cache::MemoryCache->require or die $@;
-        Cache::MemoryCache->new;
+        my $cache_config = package_config('cache');
+        $cache_config->{module}->require or die $@;
+        $cache_config->{module}->new($cache_config->{args});
     },
 );
 
