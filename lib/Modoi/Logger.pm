@@ -11,7 +11,7 @@ sub DEFAULT_CONFIG {
             class     => 'Log::Dispatch::Screen',
             min_level => 'debug',
             stderr    => 1,
-            format    => '%m',
+            format    => '[%p] %m',
         },
     };
 }

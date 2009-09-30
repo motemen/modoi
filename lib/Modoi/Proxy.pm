@@ -79,7 +79,7 @@ sub process {
     # if ($res->is_success && $self->config->cond('store')->pass($res)) {
     if ($res->is_success && $req->uri =~ m<2chan\.net/b/res/>) { # TODO
         if (my $thread_info = $self->parser->parse($res)) {
-            # TODO ここでいい？
+            # TODO ここでいい？ → よくない
             my $thread = Modoi::DB::Thread->new(
                 map { $_ => $thread_info->{$_} } @{Modoi::DB::Thread->meta->columns}
             );

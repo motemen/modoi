@@ -18,7 +18,7 @@ requires 'HTTP::Response';
 requires 'HTTP::Status';
 requires 'LWP::UserAgent';
 requires 'List::MoreUtils';
-requires 'Log::Dispatch';
+requires 'Log::Dispatch::Config';
 requires 'Path::Class';
 requires 'UNIVERSAL::require';
 requires 'URI::Fetch';

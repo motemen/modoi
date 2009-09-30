@@ -23,7 +23,7 @@ sub log {
     my $pkg = caller;
     $pkg = caller 1 if $pkg eq 'Modoi';
     $pkg = $pkg->logger_name if $pkg->can('logger_name');
-    $self->logger->log($level, "[$level] $pkg $message");
+    $self->logger->log($level, "$pkg $message");
 }
 
 sub proxy   { shift->server->proxy  }
