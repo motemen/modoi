@@ -1,7 +1,20 @@
 package Modoi::Logger;
 use Any::Moose;
-use Log::Dispatch;
-use Log::Dispatch::Screen;
+use Log::Dispatch::Config;
+
+with 'Modoi::Role::Configurable';
+
+sub DEFAULT_CONFIG {
+    +{
+        dispatchers => [ 'screen' ], 
+        screen => {
+            class     => 'Log::Dispatch::Screen',
+            min_level => 'debug',
+            stderr    => 1,
+            format    => '%m',
+        },
+    };
+}
 
 has 'logger', (
     is  => 'rw',
@@ -18,12 +31,28 @@ sub log {
     $self->logger->log(level => $level, message => "$message\n");
 }
 
-# TODO
 sub _build_logger {
     my $self = shift;
-    my $logger = Log::Dispatch->new;
-    $logger->add(Log::Dispatch::Screen->new(name => 'screen', min_level => 'debug'));
-    $logger;
+    Log::Dispatch::Config->configure(Log::Dispatch::Configurator::HASH->new($self->config));
+    Log::Dispatch::Config->instance;
+}
+
+package Log::Dispatch::Configurator::HASH;
+use base 'Log::Dispatch::Configurator';
+
+sub new {
+    my ($class, $hash) = @_;
+    bless $hash, $class;
+}
+
+sub get_attrs_global {
+    my $self = shift;
+    +{ format => undef, dispatchers => $self->{dispatchers} || [] };
+}
+
+sub get_attrs {
+    my ($self, $name) = @_;
+    $self->{$name};
 }
 
 1;
