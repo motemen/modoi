@@ -1,9 +1,7 @@
 package Modoi::Config;
 use strict;
 use warnings;
-use Exporter::Lite;
 use Carp;
-use Hash::Merge 'merge';
 
 our @EXPORT    = qw(package_config);
 our @EXPORT_OK = qw(config package_config);
@@ -11,6 +9,14 @@ our @EXPORT_OK = qw(config package_config);
 our $Config = {};
 
 our $Caller;
+
+sub import {
+    if (@_ > 1 && ref $_[-1] eq 'HASH') {
+        $_[0]->initialize(pop);
+    }
+    require Exporter::Lite;
+    goto \&Exporter::Lite::import;
+}
 
 sub initialize {
     my $class = shift;
@@ -33,8 +39,20 @@ sub package_config (@) {
         $config->{$_[0]};
     } else {
         my %option = @_;
-        merge +{ %$config }, $option{default};
+        _merge($config, $option{default});
     }
+}
+
+sub _merge {
+    my ($this, $that) = @_;
+    return $that unless defined $this;
+    return $this unless ref $that eq 'HASH';
+
+    my %merged = (%$this, %$that);
+    foreach (keys %merged) {
+        $merged{$_} = _merge($this->{$_}, $that->{$_});
+    }
+    \%merged;
 }
 
 1;

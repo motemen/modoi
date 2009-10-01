@@ -99,6 +99,13 @@ sub fetch {
     my $guard = $UriSemaphore{$req->uri}->guard;
     my $fetch_res = $self->_fetch_simple($req->uri, %fetch_args);
 
+    unless ($fetch_res) {
+        # おそらく別の Coro が fetch 中だったけど失敗したのでキャッシュを取得できなかったという状況
+        die q<Can't happen> unless $fetch_args{NoNetwork} == 1;
+        undef $guard;
+        return $self->fetch($req);
+    }
+
     Modoi->log(debug => '<<< ' . $req->uri . ' (' . ($fetch_res ? $fetch_res->http_status || 'cache' : 404) . ')');
 
     my $http_status = $fetch_res->http_status || RC_OK;

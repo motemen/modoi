@@ -8,7 +8,7 @@ requires 'DEFAULT_CONFIG';
 has 'config', (
     is  => 'rw',
     isa => 'HashRef',
-    builder => '_build_config',
+    lazy_build => 1,
 );
 
 sub _build_config {

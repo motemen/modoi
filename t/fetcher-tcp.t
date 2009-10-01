@@ -1,10 +1,15 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 15;
 use Test::TCP;
 use LWP::Simple 'get';
 use HTTP::Request::Common;
 use Coro;
+
+use Modoi::Config {
+    logger => { dispatchers => [] }
+};
+
 
 test_tcp
 
@@ -15,13 +20,13 @@ server => sub {
 
 client => sub {
     local $Test::Builder::Level = $Test::Builder::Level + 3;
-    use subs 'set_next';
 
     use_ok 'Modoi::Fetcher';
 
     my $port = shift;
     my $uri = "http://localhost:$port/";
 
+    use subs 'set_next';
     local *set_next = sub {
         my $uri = URI->new($uri . 'set_next');
            $uri->query_form(@_);
@@ -54,19 +59,36 @@ client => sub {
     $res = $fetcher->fetch(GET $uri);
     is $res->code, 200, '404 が返ってきてもキャッシュを返却';
 
-    set_next sleep => 2, content => 'sleeping';
-    my $first;
-    my $f1 = async {
-        my $res = $fetcher->fetch(GET $uri . 'sleep');
-        $first++;
-        is $res->content, "sleeping\n", '最初の fetch()';
-    };
-    my $f2 = async {
-        $res = $fetcher->fetch(GET $uri . 'sleep');
-        ok $first,                      '最初の fetch() が完了するまで待つ';
-        is $res->content, "sleeping\n", 'かつ、キャッシュを取得';
-    };
-    $f1->join;
+    {
+        set_next sleep => 1, content => 'sleeping';
+        my $first_request_done;
+        my $f1 = async {
+            my $res = $fetcher->fetch(GET $uri . 'sleep');
+            $first_request_done++;
+            is $res->content, "sleeping\n", '最初の fetch()';
+        };
+        my $f2 = async {
+            my $res = $fetcher->fetch(GET $uri . 'sleep');
+            ok $first_request_done,         '最初の fetch() が完了するまで待つ';
+            is $res->content, "sleeping\n", 'かつ、キャッシュを取得';
+        };
+        $f1->join;
+        $f2->join;
+    }
+
+    {
+        set_next sleep => 1, code => 500, content => 'ise';
+        my $f1 = async {
+            my $res = $fetcher->fetch(GET $uri . 'sleep_ise');
+            is $res->content, undef,         '最初の fetch() は失敗するけど…';
+        };
+        my $f2 = async {
+            my $res = $fetcher->fetch(GET $uri . 'sleep_ise');
+            like $res->content, qr/^\d+\n$/, '次の fetch() はキャッシュがないのを知ってちゃんとリクエスト';
+        };
+        $f1->join;
+        $f2->join;
+    }
 };
 
 package HTTPMock;
