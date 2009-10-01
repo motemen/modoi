@@ -20,7 +20,9 @@ sub import {
 
 sub initialize {
     my $class = shift;
-    $Config = $_[0] || {};
+    foreach (@_) {
+        $Config = _merge($Config, $_);
+    }
 }
 
 sub config () {

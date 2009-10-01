@@ -18,6 +18,15 @@ has 'config_file', (
     cmd_aliases => [ 'c' ],
 );
 
+has 'extra_config', (
+    is  => 'rw',
+    isa => 'HashRef',
+    required => 1,
+    default => sub { +{} },
+    metaclass   => 'Getopt',
+    cmd_aliases => [ 'o' ],
+);
+
 has 'coro_debug_port', (
     is  => 'rw',
     isa => 'Int',
@@ -39,7 +48,15 @@ no Any::Moose;
 
 sub initialize_config {
     my $self = shift;
-    Modoi::Config->initialize(YAML::LoadFile $self->config_file);
+    my $config = -e $self->config_file ? YAML::LoadFile $self->config_file : {};
+    my $extra_config;
+    while (my ($key, $value) = each %{$self->extra_config}) {
+        my @keys = split /\./, $key;
+        my $c = $extra_config ||= {};
+        $c = $c->{ shift @keys } ||= {} until @keys == 1;
+        $c->{ shift @keys } = $value;
+    }
+    Modoi::Config->initialize($config, $extra_config);
 }
 
 sub run {
