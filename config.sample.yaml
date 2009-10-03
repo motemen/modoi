@@ -5,3 +5,5 @@ fetcher:
     module: Cache::FileCache
     args:
       cache_root: .cache
+  serve_cache:
+    content_type: image/*

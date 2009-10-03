@@ -10,6 +10,8 @@ test_requires 'HTTP::Server::Simple::CGI';
 requires 'Any::Moose';
 requires 'AnyEvent';
 requires 'Coro';
+requires 'DateTime';
+requires 'DateTime::Format::HTTP';
 requires 'HTML::TreeBuilder::XPath';
 requires 'HTTP::Engine';
 requires 'HTTP::Request::Common';

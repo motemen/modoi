@@ -4,7 +4,7 @@ use Any::Moose;
 use Modoi;
 use Modoi::Config;
 use Modoi::Extractor;
-use Modoi::Util::HTTP qw(should_serve_content may_return_not_modified may_serve_cache);
+use Modoi::Util::HTTP qw(should_serve_content may_return_not_modified may_serve_cache one_year_from_now);
 
 use Coro;
 use Coro::AnyEvent;
@@ -75,14 +75,15 @@ sub fetch {
 
     if (may_serve_cache($req)) {
         if (my $cache_res = $self->fetch_cache($req->uri)) {
-            # if ($self->config->cond('serve_cache')->pass($cache_res)) {
-            if (($cache_res->content_type || '') =~ /^image\//) { # TODO
+            if ($self->config->condition('serve_cache')->pass($cache_res)) {
                 if (may_return_not_modified($req)) {
                     Modoi->log(debug => 'return NOT MODIFIED for ' . $req->uri);
                     return HTTP::Response->new(RC_NOT_MODIFIED);
                 } else {
                     Modoi->log(debug => 'serve cache for ' . $req->uri);
-                    return $cache_res->as_http_response;
+                    my $res = $cache_res->as_http_response;
+                    $res->headers->header(Expires => one_year_from_now);
+                    return $res;
                 }
             }
         }
@@ -121,6 +122,10 @@ sub fetch {
     if (!$fetch_res->is_error && should_serve_content($req)) {
         $res->code(RC_OK);
         $res->header(Content_Type => $fetch_res->content_type);
+    }
+
+    if ($self->config->condition('serve_cache')->pass($res)) {
+        $res->headers->header(Expires => one_year_from_now);
     }
 
     $res;

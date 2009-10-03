@@ -1,13 +1,16 @@
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 17;
 use Test::TCP;
 use LWP::Simple 'get';
 use HTTP::Request::Common;
 use Coro;
 
 use Modoi::Config {
-    logger => { dispatchers => [] }
+    logger  => { dispatchers => [] },
+    fetcher => {
+        serve_cache => { content_type => 'image/*' },
+    },
 };
 
 
@@ -42,7 +45,10 @@ client => sub {
     }
 
     my $fetcher = Modoi::Fetcher->new;
-    isa_ok $fetcher->cache, 'Cache::MemoryCache';
+
+    isa_ok $fetcher->cache,  'Cache::MemoryCache';
+    isa_ok $fetcher->config, 'Modoi::Config::Object';
+    isa_ok $fetcher->config->condition('serve_cache'), 'Modoi::Condition';
     
     my $res;
 
