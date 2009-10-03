@@ -31,17 +31,14 @@ config.yaml
 	server:
 	  port: 3128
 	proxy:
-	  serve_cache:
+	  persistent:
 	    content_type: image/*
 	  rule:
-	    - host: 2chan.net$
+	    - host: \b2chan.net$
 	    - host: ^www.nijibox\d+.com$
 	fetcher:
 	  serve_cache:
 	    - content_type: image/*
-	  watch:
-	    host: *.2chan.net
-	    content_type: text/html
 	fetcher:
 	  cache:
 	    module: Cache::File
@@ -49,6 +46,9 @@ config.yaml
 	      cache_root: .cache
 	watcher:
 	  interval: 180
+	  rule:
+	    host: *.2chan.net
+	    content_type: text/html
 	logger:
 	  min_level: debug
 
