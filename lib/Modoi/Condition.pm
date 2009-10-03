@@ -7,18 +7,20 @@ subtype 'Modoi::Types::Condition::Regexp'
 
 coerce 'Modoi::Types::Condition::Regexp'
     => from 'Str',
-    => via \&_make_regexp;
+    => via \&make_regexp;
 
 has 'host', (
     is  => 'rw',
     isa => 'Modoi::Types::Condition::Regexp',
     coerce => 1,
+    from_uri => 1,
 );
 
 has 'path', (
     is  => 'rw',
     isa => 'Modoi::Types::Condition::Regexp',
     coerce => 1,
+    from_uri => 1,
 );
 
 has 'content_type', (
@@ -33,10 +35,30 @@ no Any::Moose;
 
 sub pass {
     my ($self, $message) = @_;
-    # TODO
+
+    foreach my $attr ($self->meta->get_all_attributes) {
+        my $name = $attr->name;
+        my $regexp = $self->$name or next;
+        return unless _message_attr($message, $attr) =~ $regexp;
+    }
+
+    1;
 }
 
-sub _make_regexp {
+sub _message_attr {
+    my ($message, $attr) = @_;
+    my $name = $attr->name;
+
+    if ($attr->{from_uri}) {
+        $message->isa('HTTP::Response')
+            ? $message->request->uri->$name
+            : $message->uri->$name;
+    } else {
+        $message->$name;
+    }
+}
+
+sub make_regexp {
     my $pattern = shift;
     return qr/$pattern/ if _seems_like_regexp($pattern);
     $pattern =~ s/(?<!\\)\*/.*?/g;
