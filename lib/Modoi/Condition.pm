@@ -39,7 +39,9 @@ sub pass {
     foreach my $attr ($self->meta->get_all_attributes) {
         my $name = $attr->name;
         my $regexp = $self->$name or next;
-        return unless _message_attr($message, $attr) =~ $regexp;
+        my $value = _message_attr($message, $attr);
+        $value = '' unless defined $value;
+        return unless $value =~ $regexp;
     }
 
     1;

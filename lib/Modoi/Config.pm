@@ -58,3 +58,9 @@ sub _merge {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Modoi::Config - modoi のグローバルなコンフィグ
