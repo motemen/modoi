@@ -6,7 +6,6 @@ use Modoi::Fetcher;
 use Modoi::Watcher;
 use Modoi::Extractor;
 use Coro;
-use LWP::UserAgent;
 use HTTP::Request::Common 'GET';
 
 has 'fetcher', (
@@ -27,13 +26,6 @@ has 'watcher', (
     lazy_build => 1,
 );
 
-# XXX これいるかなー
-has 'ua', (
-    is  => 'rw',
-    isa => 'LWP::UserAgent',
-    lazy_build => 1,
-);
-
 __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
@@ -43,19 +35,16 @@ sub _build_watcher {
     Modoi::Watcher->new(fetcher => $self->fetcher, on_response => sub { $self->do_prefetch($_[0]) });
 }
 
-sub _build_ua {
-    LWP::UserAgent->new(env_proxy => 1);
-}
-
 sub process {
     my ($self, $req) = @_;
 
     my $res = do {
-        # TODO should not use fetcher for pages that may redirect
+        local $LWP::UserAgent::AnyEvent::Coro::UserAgent = $req->headers->header('User-Agent');
         if (uc $req->method eq 'GET') {
-            $self->fetcher->fetch($req);
+            my $res = $self->fetcher->fetch($req);
+            [ $res->redirects ]->[0] || $res;
         } else {
-            $self->ua->simple_request($req);
+            $self->fetcher->simple_request($req);
         }
     };
 

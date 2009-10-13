@@ -48,6 +48,11 @@ sub _build_cache {
 
 our %UriSemaphore;
 
+sub simple_request {
+    my $self = shift;
+    $self->ua->simple_request(@_);
+}
+
 # XXX returns Fetch::URI::Response
 sub fetch_cache {
     my ($self, $uri) = @_;
@@ -109,7 +114,7 @@ sub fetch {
         return $self->fetch($req);
     }
 
-    Modoi->log(debug => '<<< ' . $req->uri . ' (' . ($fetch_res ? $fetch_res->http_status || '200 (cache)' : 404) . ')');
+    Modoi->log(debug => '<<< ' . $req->uri . ' (' . ($fetch_res ? $fetch_res->http_status || '200, cache' : 404) . ')');
 
     my $http_status = $fetch_res->http_status || RC_OK;
 
@@ -202,8 +207,7 @@ use Time::HiRes;
 $AnyEvent::HTTP::MAX_PER_HOST = 8; # as Firefox default
 
 our %Session;
-
-sub _agent { $AnyEvent::HTTP::USERAGENT }
+our $UserAgent;
 
 sub cancel {
     my ($class, $uri) = @_;
@@ -218,12 +222,19 @@ sub progress {
 }
 
 sub send_request {
-    my ($self, $request, $arg, $size) = @_;
+    my $self = shift;
+    my ($request, $arg, $size) = @_;
+
+    if (uc $request->method ne 'GET') {
+        return $self->SUPER::send_request(@_);
+    }
 
     my $t = [ Time::HiRes::gettimeofday ];
 
     my $uri = $request->uri;
     my $data;
+
+    $request->headers->header(User_Agent => $UserAgent) if $UserAgent;
 
     $Session{$uri}{guard} = http_request $request->method, $uri,
         timeout => $self->timeout, headers => $request->headers, recurse => 0,
