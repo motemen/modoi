@@ -5,6 +5,7 @@ use Any::Moose 'X::Types::Path::Class';
 use Modoi;
 use Modoi::Config;
 use Modoi::Proxy;
+use Modoi::App;
 
 use AnyEvent;
 use Coro;
@@ -87,13 +88,17 @@ sub serve_internal {
 
     # XXX まったくてきとう
 
-    if ($req->uri->path =~ qr<^/(?:status)?$>) {
+    if ($req->uri->path =~ qr<^/(?:status|threads)?$>) {
         use Text::MicroTemplate::File;
         my $mt = Text::MicroTemplate::File->new(include_path => [ $self->root ]);
         my $file = $req->uri->path;
         $file =~ s</$></index>;
         $file =~ s<^/+><>;
-        $res->content($mt->render_file("$file.mt", Modoi->context)->as_string);
+        my $app = do {
+            my $app_class = app(map ucfirst, split '/', $file);
+            $app_class->new if $app_class;
+        };
+        $res->content($mt->render_file("$file.mt", Modoi->context, $app)->as_string);
     }
     elsif ($req->uri->path eq '/fetcher/cancel') {
         if (my $uri = $req->param('uri')) {
