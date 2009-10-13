@@ -9,6 +9,13 @@ sub build_scraper {
                 DateTime->new(%dt);
             }
         ];
+        process '//form/table[@border="0"][last()]//input[@type="checkbox"]/following-sibling::text()', updated_on => [
+            TEXT => sub {
+                my %dt; @dt{qw(year month day hour minute second)} = m<(\d+)/(\d+)/(\d+).*?(\d+):(\d+):(\d+)>;
+                $dt{year} += 2000;
+                DateTime->new(%dt);
+            }
+        ];
         process '//form//blockquote', 'responses[]' => 'TEXT';
     };
 }

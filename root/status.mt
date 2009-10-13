@@ -10,6 +10,10 @@
     vertical-align: middle;
 }
 
+span.timestamp {
+    font-size: smaller;
+}
+
 li {
     margin: 15px auto;
 }
@@ -27,9 +31,9 @@ h2 {
 ? foreach my $uri (keys %$status) {
 ?   my $thread = Modoi::DB::Thread->new(uri => $uri)->load;
     <li>
-    <a href="<?= $uri ?>"><span class="catalog-thumbnail-container"><img src="<?= $thread->catalog_thumbnail_uri ?>" /></span> <?= $thread->summary ?></a>
+    <a href="<?= $uri ?>"><span class="catalog-thumbnail-container"><img src="<?= $thread->catalog_thumbnail_uri ?>" /></span></a> <a href="<?= $uri ?>"><?= $thread->summary ?></a>
     (<?= $thread->response_count ?>)
-    <?= $thread->created_on ?>
+    <span class="timestamp"><?= $thread->created_on ?></span>/<span class="timestamp"><?= $thread->updated_on ?></span>
     </li>
 ? }
 </ul>
