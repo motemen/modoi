@@ -71,9 +71,8 @@ sub process {
         die $res->headers->header('Reason');
     }
 
-    # if ($res->is_success && $self->config->cond('watch')->pass($res)) {
-    if ($res->is_success && $req->uri =~ m<2chan\.net/b/res/>) { # TODO
-        $self->watcher->watch($req->uri);
+    if (($res->headers->header('X-Modoi-Source') || '') ne 'cache') {
+        $self->watcher->start_watching_if_necessary($res);
     }
 
     # if ($res->is_success && $self->config->cond('store')->pass($res)) {

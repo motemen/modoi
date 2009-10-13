@@ -1,6 +1,8 @@
 package Modoi::Watcher;
 use Any::Moose;
 
+with 'Modoi::Role::Configurable';
+
 use Modoi;
 use AnyEvent;
 use Coro;
@@ -33,6 +35,14 @@ has 'on_response', (
 __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
+
+sub DEFAULT_CONFIG { +{} }
+
+sub start_watching_if_necessary {
+    my ($self, $res) = @_;
+    return unless $self->config->condition('watch')->pass($res);
+    $self->watch($res->request->uri);
+}
 
 sub watch {
     my ($self, $uri) = @_;

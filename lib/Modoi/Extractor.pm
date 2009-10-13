@@ -3,14 +3,12 @@ use Any::Moose;
 
 with 'Modoi::Role::HasAsset';
 
-use HTML::TreeBuilder::XPath;
-use YAML;
-use Path::Class qw(file);
-use List::MoreUtils qw(uniq);
-
 __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
+
+use List::MoreUtils qw(uniq);
+use HTML::TreeBuilder::XPath;
 
 sub asset_name { 'extractor' }
 

@@ -53,7 +53,7 @@ sub _message_attr {
 
     if ($attr->{from_uri}) {
         $message->isa('HTTP::Response')
-            ? $message->request->uri->$name
+            ? $message->request && $message->request->uri->$name
             : $message->uri->$name;
     } else {
         $message->$name;

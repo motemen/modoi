@@ -107,14 +107,16 @@ sub fetch {
         return $self->fetch($req);
     }
 
-    Modoi->log(debug => '<<< ' . $req->uri . ' (' . ($fetch_res ? $fetch_res->http_status || 'cache' : 404) . ')');
+    Modoi->log(debug => '<<< ' . $req->uri . ' (' . ($fetch_res ? $fetch_res->http_status || '200 (cache)' : 404) . ')');
 
     my $http_status = $fetch_res->http_status || RC_OK;
 
+    my $from_cache;
     if ($http_status == RC_NOT_FOUND && may_serve_cache($req)) {
         # serve cache
         Modoi->log(info => 'serving cache for ' . $req->uri);
         $fetch_res = $self->fetch_cache($req->uri) || $fetch_res;
+        $from_cache++;
     }
 
     my $res = $fetch_res->as_http_response($req);
@@ -126,6 +128,10 @@ sub fetch {
 
     if ($self->config->condition('serve_cache')->pass($res)) {
         $res->headers->header(Expires => one_year_from_now);
+    }
+
+    if ($from_cache) {
+        $res->headers->header(X_Modoi_Source => 'cache');
     }
 
     $res;
