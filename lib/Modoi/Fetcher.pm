@@ -4,6 +4,7 @@ use Any::Moose;
 use Modoi;
 use Modoi::Config;
 use Modoi::Extractor;
+use Modoi::DB::Thread;
 use Modoi::Util::HTTP qw(should_serve_content may_return_not_modified may_serve_cache one_year_from_now);
 
 use Coro;
@@ -53,6 +54,7 @@ sub fetch_cache {
     $self->_fetch_simple($uri, NoNetwork => 1);
 }
 
+# TODO こいつが HTTP::Reponse を返したほうがよい？
 sub _fetch_simple {
     my ($self, $uri, %args) = @_;
     URI::Fetch->fetch(
@@ -122,16 +124,23 @@ sub fetch {
     my $res = $fetch_res->as_http_response($req);
 
     if (!$fetch_res->is_error && should_serve_content($req)) {
+        # えーとなんだっけ
         $res->code(RC_OK);
         $res->header(Content_Type => $fetch_res->content_type);
     }
 
     if ($self->config->condition('serve_cache')->pass($res)) {
+        # キャッシュを返してもよいコンテンツには Expires: ヘッダを付与してやる
         $res->headers->header(Expires => one_year_from_now);
     }
 
     if ($from_cache) {
+        # キャッシュから掘り起こされたコンテンツはマークしておく
         $res->headers->header(X_Modoi_Source => 'cache');
+    }
+
+    if ($res->is_success && !$fetch_args{NoNetwork}) {
+        Modoi::DB::Thread->save_response($res);
     }
 
     $res;

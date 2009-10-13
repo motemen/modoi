@@ -5,8 +5,6 @@ use Modoi;
 use Modoi::Fetcher;
 use Modoi::Watcher;
 use Modoi::Extractor;
-use Modoi::Parser;
-use Modoi::DB::Thread;
 use Coro;
 use LWP::UserAgent;
 use HTTP::Request::Common 'GET';
@@ -21,12 +19,6 @@ has 'extractor', (
     is  => 'rw',
     isa => 'Modoi::Extractor',
     default => sub { Modoi::Extractor->new },
-);
-
-has 'parser', (
-    is  => 'rw',
-    isa => 'Modoi::Parser',
-    default => sub { Modoi::Parser->new },
 );
 
 has 'watcher', (
@@ -73,19 +65,6 @@ sub process {
 
     if (($res->headers->header('X-Modoi-Source') || '') ne 'cache') {
         $self->watcher->start_watching_if_necessary($res);
-    }
-
-    # if ($res->is_success && $self->config->cond('store')->pass($res)) {
-    if ($res->is_success && $req->uri =~ m<2chan\.net/b/res/>) { # TODO
-        if (my $thread_info = $self->parser->parse($res)) {
-            # TODO ここでいい？ → よくない
-            my $thread = Modoi::DB::Thread->new(
-                map { $_ => $thread_info->{$_} } @{Modoi::DB::Thread->meta->columns}
-            );
-            $thread->uri($req->uri);
-            $thread->response_count(scalar @{$thread_info->{responses}});
-            $thread->save($thread->load(speculative => 1) ? ( update => 1 ) : ());
-        }
     }
 
     $self->do_prefetch($res);
