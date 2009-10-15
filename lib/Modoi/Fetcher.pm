@@ -159,19 +159,8 @@ sub cancel {
     LWP::UserAgent::AnyEvent::Coro->cancel($uri);
 }
 
-# XXX
-sub status {
-    my %status;
-    while (my ($uri, $sem) = each %UriSemaphore) {
-        next unless $sem->count == 0;
-        my $progress = LWP::UserAgent::AnyEvent::Coro->progress($uri);
-        my $status = $status{$uri} = {
-            current => $progress && $progress->[0] || 0,
-            total   => $progress && $progress->[1] || 0,
-        };
-        $status->{percentage} = 100 * $status->{current} / $status->{total} if $status->{current} && $status->{total};
-    }
-    \%status;
+sub uris_on_progress {
+    grep { $UriSemaphore{$_}->count == 0 } keys %UriSemaphore;
 }
 
 sub logger_name {

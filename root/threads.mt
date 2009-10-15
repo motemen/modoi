@@ -1,4 +1,4 @@
-? my ($context, $app) = @_;
+? my ($app) = @_;
 ? $_mt->wrapper_file('_wrapper.mt', title => 'Threads')->(sub {
 
 <style type="text/css">

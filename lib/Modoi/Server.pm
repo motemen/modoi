@@ -98,7 +98,7 @@ sub serve_internal {
             my $app_class = app(map ucfirst, split '/', $file);
             $app_class->new if $app_class;
         };
-        $res->content($mt->render_file("$file.mt", Modoi->context, $app)->as_string);
+        $res->content($mt->render_file("$file.mt", $app)->as_string);
     }
     elsif ($req->uri->path eq '/fetcher/cancel') {
         if (my $uri = $req->param('uri')) {

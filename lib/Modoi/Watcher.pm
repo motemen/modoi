@@ -70,6 +70,4 @@ sub unwatch {
     delete $self->timers->{$uri};
 }
 
-sub status { shift->timers }
-
 1;
