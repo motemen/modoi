@@ -1,4 +1,4 @@
-? my ($app) = @_;
+? my ($threads) = @_;
 ? $_mt->wrapper_file('_wrapper.mt', title => 'Threads')->(sub {
 
 <style type="text/css">
@@ -23,7 +23,7 @@ h2 {
 }
 </style>
 <ul>
-? foreach my $thread (@{Modoi->threads}) {
+? foreach my $thread (@$threads) {
     <li>
     <a href="<?= $thread->uri ?>"><span class="catalog-thumbnail-container"><img src="<?= $thread->catalog_thumbnail_uri ?>" /></span></a> <a href="<?= $thread->uri ?>"><?= $thread->summary ?></a>
     (<?= $thread->response_count ?>)

@@ -41,7 +41,7 @@ h2 {
 <ul>
 ? $status = Modoi->fetcher_status;
 ? while (my ($uri, $status) = each %$status) {
-    <li><a href="<?= $uri ?>"><?= $uri ?></a>: <?= $status->{percentage} ? sprintf '%.1f%%', $status->{percentage} : '-' ?> <a href="/fetcher/cancel?uri=<?= $uri ?>">cancel</a></li>
+    <li><a href="<?= $uri ?>"><?= $uri ?></a>: <?= $status->{percentage} ? sprintf '%.1f%%', $status->{percentage} : '-' ?></li>
 ? }
 </ul>
 

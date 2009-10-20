@@ -5,7 +5,6 @@ use Any::Moose 'X::Types::Path::Class';
 use Modoi;
 use Modoi::Config;
 use Modoi::Proxy;
-use Modoi::App;
 
 use AnyEvent;
 use Coro;
@@ -112,7 +111,7 @@ sub serve_internal {
 }
 
 sub render_html {
-    my ($self, $file) = @_;
+    my ($self, $file) = splice @_, 0, 2;
     $self->mt->render_file("$file.mt", @_)->as_string;
 }
 
@@ -123,7 +122,8 @@ sub serve_status {
 
 sub serve_threads {
     my ($self, $req, $res) = @_;
-    $res->content($self->render_html('threads'));
+    my $threads = Modoi->threads(limit => 50, offset => ($req->param('page') || 1) * 50);
+    $res->content($self->render_html('threads', $threads));
 }
 
 sub _build_middleware {
