@@ -14,7 +14,8 @@ use Coro::AnyEvent;
 use HTTP::Engine;
 use HTTP::Engine::Middleware;
 
-use LWP::MediaTypes;
+use Text::MicroTemplate::File;
+
 use Path::Class;
 use HTTP::Status;
 
@@ -46,6 +47,12 @@ has 'root', (
     is  => 'rw',
     isa => 'Path::Class::Dir',
     default => sub { dir('root') }, # TODO
+);
+
+has 'mt', (
+    is  => 'rw',
+    isa => 'Text::MicroTemplate::File',
+    lazy_build => 1,
 );
 
 __PACKAGE__->meta->make_immutable;
@@ -83,47 +90,41 @@ sub serve_proxy {
     $res->set_http_response($self->proxy->process($_req));
 }
 
+our @Route = (
+    '/status'  => \&serve_status,
+    '/threads' => \&serve_threads,
+);
+
 sub serve_internal {
     my ($self, $req, $res) = @_;
 
     # XXX まったくてきとう
 
-    if ($req->uri->path =~ qr<^/(?:status|threads)?$>) {
-        use Text::MicroTemplate::File;
-        my $mt = Text::MicroTemplate::File->new(include_path => [ $self->root ]);
-        my $file = $req->uri->path;
-        $file =~ s</$></index>;
-        $file =~ s<^/+><>;
-        my $app = do {
-            my $app_class = app(map ucfirst, split '/', $file);
-            $app_class->new if $app_class;
-        };
-        $res->content($mt->render_file("$file.mt", $app)->as_string);
-    }
-    elsif ($req->uri->path eq '/fetcher/cancel') {
-        if (my $uri = $req->param('uri')) {
-            $self->proxy->fetcher->cancel($uri);
-            $res->code(302);
-            $res->header(Location => '/status');
+    my @route = @Route;
+    while (my ($path, $handler) = splice @route, 0, 2) {
+        if ($req->uri->path eq $path) {
+            $self->$handler($req, $res);
+            return;
         }
     }
-    else {
-        die 'No route';
-    }
+
+    die 'No route';
 }
 
-# sub serve_static {
-#     my ($self, $req, $res) = @_;
-#     my $path = $req->uri->path;
-#     $path =~ s<^/$></index.html>;
-#     my $file = $self->root->file(split '/', $path);
-#     if (-e $file) {
-#         $res->content_type(guess_media_type("$file"));
-#         $res->content(scalar $file->slurp);
-#     } else {
-#         $res->code(404);
-#     }
-# }
+sub render_html {
+    my ($self, $file) = @_;
+    $self->mt->render_file("$file.mt", @_)->as_string;
+}
+
+sub serve_status {
+    my ($self, $req, $res) = @_;
+    $res->content($self->render_html('status'));
+}
+
+sub serve_threads {
+    my ($self, $req, $res) = @_;
+    $res->content($self->render_html('threads'));
+}
 
 sub _build_middleware {
     my $self = shift;
@@ -149,6 +150,11 @@ sub _build_engine {
             request_handler => $self->request_handler,
         }
     );
+}
+
+sub _build_mt {
+    my $self = shift;
+    Text::MicroTemplate::File->new(include_path => [ $self->root ]);
 }
 
 sub request_handler {

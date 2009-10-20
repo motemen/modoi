@@ -1,4 +1,3 @@
-? my ($app) = @_;
 ? $_mt->wrapper_file('_wrapper.mt', title => 'Status')->(sub {
 
 <style type="text/css">
@@ -27,7 +26,7 @@ h2 {
 
 <h2>Watcher</h2>
 <ul>
-? $status = $app->watcher_status;
+? $status = Modoi->watcher_status;
 ? foreach my $uri (keys %$status) {
 ?   my $thread = $status->{$uri};
     <li>
@@ -40,7 +39,7 @@ h2 {
 
 <h2>Fetcher</h2>
 <ul>
-? $status = $app->fetcher_status;
+? $status = Modoi->fetcher_status;
 ? while (my ($uri, $status) = each %$status) {
     <li><a href="<?= $uri ?>"><?= $uri ?></a>: <?= $status->{percentage} ? sprintf '%.1f%%', $status->{percentage} : '-' ?> <a href="/fetcher/cancel?uri=<?= $uri ?>">cancel</a></li>
 ? }
