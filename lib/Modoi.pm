@@ -37,9 +37,4 @@ sub watcher_status {
     \%status;
 }
 
-sub threads {
-    my $self = shift;
-    Modoi::DB::Thread::Manager->get_threads(sort_by => 'updated_on DESC', @_);
-}
-
 1;

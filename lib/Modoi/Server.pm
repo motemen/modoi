@@ -5,6 +5,7 @@ use Any::Moose 'X::Types::Path::Class';
 use Modoi;
 use Modoi::Config;
 use Modoi::Proxy;
+use Modoi::DB::Thread;
 
 use AnyEvent;
 use Coro;
@@ -122,7 +123,11 @@ sub serve_status {
 
 sub serve_threads {
     my ($self, $req, $res) = @_;
-    my $threads = Modoi->threads(limit => 50, offset => ($req->param('page') || 1) * 50);
+    my $threads = Modoi::DB::Thread::Manager->get_threads(
+        sort_by => 'updated_on DESC',
+        limit   => 50,
+        offset  => (($req->param('page') || 1) - 1) * 50,
+    );
     $res->content($self->render_html('threads', $threads));
 }
 
