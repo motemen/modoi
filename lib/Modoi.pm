@@ -32,7 +32,8 @@ sub watcher_status {
 
     my %status;
     foreach my $uri (keys %{$class->context->watcher->timers}) {
-        $status{$uri} = Modoi::DB::Thread->new(uri => $uri)->load;
+        my $thread = Modoi::DB::Thread->new(uri => $uri)->load(speculative => 1) or next;
+        $status{$uri} = $thread;
     }
     \%status;
 }

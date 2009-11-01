@@ -13,7 +13,6 @@ use Modoi::Config {
     },
 };
 
-
 test_tcp
 
 server => sub {

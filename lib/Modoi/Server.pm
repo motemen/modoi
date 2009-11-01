@@ -16,6 +16,7 @@ use HTTP::Engine::Middleware;
 
 use Text::MicroTemplate::File;
 
+use Encode;
 use Path::Class;
 use HTTP::Status;
 
@@ -70,10 +71,11 @@ sub handle_request {
     eval {
         $self->$serve($req, $res);
     };
-    if ($@) {
+    if (my $error = $@) {
+        Modoi->log(error => $error);
         $res->code(500);
-        $res->content_type('text/plain');
-        $res->content($@);
+        $res->content_type('text/plain; charset=utf8');
+        $res->content(Encode::is_utf8($error) ? encode_utf8($error) : $error);
     }
     unless ($res->content) {
         $res->content($res->code . ' ' . status_message($res->code));
