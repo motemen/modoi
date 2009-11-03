@@ -144,7 +144,7 @@ sub fetch {
         $res->headers->header(X_Modoi_Source => 'cache');
     }
 
-    if ($res->is_success && !$fetch_args{NoNetwork} && $self->config->condition('save_thread')->pass($res)) {
+    if ($res->is_success && !$fetch_args{NoNetwork} && !$from_cache && $self->config->condition('save_thread')->pass($res)) {
         Modoi->log(info => 'saving thread ' . $req->uri);
         Modoi::DB::Thread->save_response($res);
     }
