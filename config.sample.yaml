@@ -7,6 +7,9 @@ fetcher:
       cache_root: .cache
   serve_cache:
     content_type: image/*
+  save_thread:
+    host: '*.2chan.net'
+    path: /res/\d+\.htm$
 watcher:
   watch:
     host: '*.2chan.net'

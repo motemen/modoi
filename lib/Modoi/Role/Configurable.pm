@@ -13,6 +13,7 @@ has 'config', (
 
 use Any::Moose '::Util::TypeConstraints';
 
+# FIXME やっぱり気持ちわるい気がしてきた
 coerce class_type('Modoi::Config::Object')
     => from 'HashRef' => via { bless $_, 'Modoi::Config::Object' };
 
