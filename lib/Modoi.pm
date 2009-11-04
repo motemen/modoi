@@ -1,11 +1,22 @@
 package Modoi;
 use strict;
 use warnings;
-use Modoi::Context;
+use UNIVERSAL::require;
 
 # XXX このパッケージなんなの…
 
-sub context { our $Context ||= Modoi::Context->new }
+sub import {
+    my $class = shift;
+    foreach (@_) {
+        my $module = "$class\::$_";
+        $module->require or die $@;
+    }
+}
+
+sub context {
+    require Modoi::Context;
+    our $Context ||= Modoi::Context->new;
+}
 
 sub log {
     my $class = shift;
