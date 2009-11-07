@@ -52,9 +52,10 @@ sub _message_attr {
     my $name = $attr->name;
 
     if ($attr->{from_uri}) {
-        $message->isa('HTTP::Response')
-            ? $message->request && $message->request->uri->$name
-            : $message->uri->$name;
+        my $uri = $message->isa('HTTP::Response')
+            ? $message->request && $message->request->uri
+            : $message->uri;
+        $uri && $uri->can($name) && $uri->$name;
     } else {
         $message->$name;
     }

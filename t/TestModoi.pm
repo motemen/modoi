@@ -13,6 +13,7 @@ our @EXPORT_OK = qw(
     fake_http
     http_response_from_file
     yaml
+    ng
 );
 
 our @EXPORT = @EXPORT_OK;
@@ -64,6 +65,12 @@ sub fake_http ($;$) {
 
 sub yaml (@) {
     YAML::Dump @_;
+}
+
+sub ng ($;$) {
+    require Test::More;
+    local $Test::Builder::Level = $Test::Builder::Level + 2;
+    Test::More::ok !$_[0], $_[1];
 }
 
 1;

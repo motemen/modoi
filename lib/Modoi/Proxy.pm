@@ -5,8 +5,14 @@ use Modoi;
 use Modoi::Fetcher;
 use Modoi::Watcher;
 use Modoi::Extractor;
+
 use Coro;
+
+use URI;
 use HTTP::Request::Common 'GET';
+use HTML::TreeBuilder::XPath;
+
+with 'Modoi::Role::Configurable';
 
 has 'fetcher', (
     is  => 'rw',
@@ -29,6 +35,10 @@ has 'watcher', (
 __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
+
+sub DEFAULT_CONFIG {
+    +{ proxy => { host => '*.2chan.net' } };
+}
 
 sub _build_watcher {
     my $self = shift;
@@ -71,6 +81,27 @@ sub do_prefetch {
         Modoi->log(debug => "prefetch $uri");
         async { $self->fetcher->fetch(GET $uri) };
     }
+}
+
+sub rewrite_links {
+    my ($self, $res, $rewriter) = @_;
+
+    my $tree = HTML::TreeBuilder::XPath->new;
+    $tree->parse_content($res->content);
+
+    my @nodes = $tree->findnodes('//*[@href or @src]');
+    foreach my $node (@nodes) {
+        foreach my $attr (qw(href src)) {
+            if (my $uri = $node->attr($attr)) {
+                $uri = URI->new_abs($uri, $res->base);
+                if ($self->config->condition('proxy')->pass(GET $uri)) {
+                    $node->attr($attr => $rewriter->($uri));
+                }
+            }
+        }
+    }
+
+    $res->content($tree->root->as_HTML);
 }
 
 1;
