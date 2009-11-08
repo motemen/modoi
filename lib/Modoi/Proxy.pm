@@ -87,7 +87,7 @@ sub rewrite_links {
     my ($self, $res, $rewriter) = @_;
 
     my $tree = HTML::TreeBuilder::XPath->new;
-    $tree->parse_content($res->content);
+    $tree->parse_content($res->decoded_content);
 
     my @nodes = $tree->findnodes('//*[@href or @src]');
     foreach my $node (@nodes) {
@@ -95,6 +95,7 @@ sub rewrite_links {
             if (my $uri = $node->attr($attr)) {
                 $uri = URI->new_abs($uri, $res->base);
                 if ($self->config->condition('proxy')->pass(GET $uri)) {
+                    local $_ = $uri;
                     $node->attr($attr => $rewriter->($uri));
                 }
             }

@@ -95,6 +95,7 @@ sub serve_proxy {
 our @Route = (
     '/status'  => \&serve_status,
     '/threads' => \&serve_threads,
+    '/proxy'   => \&serve_rewriting_proxy,
 );
 
 sub serve_internal {
@@ -116,6 +117,27 @@ sub serve_internal {
 sub render_html {
     my ($self, $file) = splice @_, 0, 2;
     $self->mt->render_file("$file.mt", @_)->as_string;
+}
+
+sub serve_rewriting_proxy {
+    my ($self, $req, $res) = @_;
+
+    my $uri = $req->uri; # e.g. http://modoi:3128/proxy?http://img.2chan.nent/b/
+
+    my $_req = $req->as_http_request;
+    $_req->uri($uri->query);
+
+    my $_res = $self->proxy->process($_req);
+    if ($_res->header('Content-Type') eq 'text/html') {
+        $self->proxy->rewrite_links(
+            $_res, sub {
+                $uri->query($_);
+                "$uri";
+            }
+        );
+    }
+
+    $res->set_http_response($_res);
 }
 
 sub serve_status {
