@@ -7,6 +7,8 @@ __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
 
+use Modoi;
+
 sub asset_name { 'parser' }
 
 sub asset_module_uses { qw(DateTime Web::Scraper) }
@@ -14,10 +16,15 @@ sub asset_module_uses { qw(DateTime Web::Scraper) }
 sub parse {
     my ($self, $res) = @_;
 
+    Modoi->log(debug => 'parsing ' . $res->base);
+
     my $module  = $self->load_asset_module($res) or return;
     my $scraper = $module->build_scraper;
 
-    $scraper->scrape($res);
+    my $result = $scraper->scrape($res) or return;
+    return unless %$result;
+
+    $result;
 }
 
 1;

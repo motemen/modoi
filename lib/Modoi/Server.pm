@@ -17,6 +17,8 @@ use HTTP::Engine::Middleware;
 use Text::MicroTemplate::File;
 
 use Encode;
+Encode->import('is_utf8');
+
 use Path::Class;
 use HTTP::Status;
 
@@ -126,9 +128,14 @@ sub serve_rewriting_proxy {
 
     my $_req = $req->as_http_request;
     $_req->uri($uri->query);
+    $_req->uri('http://' . $_req->uri) unless $_req->uri =~ m<^\w+://>;
 
     my $_res = $self->proxy->process($_req);
     if ($_res->header('Content-Type') eq 'text/html') {
+        if ($req->header('User-Agent') =~ /iPhone/ && (my $thread = eval { Modoi->context->parser->parse($_res) })) {
+            my $content = $self->render_html('iphone/thread', $thread);
+            $_res->content(is_utf8($content) ? encode_utf8($content) : $content);
+        }
         $self->proxy->rewrite_links(
             $_res, sub {
                 $uri->query($_);

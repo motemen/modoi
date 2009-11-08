@@ -29,5 +29,6 @@ sub log {
 sub proxy   { shift->server->proxy  }
 sub fetcher { shift->proxy->fetcher }
 sub watcher { shift->proxy->watcher }
+sub parser  { require Modoi::DB::Thread; Modoi::DB::Thread->parser }
 
 1;

@@ -33,7 +33,6 @@ sub save_response {
 
     # TODO パーズする前に判断
     my $thread_info = $class->parser->parse($res) or return;
-    return unless %$thread_info;
 
     my $thread = $class->new(uri => ($res->request ? $res->request->uri : $res->base));
     $thread->load(speculative => 1);
