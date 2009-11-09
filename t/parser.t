@@ -42,4 +42,5 @@ my $parser = Modoi::Parser->new;
     my $parsed = $parser->parse($res);
 
     note yaml $parsed;
+    # note yaml [ map { join '', map { ref $_ ? $_->as_HTML : $_ } @$_ } @{$parsed->{threads}} ];
 }

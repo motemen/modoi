@@ -16,7 +16,7 @@ sub build_scraper {
 
                 next if ref && $_->tag eq 'table' && ($_->attr('style') || $_->attr('align'));
 
-                push @{ result->{threads}->[-1] }, $_ if @{ result->{threads} };
+                push @{ result->{threads}->[-1] }, ref $_ ? $_->as_HTML('') : $_ if @{ result->{threads} };
             }
         };
         result;

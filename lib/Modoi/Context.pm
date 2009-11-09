@@ -14,6 +14,12 @@ has 'server', (
     isa => 'Modoi::Server',
 );
 
+has 'pages', (
+    is  => 'rw',
+    isa => 'Modoi::Pages',
+    default => sub { require Modoi::Pages; Modoi::Pages->new },
+);
+
 __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;

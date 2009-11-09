@@ -14,6 +14,7 @@ use Coro::AnyEvent;
 use HTTP::Engine;
 use HTTP::Engine::Middleware;
 
+use Text::MicroTemplate 'encoded_string';
 use Text::MicroTemplate::File;
 
 use Encode;
@@ -132,9 +133,13 @@ sub serve_rewriting_proxy {
 
     my $_res = $self->proxy->process($_req);
     if ($_res->header('Content-Type') eq 'text/html') {
-        if ($req->header('User-Agent') =~ /iPhone/ && (my $thread = eval { Modoi->context->parser->parse($_res) })) {
-            my $content = $self->render_html('iphone/thread', $thread);
-            $_res->content(is_utf8($content) ? encode_utf8($content) : $content);
+        if ($req->header('User-Agent') =~ /iPhone/) {
+            {
+                my $page   = Modoi->context->pages->classify($_res) or last;
+                my $parsed = Modoi->context->parser->parse($_res)   or last;
+                my $content = $self->render_html("iphone/$page", $parsed);
+                $_res->content(is_utf8($content) ? encode_utf8($content) : $content);
+            }
         }
         $self->proxy->rewrite_links(
             $_res, sub {

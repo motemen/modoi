@@ -1,0 +1,6 @@
+- name: index
+  path: '^/b/$'
+- name: thread
+  path: 'res/\d+\.htm$'
+- name: catalog
+  path: '^/b/futaba\.php\?mode=cat$'

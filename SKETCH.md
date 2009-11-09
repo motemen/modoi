@@ -1,3 +1,5 @@
+ * どこかで URL から index/thread/catalog を判別させる
+
 サーバの機能
 ============
 
