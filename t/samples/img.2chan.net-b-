@@ -1,0 +1,287 @@
+<html><head>
+<META HTTP-EQUIV="Content-type" CONTENT="text/html; charset=Shift_JIS">
+<!-- meta HTTP-EQUIV="pragma" CONTENT="no-cache" -->
+<STYLE TYPE="text/css">
+<!--
+body,tr,td,th { font-size:12pt }
+a.del {color:#800000;}
+a:hover { color:#DD0000; }
+span { font-size:20pt }
+small { font-size:10pt }
+-->
+</STYLE>
+<title>二次元裏＠ふたば</title>
+<script language="JavaScript"><!--
+function l(e){var P=getCookie("pwdc"),N=getCookie("namec"),i;with(document){for(i=0;i<forms.length;i++){if(forms[i].pwd)with(forms[i]){if(!pwd.value)pwd.value=P;}if(forms[i].name)with(forms[i]){if(!name.value)name.value=N;}if(forms[i].href2)with(forms[i]){href2.value=window.location.href;}}}};function getCookie(key, tmp1, tmp2, xx1, xx2, xx3) {tmp1 = " " + document.cookie + ";";xx1 = xx2 = 0;len = tmp1.length;	while (xx1 < len) {xx2 = tmp1.indexOf(";", xx1);tmp2 = tmp1.substring(xx1 + 1, xx2);xx3 = tmp2.indexOf("=");if (tmp2.substring(0, xx3) == key) {return(unescape(tmp2.substring(xx3 + 1, xx2 - xx1 - 1)));}xx1 = xx2 + 1;}return("");};function allchk(){var i;with(document){for(i=0;i<forms[0].elements.length;i++){with(forms[0].elements[i]){if(value=="delete"){checked=true;}}}}};function del(d){self.location.href="/del.php?b=b&d="+d;};
+//--></script>
+</head>
+<body bgcolor="#FFFFEE" text="#800000" link="#0000EE" vlink="#0000EE">
+<p align=right>
+[<a href="../" target="_top">ホーム</a>]
+<p align=center>
+<font color="#800000" size=5>
+<b><div style="font-size: 20pt;text-align: center;">二次元裏＠ふたば</div></b></font><br>
+<hr width="90%" size=1>
+<center>
+<form action="futaba.php?guid=on" method="POST" enctype="multipart/form-data">
+<input type=hidden name=mode value="regist">
+<input type=hidden name=href2 value="href">
+
+<input type=hidden name="MAX_FILE_SIZE" value="512000">
+<table cellpadding=1 cellspacing=1>
+<tr><td bgcolor=#eeaa88><b>E-mail</b></td><td><input type=text name=email size="28">
+<input type=submit value="送信する"></td></tr>
+<tr><td bgcolor=#eeaa88><b>コメント</b></td><td><textarea name=com cols="48" rows="4" wrap=soft></textarea></td></tr>
+<tr><td bgcolor=#eeaa88><b>添付File</b></td>
+<td><input type=file name=upfile size="35">
+[<label><input type=checkbox name=textonly value=on>画像なし</label>]</td></tr>
+<tr><td bgcolor=#eeaa88><b>削除キー</b></td><td><input type=password name=pwd size=8 maxlength=8 value=""><small>(記事の削除用。英数字で8文字以内)</small></td></tr>
+<script language="JavaScript"><!--
+l();
+//--></script>
+<tr><td colspan=2>
+<small>
+<li>添付可能：GIF, JPG, PNG. 500KBまで. 250x250以上は縮小.
+<li>現在431人くらいが見てます.<a href="futaba.php?mode=cat">カタログ</a> <a href="futaba.php?mode=cat&sort=1">新順</a> <a href="futaba.php?mode=cat&sort=2">古順</a> <a href="futaba.php?mode=cat&sort=3">多順</a> <a href="futaba.php?mode=cat&sort=4">少順</a>
+
+<LI>管理人への連絡は<a href="http://www.2chan.net/junbi/index2.html">準備板</a>へ. 同人関連のアップロード依頼はだめ.
+<LI><a href="http://dec.2chan.net/b/">実況禁止.実況はdecへどうぞ.</a> <a href="../sb.php?b=b">SB携帯のPCﾌﾞﾗｳｻﾞで見る入口</a>
+<li><a href="http://www.2chan.net/ktinv.htm" target=_blank>携帯ふたば入口</a>
+<li>この板の保存数は6000件です.
+<table><tr><td><center><a href="http://www.i-cute.jp/monthly-banner/6009.php" target="_blank"><img src="http://gyut.to/adbanner/gyutto_468_0310.gif" width=468 height=60 border=0></a><br>
+<a href="http://www.i-cute.jp/monthly-banner/5371.php" target="_blank"><img src="http://59.106.154.123/futaba_banner2.gif" width=468 height=60 border=0></a><br>
+<a href="http://www.i-cute.jp/monthly-banner/5731.php" target="_blank"><img src="http://aqua.dmm.co.jp/integ-inc/er_468_60.gif" width=468 height=60 border=0></a><br>
+<!--a href="http://www.i-cute.jp/monthly-banner/6080.php" target="_blank"><img src="http://pink072.jp/bannerimg/12559439260.gif" width=468 height=60 border=0></a><br-->
+</center></td></tr></table>
+</small></td></tr></table></form></center><hr><form action="futaba.php" method=POST>広告:::<b><a href="http://www.2chan.net/ktinv.htm">|∀・)☆携帯ふたば☆ どこでも読める</a></b><br>画像ファイル名：<a href="http://img.2chan.net:81/b/src/1257737952664.jpg" target=_blank>1257737952664.jpg</a>-(44153 B)<small>サムネ表示.</small><br><a href="http://img.2chan.net:81/b/src/1257737952664.jpg" target=_blank><img src=http://img.2chan.net:81/b/thumb/1257737952664s.jpg border=0 align=left width=197 height=250 hspace=20 alt="44153 B"></a><input type=checkbox name=73548458 value=delete id=delcheck>09/11/09(月)12:39:12 No.73548458 <a class=del href="javascript:void(0);" onclick="del(73548458);return(false);">del</a> 
+<small>15:09頃消えます</small>[<a href=res/73548458.htm>返信</a>]
+<blockquote>ｷﾀ━━━━━━(ﾟ∀ﾟ)━━━━━━ !!!!! </blockquote><font color="#707070">レス38件省略。全て読むには返信ボタンを押してください。</font><br>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73551953 value=delete id=delcheck>09/11/09(月)14:03:57 No.73551953 <a class=del href="javascript:void(0);" onclick="del(73551953);return(false);">del</a><blockquote><font color=789922>&gt;su250149.jpg</font><br><font color=789922>&gt;現実は非情なのよカナ</font><br>う、ウソし！？<br>こんなコラ認めないし！ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73551955 value=delete id=delcheck>09/11/09(月)14:04:02 No.73551955 <a class=del href="javascript:void(0);" onclick="del(73551955);return(false);">del</a><blockquote><font color=789922>&gt;現実は非情なのよカナ</font><br>悪夢だし！<br>4巻表紙の実績を信じるし… </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73551987 value=delete id=delcheck>09/11/09(月)14:04:55 No.73551987 <a class=del href="javascript:void(0);" onclick="del(73551987);return(false);">del</a><blockquote><font color=789922>&gt;su250149.jpg</font><br>でもこれが妥当だよね </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73551997 value=delete id=delcheck>09/11/09(月)14:05:20 No.73551997 <a class=del href="javascript:void(0);" onclick="del(73551997);return(false);">del</a><blockquote>表京ちゃん裏ハギヨシの抱き枕は </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552058 value=delete id=delcheck>09/11/09(月)14:06:50 No.73552058 <a class=del href="javascript:void(0);" onclick="del(73552058);return(false);">del</a><blockquote><font color=789922>&gt;表京ちゃん裏ハギヨシの抱き枕は</font><br>それなりに需要がありそうだから駄目よ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552155 value=delete id=delcheck>09/11/09(月)14:09:41 No.73552155 <a class=del href="javascript:void(0);" onclick="del(73552155);return(false);">del</a><blockquote><font color=789922>&gt;&gt;su250149.jpg</font><br><font color=789922>&gt;でもこれが妥当だよね</font><br>キャプテンは万々歳だし部長もまんざらじゃないし丁度いいよね </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552269 value=delete id=delcheck>09/11/09(月)14:13:19 No.73552269 <a class=del href="javascript:void(0);" onclick="del(73552269);return(false);">del</a><blockquote>みはるん→池田→キャプテン→上埜さん<br>の一方通行感が俺によし </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552400 value=delete id=delcheck>09/11/09(月)14:16:43 No.73552400 <a class=del href="javascript:void(0);" onclick="del(73552400);return(false);">del</a><blockquote><font color=789922>&gt;キャプテンは万々歳だし部長もまんざらじゃないし丁度いいよね</font><br>余計なこと言うなし！<br>清澄は自分の学校に戻れし！ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552490 value=delete id=delcheck>09/11/09(月)14:19:58 No.73552490 <a class=del href="javascript:void(0);" onclick="del(73552490);return(false);">del</a><blockquote><font color=789922>&gt;表は京ちゃん(半裸)</font><br><font color=789922>&gt;裏は文堂兄(全裸)</font> </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552967 value=delete id=delcheck>09/11/09(月)14:33:59 No.73552967 <a class=del href="javascript:void(0);" onclick="del(73552967);return(false);">del</a><blockquote><font color=789922>&gt;表は文堂兄(半裸)</font><br><font color=789922>&gt;裏も文堂兄(全裸)</font> </blockquote></td></tr></table>
+<br clear=left><hr>
+広告:::<b><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B002LGVLGI/futabachannel-22/ref=nosim/" target=_blank>化物語 第三巻 / するがモンキー (完全生産限定版) [Blu-ray]</a></b><br>画像ファイル名：<a href="http://img.2chan.net:81/b/src/1257742604478.jpg" target=_blank>1257742604478.jpg</a>-(136567 B)<small>サムネ表示.</small><br><a href="http://img.2chan.net:81/b/src/1257742604478.jpg" target=_blank><img src=http://img.2chan.net:81/b/thumb/1257742604478s.jpg border=0 align=left width=198 height=250 hspace=20 alt="136567 B"></a><input type=checkbox name=73551680 value=delete id=delcheck>09/11/09(月)13:56:44 No.73551680 <a class=del href="javascript:void(0);" onclick="del(73551680);return(false);">del</a> 
+<small>16:27頃消えます</small>[<a href=res/73551680.htm>返信</a>]
+<blockquote>「」の口説きテクニックを教えてくれ </blockquote><font color="#707070">レス15件省略。全て読むには返信ボタンを押してください。</font><br>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73551913 value=delete id=delcheck>09/11/09(月)14:02:58 No.73551913 <a class=del href="javascript:void(0);" onclick="del(73551913);return(false);">del</a><blockquote>キミは<br>オレが<br>まもる </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73551915 value=delete id=delcheck>09/11/09(月)14:03:00 No.73551915 <a class=del href="javascript:void(0);" onclick="del(73551915);return(false);">del</a><blockquote>「袖なしがカワイイ･･･？この人四肢切断したいの?!」 </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73551957 value=delete id=delcheck>09/11/09(月)14:04:08 No.73551957 <a class=del href="javascript:void(0);" onclick="del(73551957);return(false);">del</a><blockquote>いつもと違って可愛いね </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73551967 value=delete id=delcheck>09/11/09(月)14:04:23 No.73551967 <a class=del href="javascript:void(0);" onclick="del(73551967);return(false);">del</a><blockquote>なるほど袖なしだから<br>袖にされないって寸法か </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73551976 value=delete id=delcheck>09/11/09(月)14:04:40 No.73551976 <a class=del href="javascript:void(0);" onclick="del(73551976);return(false);">del</a><blockquote>「」は目で落とすよ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552097 value=delete id=delcheck>09/11/09(月)14:07:59 No.73552097 <a class=del href="javascript:void(0);" onclick="del(73552097);return(false);">del</a><blockquote><font color=789922>&gt;袖にされないって寸法か</font><br>これが本当の福（服）来るってな！<br>お後がよろしいようで </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552542 value=delete id=delcheck>09/11/09(月)14:21:43 No.73552542 <a class=del href="javascript:void(0);" onclick="del(73552542);return(false);">del</a><blockquote>泣いても誰も来えへんのやぞ！ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552563 value=delete id=delcheck>09/11/09(月)14:22:22 No.73552563 <a class=del href="javascript:void(0);" onclick="del(73552563);return(false);">del</a><blockquote>かぁーっ！ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552779 value=delete id=delcheck>09/11/09(月)14:28:41 No.73552779 <a class=del href="javascript:void(0);" onclick="del(73552779);return(false);">del</a><blockquote><font color=789922>&gt;キミが</font><br><font color=789922>&gt;オレを</font><br><font color=789922>&gt;まもる</font> </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552966 value=delete id=delcheck>09/11/09(月)14:33:55 No.73552966 <a class=del href="javascript:void(0);" onclick="del(73552966);return(false);">del</a><blockquote>ズーミン朝 </blockquote></td></tr></table>
+<br clear=left><hr>
+広告:::<b><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B002V91TQM/futabachannel-22/ref=nosim/" target=_blank>ToHeart2 向坂環 (1/6スケールPVC塗装済み完成品)</a></b><br>画像ファイル名：<a href="http://feb.2chan.net/img/b/src/1257743259729.jpg" target=_blank>1257743259729.jpg</a>-(191492 B)<small>サムネ表示.</small><br><a href="http://feb.2chan.net/img/b/src/1257743259729.jpg" target=_blank><img src=http://feb.2chan.net/img/b/thumb/1257743259729s.jpg border=0 align=left width=211 height=251 hspace=20 alt="191492 B"></a><input type=checkbox name=73552084 value=delete id=delcheck>09/11/09(月)14:07:39 No.73552084 <a class=del href="javascript:void(0);" onclick="del(73552084);return(false);">del</a> 
+<small>16:38頃消えます</small>[<a href=res/73552084.htm>返信</a>]
+<blockquote>ニュースで知り合いの名前出たことある？<br>俺は昔のクラスメイトが住所不定無職になって殺人未遂で逮捕されてるのを今見た </blockquote><font color="#707070">レス27件省略。全て読むには返信ボタンを押してください。</font><br>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552641 value=delete id=delcheck>09/11/09(月)14:24:44 No.73552641 <a class=del href="javascript:void(0);" onclick="del(73552641);return(false);">del</a><blockquote>原付免許が取れる年になると死亡率ガツンと上がる </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552662 value=delete id=delcheck>09/11/09(月)14:25:33 No.73552662 <a class=del href="javascript:void(0);" onclick="del(73552662);return(false);">del</a><blockquote>バイクは危ないよな </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552712 value=delete id=delcheck>09/11/09(月)14:27:06 No.73552712 <a class=del href="javascript:void(0);" onclick="del(73552712);return(false);">del</a><blockquote><font color=789922>&gt;人間は変われないのかね</font><br>とある猟奇殺人鬼がこう言いました<br>「俺を変えるなんて無理な話だ。俺は数十年かけてこうなった。俺を変えるにはまた数十年、もしくはそれ以上かけないとダメだ」 </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552795 value=delete id=delcheck>09/11/09(月)14:29:05 No.73552795 <a class=del href="javascript:void(0);" onclick="del(73552795);return(false);">del</a><blockquote>飲酒運転で家族乗りの車と衝突して被害者側が一人だけ生き残って本人は逃走して後日捕まった奴と同級生ってくらいだな<br>本人は今、アホのふりして減刑工作に勤しんでる </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552808 value=delete id=delcheck>09/11/09(月)14:29:35 No.73552808 <a class=del href="javascript:void(0);" onclick="del(73552808);return(false);">del</a><blockquote>中学の知り合いが重い病気で死んだなぁ<br>今の所事故で死んだ人はいない </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552880 value=delete id=delcheck>09/11/09(月)14:31:47 No.73552880 <a class=del href="javascript:void(0);" onclick="del(73552880);return(false);">del</a><blockquote>確率でいうと1クラスに１人は刑務所に行くと聞いた事がある </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552888 value=delete id=delcheck>09/11/09(月)14:31:57 No.73552888 <a class=del href="javascript:void(0);" onclick="del(73552888);return(false);">del</a><blockquote>ちょうど目の前で万引きで補導された友人を見かけた事がある<br>パトカーに乗っていくアイツを遠巻きで見てたあの日… </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552924 value=delete id=delcheck>09/11/09(月)14:32:50 No.73552924 <a class=del href="javascript:void(0);" onclick="del(73552924);return(false);">del</a><blockquote>地元の同級生の弟だったか妹だったかが高校生の時に男女数名で酒飲んで車運転して<br>物の見事に自爆してチョロっとニュースに……<br>同級生達が悲劇のように語ってたけど共感できなかった </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552962 value=delete id=delcheck>09/11/09(月)14:33:51 No.73552962 <a class=del href="javascript:void(0);" onclick="del(73552962);return(false);">del</a><blockquote>もうそろそろお線香あげに行く時期になるが<br>中学の頃にスイミングスクールで溺死という<br>割と不審な死に方をした奴がいたなぁ・・・ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552964 value=delete id=delcheck>09/11/09(月)14:33:52 No.73552964 <a class=del href="javascript:void(0);" onclick="del(73552964);return(false);">del</a><blockquote>ニュースだったか覚えてないけどサッカーのジュニアユースだった友達の名前を昔見たのは覚えてる </blockquote></td></tr></table>
+<br clear=left><hr>
+広告:::<b><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B002V8GXAA/futabachannel-22/ref=nosim/" target=_blank>超合金 ファイアボール ドロッセル</a></b><br>画像ファイル名：<a href="http://feb.2chan.net/img/b/src/1257743009867.jpg" target=_blank>1257743009867.jpg</a>-(66462 B)<small>サムネ表示.</small><br><a href="http://feb.2chan.net/img/b/src/1257743009867.jpg" target=_blank><img src=http://feb.2chan.net/img/b/thumb/1257743009867s.jpg border=0 align=left width=250 height=188 hspace=20 alt="66462 B"></a><input type=checkbox name=73551938 value=delete id=delcheck>09/11/09(月)14:03:29 No.73551938 <a class=del href="javascript:void(0);" onclick="del(73551938);return(false);">del</a> 
+<small>16:34頃消えます</small>[<a href=res/73551938.htm>返信</a>]
+<blockquote>今日はまだしてないのになんだかイカ臭いんぬ… </blockquote><table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73551983 value=delete id=delcheck>09/11/09(月)14:04:51 No.73551983 <a class=del href="javascript:void(0);" onclick="del(73551983);return(false);">del</a><blockquote>このイカ臭いなかで聞くジャズもまたオツなものなんぬ… </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73551986 value=delete id=delcheck>09/11/09(月)14:04:54 No.73551986 <a class=del href="javascript:void(0);" onclick="del(73551986);return(false);">del</a><blockquote>換気するんぬ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552039 value=delete id=delcheck>09/11/09(月)14:06:27 No.73552039 <a class=del href="javascript:void(0);" onclick="del(73552039);return(false);">del</a><blockquote>そんな時には </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552054 value=delete id=delcheck>09/11/09(月)14:06:46 No.73552054 <a class=del href="javascript:void(0);" onclick="del(73552054);return(false);">del</a><blockquote>窓開けると寒いんぬ… </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552072 value=delete id=delcheck>09/11/09(月)14:07:21 No.73552072 <a class=del href="javascript:void(0);" onclick="del(73552072);return(false);">del</a><blockquote>やっぱり閉めるんぬ… </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552102 value=delete id=delcheck>09/11/09(月)14:08:04 No.73552102 <a class=del href="javascript:void(0);" onclick="del(73552102);return(false);">del</a><blockquote>まだ臭うんぬ… </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552110 value=delete id=delcheck>09/11/09(月)14:08:22 No.73552110 <a class=del href="javascript:void(0);" onclick="del(73552110);return(false);">del</a><blockquote>イカを食うんぬ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552214 value=delete id=delcheck>09/11/09(月)14:11:47 No.73552214 <a class=del href="javascript:void(0);" onclick="del(73552214);return(false);">del</a><blockquote>窓開けると外に室内の音が漏れるのがなんか恥ずかしいんぬ・・・ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552963 value=delete id=delcheck>09/11/09(月)14:33:51 No.73552963 <a class=del href="javascript:void(0);" onclick="del(73552963);return(false);">del</a><blockquote>聞かせてやるんぬ！ </blockquote></td></tr></table>
+<br clear=left><hr>
+広告:::<b><a href="http://www.2chan.net/ktinv.htm">|∀・)☆携帯ふたば☆ どこでも読める</a></b><br>画像ファイル名：<a href="http://feb.2chan.net/img/b/src/1257741381074.jpg" target=_blank>1257741381074.jpg</a>-(45451 B)<small>サムネ表示.</small><br><a href="http://feb.2chan.net/img/b/src/1257741381074.jpg" target=_blank><img src=http://feb.2chan.net/img/b/thumb/1257741381074s.jpg border=0 align=left width=250 height=250 hspace=20 alt="45451 B"></a><input type=checkbox name=73550918 value=delete id=delcheck>09/11/09(月)13:36:21 No.73550918 <a class=del href="javascript:void(0);" onclick="del(73550918);return(false);">del</a> 
+<small>16:06頃消えます</small>[<a href=res/73550918.htm>返信</a>]
+<blockquote>http://www.youtube.com/watch?v=tvGkSrzZ6Ys<br><br>このゲームに期待しているのは俺だけでいい・・・ </blockquote><font color="#707070">レス17件省略。全て読むには返信ボタンを押してください。</font><br>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552117 value=delete id=delcheck>09/11/09(月)14:08:34 No.73552117 <a class=del href="javascript:void(0);" onclick="del(73552117);return(false);">del</a><blockquote>またドッターひとりでがんばるのか </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552185 value=delete id=delcheck>09/11/09(月)14:10:51 No.73552185 <a class=del href="javascript:void(0);" onclick="del(73552185);return(false);">del</a><blockquote>物理演算に頼りすぎてゲームの装飾が少ない </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552368 value=delete id=delcheck>09/11/09(月)14:15:51 No.73552368 <a class=del href="javascript:void(0);" onclick="del(73552368);return(false);">del</a><blockquote>インクレディブルマシーンを魔界村のキャラにやらせたカプコンよりは方向性がわかる </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552406 value=delete id=delcheck>09/11/09(月)14:17:04 No.73552406 <a class=del href="javascript:void(0);" onclick="del(73552406);return(false);">del</a><blockquote>アニメパターン少ないしドット目当てだと厳しいか<br>物理演算は面白そうだ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552541 value=delete id=delcheck>09/11/09(月)14:21:37 No.73552541 <a class=del href="javascript:void(0);" onclick="del(73552541);return(false);">del</a><blockquote>同人だったら喜んで買うけどDSか… </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552600 value=delete id=delcheck>09/11/09(月)14:23:50 No.73552600 <a class=del href="javascript:void(0);" onclick="del(73552600);return(false);">del</a><blockquote>ダイコンですか </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552812 value=delete id=delcheck>09/11/09(月)14:29:43 No.73552812 <a class=del href="javascript:void(0);" onclick="del(73552812);return(false);">del</a><blockquote>どんな会社なのかぐぐってみたけどさっぱり情報がないな </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552839 value=delete id=delcheck>09/11/09(月)14:30:40 No.73552839 <a class=del href="javascript:void(0);" onclick="del(73552839);return(false);">del</a><blockquote>くまたんちの会社じゃないのか </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552846 value=delete id=delcheck>09/11/09(月)14:30:59 No.73552846 <a class=del href="javascript:void(0);" onclick="del(73552846);return(false);">del</a><blockquote>ラー油が大プッシュしてたのでこれは危ないなと </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552961 value=delete id=delcheck>09/11/09(月)14:33:48 No.73552961 <a class=del href="javascript:void(0);" onclick="del(73552961);return(false);">del</a><blockquote>とりあえず尼で予約してきた </blockquote></td></tr></table>
+<br clear=left><hr>
+広告:::<b><a href="http://www.2chan.net/ktinv.htm">|∀・)☆携帯ふたば☆ どこでもレス</a></b><br>画像ファイル名：<a href="http://feb.2chan.net/img/b/src/1257743573114.jpg" target=_blank>1257743573114.jpg</a>-(81022 B)<small>サムネ表示.</small><br><a href="http://feb.2chan.net/img/b/src/1257743573114.jpg" target=_blank><img src=http://feb.2chan.net/img/b/thumb/1257743573114s.jpg border=0 align=left width=250 height=227 hspace=20 alt="81022 B"></a><input type=checkbox name=73552247 value=delete id=delcheck>09/11/09(月)14:12:53 No.73552247 <a class=del href="javascript:void(0);" onclick="del(73552247);return(false);">del</a> 
+<small>16:43頃消えます</small>[<a href=res/73552247.htm>返信</a>]
+<blockquote>よつば<br>おやつの時間まではまだちょっとあるみたいだ </blockquote><table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552285 value=delete id=delcheck>09/11/09(月)14:13:46 No.73552285 <a class=del href="javascript:void(0);" onclick="del(73552285);return(false);">del</a><blockquote>また銃オタが父ちゃんを虐めるスレか </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552581 value=delete id=delcheck>09/11/09(月)14:23:12 No.73552581 <a class=del href="javascript:void(0);" onclick="del(73552581);return(false);">del</a><blockquote>さあ画像の銃の名前はなんていうのかな！？ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552650 value=delete id=delcheck>09/11/09(月)14:25:04 No.73552650 <a class=del href="javascript:void(0);" onclick="del(73552650);return(false);">del</a><blockquote>こ・・・こるとだいやもんどばっく・・・ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552694 value=delete id=delcheck>09/11/09(月)14:26:32 No.73552694 <a class=del href="javascript:void(0);" onclick="del(73552694);return(false);">del</a><blockquote>あーーー！？<br>聞こえねーーなーー！ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552706 value=delete id=delcheck>09/11/09(月)14:26:56 No.73552706 <a class=del href="javascript:void(0);" onclick="del(73552706);return(false);">del</a><blockquote>とーちゃんスペシャルだ！ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552752 value=delete id=delcheck>09/11/09(月)14:28:05 No.73552752 <a class=del href="javascript:void(0);" onclick="del(73552752);return(false);">del</a><blockquote>こんにゃく屋は何をやってもだめだな！ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552816 value=delete id=delcheck>09/11/09(月)14:29:55 No.73552816 <a class=del href="javascript:void(0);" onclick="del(73552816);return(false);">del</a><blockquote>とーちゃんは銃さえもハンドメイドするプロ中のプロなんだよ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552893 value=delete id=delcheck>09/11/09(月)14:32:01 No.73552893 <a class=del href="javascript:void(0);" onclick="del(73552893);return(false);">del</a><blockquote>マテバM２００８ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552928 value=delete id=delcheck>09/11/09(月)14:32:59 No.73552928 <a class=del href="javascript:void(0);" onclick="del(73552928);return(false);">del</a><blockquote>マテバじゃん？ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552956 value=delete id=delcheck>09/11/09(月)14:33:39 No.73552956 <a class=del href="javascript:void(0);" onclick="del(73552956);return(false);">del</a><blockquote>マテバ６Unica </blockquote></td></tr></table>
+<br clear=left><hr>
+広告:::<b><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B002V8GXAA/futabachannel-22/ref=nosim/" target=_blank>超合金 ファイアボール ドロッセル</a></b><br>画像ファイル名：<a href="http://feb.2chan.net/img/b/src/1257742959533.jpg" target=_blank>1257742959533.jpg</a>-(94543 B)<small>サムネ表示.</small><br><a href="http://feb.2chan.net/img/b/src/1257742959533.jpg" target=_blank><img src=http://feb.2chan.net/img/b/thumb/1257742959533s.jpg border=0 align=left width=250 height=173 hspace=20 alt="94543 B"></a><input type=checkbox name=73551909 value=delete id=delcheck>09/11/09(月)14:02:39 No.73551909 <a class=del href="javascript:void(0);" onclick="del(73551909);return(false);">del</a> 
+<small>16:33頃消えます</small>[<a href=res/73551909.htm>返信</a>]
+<blockquote>竜ちゃんは初心を忘れないいい子だと思う </blockquote><font color="#707070">レス72件省略。全て読むには返信ボタンを押してください。</font><br>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552871 value=delete id=delcheck>09/11/09(月)14:31:36 No.73552871 <a class=del href="javascript:void(0);" onclick="del(73552871);return(false);">del</a><blockquote><font color=789922>&gt;酒の場合自分の作品に対して過度な愛着とかなさそうだから今の状況が許せるんじゃないかな</font><br>でも絶対霊夢に対しては過度の愛着抱いてるよ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552875 value=delete id=delcheck>09/11/09(月)14:31:40 No.73552875 <a class=del href="javascript:void(0);" onclick="del(73552875);return(false);">del</a><blockquote>あんまり自分の作品を芸術品みたいに愛でてるとやりたい放題されてる設定に本人が怒って炎上<br>とかなりそう </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552877 value=delete id=delcheck>09/11/09(月)14:31:42 No.73552877 <a class=del href="javascript:void(0);" onclick="del(73552877);return(false);">del</a><blockquote><font color=789922>&gt;同人での稼ぎが副業に相当するんじゃねとか上から睨まれたんじゃねーの？</font><br>内容が内容だから副業の許可も出ないだろうしな </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552908 value=delete id=delcheck>09/11/09(月)14:32:31 No.73552908 <a class=del href="javascript:void(0);" onclick="del(73552908);return(false);">del</a><blockquote><font color=789922>&gt;原型が無いくらい改変されてるの売ってるのを見てどう思ってるんだろうか</font><br>勝手に全く関係ない歌詞つけられて東方アレンジ名義で売るとかそういうのは腹立つらしいが </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552920 value=delete id=delcheck>09/11/09(月)14:32:46 No.73552920 <a class=del href="javascript:void(0);" onclick="del(73552920);return(false);">del</a><blockquote>ひぐらしは好きだったけどこの文面見た時は普通にイラッときた </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552922 value=delete id=delcheck>09/11/09(月)14:32:47 No.73552922 <a class=del href="javascript:void(0);" onclick="del(73552922);return(false);">del</a><blockquote><font color=789922>&gt;&gt;酒の場合自分の作品に対して過度な愛着とかなさそうだから今の状況が許せるんじゃないかな</font><br><font color=789922>&gt;でも絶対霊夢に対しては過度の愛着抱いてるよ</font><br>あの神社の神主って名乗ってる位だから愛着ない訳がないわな </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552925 value=delete id=delcheck>09/11/09(月)14:32:58 No.73552925 <a class=del href="javascript:void(0);" onclick="del(73552925);return(false);">del</a><blockquote>三人（？）に共通するのは<br>絵がそんなに上手くなかったこと<br>つまり「自分の方が上手く描けるんじゃね？」って潜在的に思わせることが重要な因子のひとつなんじゃないだろうか </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552946 value=delete id=delcheck>09/11/09(月)14:33:20 No.73552946 <a class=del href="javascript:void(0);" onclick="del(73552946);return(false);">del</a><blockquote>流石に商業展開のときにやめざるえなかったんじゃね </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552951 value=delete id=delcheck>09/11/09(月)14:33:31 No.73552951 <a class=del href="javascript:void(0);" onclick="del(73552951);return(false);">del</a><blockquote><font color=789922>&gt;原型が無いくらい改変されてるの売ってるのを見てどう思ってるんだろうか</font><br>「いやー凄かったですね、何の曲か分からないけど」 </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552954 value=delete id=delcheck>09/11/09(月)14:33:38 No.73552954 <a class=del href="javascript:void(0);" onclick="del(73552954);return(false);">del</a><blockquote><font color=789922>&gt;勝手に全く関係ない歌詞つけられて東方アレンジ名義で売るとかそういうのは腹立つらしいが</font><br>というか曲作った時に骨自身で曲毎に歌詞つくってあるらしいからな<br>発表はしてないみたいだけど </blockquote></td></tr></table>
+<br clear=left><hr>
+広告:::<b><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B002TEYRT0/futabachannel-22/ref=nosim/" target=_blank>劇場版 天元突破グレンラガン 螺巌篇 【完全生産限定版】 [DVD]</a></b><br>画像ファイル名：<a href="http://feb.2chan.net/img/b/src/1257742339780.jpg" target=_blank>1257742339780.jpg</a>-(139054 B)<small>サムネ表示.</small><br><a href="http://feb.2chan.net/img/b/src/1257742339780.jpg" target=_blank><img src=http://feb.2chan.net/img/b/thumb/1257742339780s.jpg border=0 align=left width=250 height=235 hspace=20 alt="139054 B"></a><input type=checkbox name=73551512 value=delete id=delcheck>09/11/09(月)13:52:19 No.73551512 <a class=del href="javascript:void(0);" onclick="del(73551512);return(false);">del</a> 
+<small>16:22頃消えます</small>[<a href=res/73551512.htm>返信</a>]
+<blockquote>女の子ってエッチの時もオナニーの時も<br>そんなに喘がないそうだ<br>エッチのときは男性を興奮させるようにわざと喘いでるらしい・・・<br><br>オナニーなんて鼻息荒くなる程度とか言ってた<br>皆が皆そうじゃないと思うけど<br>そういうのが大半らしいって女が言ってた<br>嘘だよね？ </blockquote><font color="#707070">レス48件省略。全て読むには返信ボタンを押してください。</font><br>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552165 value=delete id=delcheck>09/11/09(月)14:10:00 No.73552165 <a class=del href="javascript:void(0);" onclick="del(73552165);return(false);">del</a><blockquote>屑さんは帰ってください </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552186 value=delete id=delcheck>09/11/09(月)14:10:53 No.73552186 <a class=del href="javascript:void(0);" onclick="del(73552186);return(false);">del</a><blockquote>それは屑さんじゃない </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552208 value=delete id=delcheck>09/11/09(月)14:11:31 No.73552208 <a class=del href="javascript:void(0);" onclick="del(73552208);return(false);">del</a><blockquote>ガッハハハハ！いい具合だ！ドビュビュー！とかはやりたいと思う </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552297 value=delete id=delcheck>09/11/09(月)14:14:12 No.73552297 <a class=del href="javascript:void(0);" onclick="del(73552297);return(false);">del</a><blockquote>オナニーのときは喘ぐよ<br>お尻の穴でいい気持ちになりたいんだったら女の子みたいな声を出すと興奮するでしょ？ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552320 value=delete id=delcheck>09/11/09(月)14:14:44 No.73552320 <a class=del href="javascript:void(0);" onclick="del(73552320);return(false);">del</a><blockquote>らめえ にんしんしらう（棒読み） </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552354 value=delete id=delcheck>09/11/09(月)14:15:35 No.73552354 <a class=del href="javascript:void(0);" onclick="del(73552354);return(false);">del</a><blockquote>オナホ使ってて射精しながら動かすと声出ちゃうよね </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552433 value=delete id=delcheck>09/11/09(月)14:18:07 No.73552433 <a class=del href="javascript:void(0);" onclick="del(73552433);return(false);">del</a><blockquote><font color=789922>&gt;「ンギモヂイイッ！」</font><br>もちろんCVは山口眞弓 </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552495 value=delete id=delcheck>09/11/09(月)14:20:03 No.73552495 <a class=del href="javascript:void(0);" onclick="del(73552495);return(false);">del</a><blockquote>声より結合部から流れるくちゅくちゅという音の方がエロいね </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552502 value=delete id=delcheck>09/11/09(月)14:20:15 No.73552502 <a class=del href="javascript:void(0);" onclick="del(73552502);return(false);">del</a><blockquote><font color=789922>&gt;フクダーダのマンガ読めば分かるよ </font><br>ふん、ふん、ふん<br>なんていわないよね・・・ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552953 value=delete id=delcheck>09/11/09(月)14:33:34 No.73552953 <a class=del href="javascript:void(0);" onclick="del(73552953);return(false);">del</a><blockquote><font color=789922>&gt;もちろんCVは山口眞弓</font><br>じゃあ男もCV遊佐浩二で話しかけなきゃ… </blockquote></td></tr></table>
+<br clear=left><hr>
+広告:::<b><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B002V91TQM/futabachannel-22/ref=nosim/" target=_blank>ToHeart2 向坂環 (1/6スケールPVC塗装済み完成品)</a></b><br>画像ファイル名：<a href="http://img.2chan.net:81/b/src/1257744812520.gif" target=_blank>1257744812520.gif</a>-(40129 B)<small>サムネ表示.</small><br><a href="http://img.2chan.net:81/b/src/1257744812520.gif" target=_blank><img src=http://img.2chan.net:81/b/thumb/1257744812520s.jpg border=0 align=left width=250 height=210 hspace=20 alt="40129 B"></a><input type=checkbox name=73552952 value=delete id=delcheck>09/11/09(月)14:33:32 No.73552952 <a class=del href="javascript:void(0);" onclick="del(73552952);return(false);">del</a> 
+<small>17:04頃消えます</small>[<a href=res/73552952.htm>返信</a>]
+<blockquote>卵ってSとかMとかLとかいろいろサイズがあるけど結局どれがお得なの？<br>あと茶色い卵は妙に高いけど何がちがうんだろか </blockquote><br clear=left><hr>
+広告:::<b><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B002UNMBGQ/futabachannel-22/ref=nosim/" target=_blank>figma フェイト・テスタロッサ The MOVIE 1st ver.</a></b><br>画像ファイル名：<a href="http://img.2chan.net:81/b/src/1257742928359.jpg" target=_blank>1257742928359.jpg</a>-(28101 B)<small>サムネ表示.</small><br><a href="http://img.2chan.net:81/b/src/1257742928359.jpg" target=_blank><img src=http://img.2chan.net:81/b/thumb/1257742928359s.jpg border=0 align=left width=211 height=250 hspace=20 alt="28101 B"></a><input type=checkbox name=73551888 value=delete id=delcheck>09/11/09(月)14:02:08 No.73551888 <a class=del href="javascript:void(0);" onclick="del(73551888);return(false);">del</a> 
+<small>16:32頃消えます</small>[<a href=res/73551888.htm>返信</a>]
+<blockquote>劇場版後悔間近で俺の中でマクロスが<br>盛りあがってきているので<br>バルキリーの玩具かプラモを買おうかなと思うんだが<br>たくさん出ていてよくわからない<br>何処のを買えばいいのかな </blockquote><font color="#707070">レス27件省略。全て読むには返信ボタンを押してください。</font><br>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552761 value=delete id=delcheck>09/11/09(月)14:28:21 No.73552761 <a class=del href="javascript:void(0);" onclick="del(73552761);return(false);">del</a><blockquote>一番くじで引いたABC賞を眺めながら弄るプラモは<br>本気で格好良いな </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552770 value=delete id=delcheck>09/11/09(月)14:28:31 No.73552770 <a class=del href="javascript:void(0);" onclick="del(73552770);return(false);">del</a><blockquote>地味に欲しかった<br>http://87-hana.net/?pid=10453495 </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552789 value=delete id=delcheck>09/11/09(月)14:28:53 No.73552789 <a class=del href="javascript:void(0);" onclick="del(73552789);return(false);">del</a><blockquote>超合金のアルト機ブースター付きってそろそろ発売じゃね </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552799 value=delete id=delcheck>09/11/09(月)14:29:14 No.73552799 <a class=del href="javascript:void(0);" onclick="del(73552799);return(false);">del</a><blockquote>トルネードパック仕様でまた出すんだっけ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552844 value=delete id=delcheck>09/11/09(月)14:30:47 No.73552844 <a class=del href="javascript:void(0);" onclick="del(73552844);return(false);">del</a><blockquote>プラモは着脱できなから<br>メサイアが大量に増えることになる<br>らしい </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552899 value=delete id=delcheck>09/11/09(月)14:32:08 No.73552899 <a class=del href="javascript:void(0);" onclick="del(73552899);return(false);">del</a><blockquote>ロボ魂でもアーマードパック装備のオズマ機とかルカ機出るかな<br>ゴーストはネット販売とかで </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552902 value=delete id=delcheck>09/11/09(月)14:32:20 No.73552902 <a class=del href="javascript:void(0);" onclick="del(73552902);return(false);">del</a><blockquote>プラモでもスパパクを換装できるように改造しようと思ってたけど<br>積んだままになってしまったのでパック打ってしまった </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552903 value=delete id=delcheck>09/11/09(月)14:32:23 No.73552903 <a class=del href="javascript:void(0);" onclick="del(73552903);return(false);">del</a><blockquote>飾る場所さえ確保できるならプラモはかなり良い選択肢だと思うよ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552923 value=delete id=delcheck>09/11/09(月)14:32:50 No.73552923 <a class=del href="javascript:void(0);" onclick="del(73552923);return(false);">del</a><blockquote><font color=789922>&gt;プラモは着脱できなから</font><br><font color=789922>&gt;メサイアが大量に増えることになる</font><br>現在全16パッケージ </blockquote></td></tr></table>
+<table border=0><tr><td align=right valign=top>…</td><td bgcolor=#F0E0D6>
+<input type=checkbox name=73552950 value=delete id=delcheck>09/11/09(月)14:33:29 No.73552950 <a class=del href="javascript:void(0);" onclick="del(73552950);return(false);">del</a><blockquote><font color=789922>&gt;『 DX超合金 マクロス・クォーター 』</font><br><font color=789922>&gt;バンダイ</font><br><font color=789922>&gt;形式：おもちゃ＆ホビー</font><br><font color=789922>&gt;参考価格：￥ 20&#44;790</font><br><font color=789922>&gt;価格：￥ 14&#44;980</font><br>スレ「」これ買おうぜ！ </blockquote></td></tr></table>
+<br clear=left><hr>
+<table align=right><tr><td nowrap align=center>
+<input type=hidden name=mode value=usrdel>【記事削除】[<input type=checkbox name=onlyimgdel value=on>画像だけ消す]<br>
+削除キー<input type=password name=pwd size=8 maxlength=8 value="">
+<input type=submit value="削除"></td></tr></table></form>
+<script language="JavaScript"><!--
+l();
+//--></script><table align=left border=1><tr><td>最初のページ</td><td>[<b>0</b>][<a href="1.htm">1</a>][<a href="2.htm">2</a>][<a href="3.htm">3</a>][<a href="4.htm">4</a>][<a href="5.htm">5</a>][<a href="6.htm">6</a>][<a href="7.htm">7</a>][<a href="8.htm">8</a>][<a href="9.htm">9</a>][<a href="10.htm">10</a>][<a href="http://dat.2chan.net/16/futaba.htm">二次ネタ</a>]</td><form action="1.htm" method=get><td><input type=submit value="次のページ"></td></form></tr></table><br clear=all>
+
+<center>
+<small><!-- GazouBBS v3.0 --><!-- ふたば改0.8 -->
+- <a href="http://php.s3.to" target=_top>GazouBBS</a> + <a href="http://www.2chan.net/" target=_top>futaba</a>-
+</small><br>
+<a href="http://dl.getchu.com/" target="_blank"><img src="http://dec.2chan.net:81/ad/futaba_dlgetchu.gif" width=468 height=60 border=0 alt="商業・同人ダウンロード_DL.Getchu.com(ディーエルゲッチュコム)"></a><br>
+<a href="http://www.SUEHIROGARI.net" target="_blank"><img src="http://www.suehirogari.net/g001.gif" width=468 height=60 border=0></a><br>
+<table width=468 border><tr><td><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B002JM119G/futabachannel-22/ref=nosim/" target=_blank><img src=http://ecx.images-amazon.com/images/I/51HvnnNKqKL._SL160_.jpg border=0 align=left width=100 height=160 hspace=20></a>
+<blockquote>『 マクロス アルティメット フロンティア 超時空娘々パック(期間限定生産：映像UMD同梱) 』<br />バンダイ<br />プラットフォーム：Sony PSP<br />形式：Video Game<br /><small><strike>参考価格：￥ 7,329</strike></small><br />価格：<font size=+2 color=#ff0000>￥ 6,009</font><br /><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B002JM119G/futabachannel-22/ref=nosim/" target=_blank>商品の詳細を見る</a><br><form method="get" action="http://www.amazon.co.jp/gp/search" target="_blank"><input type="text" name="keywords" size="30" value=""><input type="hidden" name="tag" value="futabachannel-22"><input type="hidden" name="__mk_ja_JP" value="カタカナ"><input type="hidden" name="search-alias" value="aps"><input type="hidden" name="linkCode" value="as2"><input type=submit value="amazon検索"></form></blockquote></td></tr></table></center>
+</body></html><!---->

@@ -36,3 +36,10 @@ my $parser = Modoi::Parser->new;
     isa_ok $parsed->{updated_on}, 'DateTime';
     is     $parsed->{updated_on}->strftime('%F %T'), '2009-11-03 16:31:40';
 }
+
+{
+    my $res = fake_http GET => 'http://img.2chan.net/b/';
+    my $parsed = $parser->parse($res);
+
+    note yaml $parsed;
+}
