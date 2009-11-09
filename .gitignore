@@ -7,3 +7,4 @@ inc/
 pm_to_blib
 modoi.db
 .cache/
+config.yaml
