@@ -9,7 +9,7 @@ sub DEFAULT_CONFIG {
         dispatchers => [ 'screen' ], 
         screen => {
             class     => 'Log::Dispatch::Screen',
-            min_level => 'debug',
+            min_level => 'info',
             stderr    => 1,
             format    => '[%p] %m',
         },

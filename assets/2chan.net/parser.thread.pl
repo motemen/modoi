@@ -1,3 +1,7 @@
+sub condition {
+    +{ path => qr<^/b/res/\d+\.htm$> };
+}
+
 sub build_scraper {
     scraper {
         process '//form/a/img',      thumbnail_uri => '@src';
