@@ -137,7 +137,8 @@ sub serve_rewriting_proxy {
             {
                 my $page   = Modoi->context->pages->classify($_res) or last;
                 my $parsed = Modoi->context->parser->parse($_res)   or last;
-                my $content = $self->render_html("iphone/$page", $parsed);
+                my $view   = do { require Modoi::View::iPhone; Modoi::View::iPhone->new(mt => $self->mt) };
+                my $content = $view->render($page, $parsed);
                 $_res->content(is_utf8($content) ? encode_utf8($content) : $content);
             }
         }
