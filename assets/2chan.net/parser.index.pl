@@ -1,7 +1,3 @@
-sub condition {
-    +{ path => qr<^/b/$> };
-}
-
 sub build_scraper {
     scraper {
         result->{threads} = [];
@@ -15,8 +11,9 @@ sub build_scraper {
                 }
 
                 next if ref && $_->tag eq 'table' && ($_->attr('style') || $_->attr('align'));
+                next unless @{ result->{threads} };
 
-                push @{ result->{threads}->[-1] }, ref $_ ? $_->as_HTML('') : $_ if @{ result->{threads} };
+                push @{ result->{threads}->[-1] }, ref() ? $_->clone : $_;
             }
         };
         result;

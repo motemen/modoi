@@ -1,7 +1,7 @@
 package Modoi::Role::HasAsset;
 use Any::Moose '::Role';
 
-use Modoi::Condition;
+use Modoi;
 use YAML;
 use Path::Class;
 
@@ -42,12 +42,15 @@ our %ModuleLoaded;
 sub load_asset_module {
     my ($self, $res) = @_;
 
-    my @files = $self->asset_files($res, 'pl');
+    my $ext = 'pl';
+    if (my $name = Modoi->context->pages->classify($res)) {
+        $ext = "$name.$ext";
+    }
+
+    my @files = $self->asset_files($res, $ext);
     foreach my $file (@files) {
         my $module = $self->_eval_asset_module($file) or next;
-        return $module unless $module->can('condition');
-        my $cond = Modoi::Condition->new($module->condition);
-        return $module if $cond->pass($res);
+        return $module;
     }
 }
 

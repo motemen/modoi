@@ -3,7 +3,7 @@
 
 ? foreach my $thread (@{$index->{threads}}) {
 ?   foreach my $elem (@$thread) {
-?=    encoded_string(ref $elem ? $elem->as_HTML : $elem);
+?=    encoded_string(ref $elem ? $elem->as_HTML('') : $elem);
 ?   }
 ? }
 

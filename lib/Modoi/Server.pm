@@ -133,7 +133,7 @@ sub serve_rewriting_proxy {
 
     my $_res = $self->proxy->process($_req);
     if ($_res->header('Content-Type') eq 'text/html') {
-        if ($req->header('User-Agent') =~ /iPhone/) {
+        if (1 || $req->header('User-Agent') =~ /iPhone/) {
             {
                 my $page   = Modoi->context->pages->classify($_res) or last;
                 my $parsed = Modoi->context->parser->parse($_res)   or last;

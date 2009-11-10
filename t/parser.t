@@ -11,7 +11,7 @@ my $parser = Modoi::Parser->new;
     my $res = fake_http GET => 'http://img.2chan.net/b/res/69762910.htm';
     my $parsed = $parser->parse($res);
 
-    is     $parsed->{summary},  'ｷﾀ━━━━━━(ﾟ∀ﾟ)━━━━━━ !!!!! ';
+    is     $parsed->{summary},  'ｷﾀ━━━━━━(ﾟ∀ﾟ)━━━━━━ !!!!!';
     isa_ok $parsed->{responses}, 'ARRAY';
     is     scalar @{$parsed->{responses}}, 58;
     isa_ok $parsed->{thumbnail_uri}, 'URI';
@@ -20,13 +20,15 @@ my $parser = Modoi::Parser->new;
     is     $parsed->{created_on}->strftime('%F %T'), '2009-09-18 19:11:31';
     isa_ok $parsed->{updated_on}, 'DateTime';
     is     $parsed->{updated_on}->strftime('%F %T'), '2009-09-18 20:00:38';
+
+    note yaml $parsed;
 }
 
 {
     my $res = fake_http GET => 'http://nov.2chan.net/b/res/14133347.htm';
     my $parsed = $parser->parse($res);
 
-    is     $parsed->{summary},  'ねーえ、4期まだぁ？ ';
+    is     $parsed->{summary},  'ねーえ、4期まだぁ？';
     isa_ok $parsed->{responses}, 'ARRAY';
     is     scalar @{$parsed->{responses}}, 12;
     isa_ok $parsed->{thumbnail_uri}, 'URI';
@@ -35,12 +37,13 @@ my $parser = Modoi::Parser->new;
     is     $parsed->{created_on}->strftime('%F %T'), '2009-11-03 11:59:22';
     isa_ok $parsed->{updated_on}, 'DateTime';
     is     $parsed->{updated_on}->strftime('%F %T'), '2009-11-03 16:31:40';
+
+    note yaml $parsed;
 }
 
 {
     my $res = fake_http GET => 'http://img.2chan.net/b/';
     my $parsed = $parser->parse($res);
 
-    note yaml $parsed;
-    # note yaml [ map { join '', map { ref $_ ? $_->as_HTML : $_ } @$_ } @{$parsed->{threads}} ];
+    # note yaml $parsed;
 }

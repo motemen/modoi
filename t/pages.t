@@ -1,5 +1,5 @@
 use strict;
-use Test::More 'no_plan';
+use Test::More tests => 3;
 use t::TestModoi;
 
 BEGIN { use_ok 'Modoi::Pages' }

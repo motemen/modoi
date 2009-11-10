@@ -1,5 +1,5 @@
 use strict;
-use Test::More 'no_plan';
+use Test::More tests => 5;
 use t::TestModoi;
 
 package Modoi::TestExtractor;

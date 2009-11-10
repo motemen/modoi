@@ -1,11 +1,7 @@
-sub condition {
-    +{ path => qr<^/b/res/\d+\.htm$> };
-}
-
 sub build_scraper {
     scraper {
         process '//form/a/img',      thumbnail_uri => '@src';
-        process '//form/blockquote', summary       => 'TEXT';
+        process '//form/blockquote', summary       => 'HTML';
         process '//form/input[@type="checkbox"]/following-sibling::a[starts-with(@href,"mailto:")] | //form/input[@type="checkbox"]/following-sibling::text()[normalize-space(.)][last()]',
             created_on => [
                 TEXT => sub {
@@ -22,6 +18,7 @@ sub build_scraper {
                     DateTime->new(%dt);
                 }
             ];
-        process '//form//blockquote', 'responses[]' => 'TEXT';
+        process '//form//blockquote', sub { push @{ result->{responses} }, $_->clone };
+        result;
     };
 }
