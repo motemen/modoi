@@ -20,6 +20,18 @@ has 'pages', (
     default => sub { require Modoi::Pages; Modoi::Pages->new },
 );
 
+has 'parser', (
+    is  => 'rw',
+    isa => 'Modoi::Parser',
+    default => sub { require Modoi::DB::Thread; Modoi::DB::Thread->parser },
+);
+
+has 'html', (
+    is  => 'rw',
+    isa => 'Modoi::HTML',
+    default => sub { require Modoi::HTML; Modoi::HTML->new },
+);
+
 __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
@@ -35,6 +47,5 @@ sub log {
 sub proxy   { shift->server->proxy  }
 sub fetcher { shift->proxy->fetcher }
 sub watcher { shift->proxy->watcher }
-sub parser  { require Modoi::DB::Thread; Modoi::DB::Thread->parser }
 
 1;

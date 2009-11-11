@@ -29,10 +29,24 @@ sub manipulate_index {
         splice @$elems, 0, 8;
         foreach my $elem (@$elems) {
             if (ref $elem) {
-                $_->delete foreach $elem->look_down(_tag => 'a', sub { shift->attr('href') =~ /^javascript:/ });
-                $_->delete foreach $elem->look_down(_tag => 'input');
-                $_->delete foreach $elem->look_down(_tag => 'td', align => 'right', valign => 'top');
+                # スレ先頭の del リンクを削除
+                if ($elem->tag eq 'input' ||
+                   ($elem->tag eq 'a' && $elem->attr('href') =~ /^javascript:/)) {
+                    $elem->detach;
+                    $elem->delete;
+                    $elem = undef;
+                    next;
+                }
+                # レスの del リンクと広告を削除
+                $_->detach && $_->delete foreach (
+                    $elem->look_down(_tag => 'a', href => qr/^javascript:/),
+                    $elem->look_down(_tag => 'input'),
+                    $elem->look_down(_tag => 'td', align => 'right', valign => 'top'),
+                );
+                # 色を消す
                 $_->attr(bgcolor => undef) foreach $elem->look_down(_tag => 'td');
+                # 左寄せにしない
+                $_->attr(align => undef) foreach $elem->look_down(_tag => 'img');
             }
         }
     }

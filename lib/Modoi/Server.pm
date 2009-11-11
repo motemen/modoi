@@ -132,7 +132,7 @@ sub serve_rewriting_proxy {
     $_req->uri('http://' . $_req->uri) unless $_req->uri =~ m<^\w+://>;
 
     my $_res = $self->proxy->process($_req);
-    if ($_res->header('Content-Type') eq 'text/html') {
+    if (($_res->header('Content-Type') || '') eq 'text/html') {
         if (1 || $req->header('User-Agent') =~ /iPhone/) {
             {
                 my $page   = Modoi->context->pages->classify($_res) or last;
