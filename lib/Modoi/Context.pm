@@ -26,12 +26,6 @@ has 'parser', (
     default => sub { require Modoi::DB::Thread; Modoi::DB::Thread->parser },
 );
 
-has 'html', (
-    is  => 'rw',
-    isa => 'Modoi::HTML',
-    default => sub { require Modoi::HTML; Modoi::HTML->new },
-);
-
 __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;

@@ -18,7 +18,7 @@ sub build_scraper {
                     DateTime->new(%dt);
                 }
             ];
-        process '//form//blockquote', sub { push @{ result->{responses} }, $_->clone };
+        process '//form[@action="futaba.php"]/table', sub { push @{ result->{responses} }, $_->clone };
         result;
     };
 }
