@@ -2,9 +2,11 @@
 ? $_mt->wrapper_file('iphone/_wrapper.mt')->(sub {
 
 <div class="thread">
-  <div class="thumbnail"><img src="<?= $thread->{thumbnail_uri} ?>" /></div>
+? foreach my $elem (@{$thread->{head_elements}}) {
+?=  encoded_string(ref $elem ? $elem->as_HTML('') : $elem);
+? }
 ? foreach my $res (@{$thread->{responses}}) {
-?=  encoded_string(ref $res ? $res->as_HTML('') : $res)
+?=  encoded_string(ref $res ? $res->as_HTML('') : $res);
 ? }
 </div>
 

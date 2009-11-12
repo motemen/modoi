@@ -1,7 +1,7 @@
 sub build_scraper {
     scraper {
         process '//form/a/img',      thumbnail_uri => '@src';
-        process '//form/blockquote', summary       => 'HTML';
+        process '//form/blockquote', summary       => [ TEXT => sub { s/ $// } ];
         process '//form/input[@type="checkbox"]/following-sibling::a[starts-with(@href,"mailto:")] | //form/input[@type="checkbox"]/following-sibling::text()[normalize-space(.)][last()]',
             created_on => [
                 TEXT => sub {
@@ -18,6 +18,13 @@ sub build_scraper {
                     DateTime->new(%dt);
                 }
             ];
+
+        process '//form[@action="futaba.php"]', sub {
+            foreach ($_->content_list) {
+                last if ref $_ && $_->tag eq 'table';
+                push @{ result->{head_elements} }, ref $_ ? $_->clone : $_;
+            }
+        };
         process '//form[@action="futaba.php"]/table', sub { push @{ result->{responses} }, $_->clone };
         result;
     };
