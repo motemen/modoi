@@ -1,5 +1,7 @@
 server:
   port: 3128
+  middlewares:
+   - module: ModuleReload
 fetcher:
   cache:
     module: Cache::FileCache

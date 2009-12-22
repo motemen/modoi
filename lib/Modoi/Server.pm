@@ -171,15 +171,23 @@ sub serve_threads {
 sub _build_middleware {
     my $self = shift;
 
-    my $middleware = HTTP::Engine::Middleware->new;
-    $middleware->install('HTTP::Engine::Middleware::ModuleReload');
+    my $middleware = HTTP::Engine::Middleware->new(root => $self->root);
+
     $middleware->install(
         'HTTP::Engine::Middleware::Static' => {
             regexp  => qr</css/.*>,
             docroot => $self->root,
         }
     );
-    $middleware
+
+    foreach (@{$self->config->{middlewares}}) {
+        my $module = $_->{module};
+        $module = "HTTP::Engine::Middleware::$module" unless $module->require;
+        Modoi->log(info => "install $module");
+        $middleware->install($module => $_->{args} || {});
+    }
+
+    $middleware;
 }
 
 sub _build_engine {
@@ -188,7 +196,7 @@ sub _build_engine {
     HTTP::Engine->new(
         interface => {
             module => 'AnyEvent',
-            args   => $self->config,
+            args   => +{ %{$self->config} },
             request_handler => $self->request_handler,
         }
     );
