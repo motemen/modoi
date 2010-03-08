@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 17;
+use Test::More tests => 19;
 use Test::TCP;
 use LWP::Simple 'get';
 use HTTP::Request::Common;
@@ -51,14 +51,14 @@ client => sub {
     
     my $res;
 
-    ok !$fetcher->fetch_cache($uri), '(まだキャッシュない)';
+    ok !$fetcher->fetch_cache($uri)->is_success, '(まだキャッシュない)';
     set_next code => 404;
     $res = $fetcher->fetch(GET $uri);
     is $res->code, 404, 'キャッシュなしで 404 なら 404';
 
     $res = $fetcher->fetch(GET $uri);
     is $res->code, 200, '一度 200 をキャッシュすると…';
-    ok $fetcher->fetch_cache($uri), '(キャッシュされた)';
+    ok $fetcher->fetch_cache($uri)->is_success, '(キャッシュされた)';
 
     set_next code => 404;
     $res = $fetcher->fetch(GET $uri);
@@ -71,11 +71,13 @@ client => sub {
             my $res = $fetcher->fetch(GET $uri . 'sleep');
             $first_request_done++;
             is $res->content, "sleeping\n", '最初の fetch()';
+            ok !$res->header('X-Modoi-Source');
         };
         my $f2 = async {
             my $res = $fetcher->fetch(GET $uri . 'sleep');
             ok $first_request_done,         '最初の fetch() が完了するまで待つ';
             is $res->content, "sleeping\n", 'かつ、キャッシュを取得';
+            is $res->header('X-Modoi-Source'), 'cache';
         };
         $f1->join;
         $f2->join;

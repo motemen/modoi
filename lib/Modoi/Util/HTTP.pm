@@ -34,7 +34,6 @@ sub one_year_from_now {
     my $dt = DateTime->now->add(years => 1);
     $dt->set_formatter('DateTime::Format::HTTP');
     $dt;
-
 }
 
 1;

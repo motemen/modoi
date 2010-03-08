@@ -5,7 +5,12 @@ use Modoi;
 use Modoi::Config;
 use Modoi::Extractor;
 use Modoi::DB::Thread;
-use Modoi::Util::HTTP qw(should_serve_content may_return_not_modified may_serve_cache one_year_from_now);
+use Modoi::Util::HTTP qw(
+    should_serve_content
+    may_return_not_modified
+    may_serve_cache
+    one_year_from_now
+);
 
 use Coro;
 use Coro::AnyEvent;
@@ -53,22 +58,27 @@ sub simple_request {
     $self->ua->simple_request(@_);
 }
 
-# XXX returns Fetch::URI::Response
 sub fetch_cache {
     my ($self, $uri) = @_;
     $self->_fetch_simple($uri, NoNetwork => 1);
 }
 
-# TODO こいつが HTTP::Reponse を返したほうがよい？
 sub _fetch_simple {
     my ($self, $uri, %args) = @_;
-    URI::Fetch->fetch(
+    my $fetch_res = URI::Fetch->fetch(
         "$uri",
         Cache         => $self->cache,
         ForceResponse => 1,
         UserAgent     => $self->ua,
         %args,
-    );
+    ) or return do {
+        my $res = HTTP::Response->new(599);
+        $res->header(X_Modoi_Reason => 'URI::Fetch returned undef');
+        $res;
+    };
+    my $res = $fetch_res->as_http_response;
+    $res->headers->header(X_Modoi_Source => 'cache') if $args{NoNetwork};
+    $res;
 }
 
 # TODO ながい
@@ -81,8 +91,10 @@ sub fetch {
     );
 
     if (may_serve_cache($req)) {
-        if (my $cache_res = $self->fetch_cache($req->uri)) {
+        my $cache_res = $self->fetch_cache($req->uri);
+        if ($cache_res->is_success) {
             if ($self->config->condition('serve_cache')->pass($cache_res)) {
+                # キャッシュから返却
                 if (may_return_not_modified($req)) {
                     Modoi->log(debug => 'return NOT MODIFIED for ' . $req->uri);
                     return HTTP::Response->new(RC_NOT_MODIFIED);
@@ -101,35 +113,35 @@ sub fetch {
     $UriSemaphore{$req->uri} ||= Coro::Semaphore->new;
     if ($UriSemaphore{$req->uri}->count <= 0) {
         Modoi->log(debug => $req->uri . ': currently fetching');
-        $fetch_args{NoNetwork} = 1; # キャッシュを期待する
+        $fetch_args{NoNetwork} = 1; # 他のジョブが取ってきているキャッシュを期待する
     }
 
     my $guard = $UriSemaphore{$req->uri}->guard;
     my $fetch_res = $self->_fetch_simple($req->uri, %fetch_args);
 
-    unless ($fetch_res) {
+    if ($fetch_args{NoNetwork} && $fetch_res->is_error) {
         # おそらく別の Coro が fetch 中だったけど失敗したのでキャッシュを取得できなかったという状況
-        die q<Can't happen> unless $fetch_args{NoNetwork} == 1;
+        # じゃあセマフォを消してもう一回
         undef $guard;
         return $self->fetch($req);
     }
 
-    Modoi->log(debug => '<<< ' . $req->uri . ' (' . ($fetch_res ? $fetch_res->http_status || '200, cache' : 404) . ')');
+    Modoi->log(
+        debug => '<<< ' . $req->uri . ' (' . $fetch_res->code . do { my $source = $fetch_res->header('X-Modoi-Source'); $source ? ",$source" : '' } . ')'
+    );
 
-    my $http_status = $fetch_res->http_status || RC_OK;
-
-    my $from_cache;
-    if ($http_status == RC_NOT_FOUND && may_serve_cache($req)) {
+    if ($fetch_res->code == RC_NOT_FOUND && may_serve_cache($req)) {
         # serve cache
         Modoi->log(info => 'serving cache for ' . $req->uri);
-        $fetch_res = $self->fetch_cache($req->uri) || $fetch_res;
-        $from_cache++;
+        my $cache_res = $self->fetch_cache($req->uri);
+        $fetch_res = $cache_res if $cache_res->is_success;
     }
 
-    my $res = $fetch_res->as_http_response($req);
+    my $res = $fetch_res;
+    $res->request($req) unless $res->request;
 
     if (!$fetch_res->is_error && should_serve_content($req)) {
-        # えーとなんだっけ
+        # えーとなんだっけ、何だかの理由で必要
         $res->code(RC_OK);
         $res->header(Content_Type => $fetch_res->content_type);
     }
@@ -139,12 +151,11 @@ sub fetch {
         $res->headers->header(Expires => one_year_from_now);
     }
 
-    if ($from_cache) {
-        # キャッシュから掘り起こされたコンテンツはマークしておく
-        $res->headers->header(X_Modoi_Source => 'cache');
-    }
-
-    if ($res->is_success && !$fetch_args{NoNetwork} && !$from_cache && $self->config->condition('save_thread')->pass($res)) {
+    # TODO ここに埋め込んじゃだめ
+    if ($res->is_success
+            && !$fetch_args{NoNetwork}
+            && ($res->header('X-Modoi-Source') || '') eq 'cache'
+            && $self->config->condition('save_thread')->pass($res)) {
         Modoi->log(info => 'saving thread ' . $req->uri);
         Modoi::DB::Thread->save_response($res);
     }
