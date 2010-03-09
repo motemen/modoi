@@ -1,6 +1,8 @@
 use strict;
 use warnings;
+use utf8;
 use Test::More tests => 19;
+use t::TestModoi;
 use Test::TCP;
 use LWP::Simple 'get';
 use HTTP::Request::Common;

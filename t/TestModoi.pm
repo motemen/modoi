@@ -1,12 +1,14 @@
 package t::TestModoi;
 use strict;
 use warnings;
-use Exporter::Lite;
+use lib glob 'modules/*/lib';
+use Test::More;
 use Encode::Guess;
 use Path::Class;
 use HTTP::Response;
 use HTTP::Request::Common;
 use YAML;
+use Exporter::Lite;
 
 our @EXPORT_OK = qw(
     test_file
