@@ -114,6 +114,12 @@ sub fetch {
 
     Modoi->log(debug => '>>> fetch ' . $req->uri);
 
+    if (should_serve_content($req)) {
+        # スーパーリロードの場合はキャッシュをうまいこと無視しないといけない
+        # これだとレスポンスを格納できないのでダメそう FIXME
+        %fetch_args = ( Cache => '' );
+    }
+
     $UriSemaphore{$req->uri} ||= Coro::Semaphore->new;
     if ($UriSemaphore{$req->uri}->count <= 0) {
         Modoi->log(debug => $req->uri . ': currently fetching');
@@ -155,7 +161,6 @@ sub fetch {
         $res->headers->header(Expires => one_year_from_now);
     }
 
-    # TODO ここに埋め込んじゃだめ
     if ($res->is_success
             && ($res->header('X-Modoi-Source') || '') ne 'cache'
             && $self->config->condition('save_thread')->pass($res)) {

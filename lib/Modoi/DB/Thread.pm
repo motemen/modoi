@@ -33,8 +33,9 @@ sub save_response {
 
     Modoi->log(info => 'saving thread ' . $res->request->uri);
 
-    my $parsed = $class->parser->parse($res) or return;
-    return unless $parsed->isa('WWW::Futaba::Parser::Result::Thread'); # XXX
+    # XXX
+    my $parsed = eval { $class->parser->parse($res) } or return;
+    return unless $parsed->isa('WWW::Futaba::Parser::Result::Thread');
 
     my $thread = $class->new(uri => ($res->request ? $res->request->uri : $res->base));
     unless ($thread->load(speculative => 1)) {
