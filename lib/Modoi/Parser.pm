@@ -27,7 +27,7 @@ sub parse {
     $result;
 }
 
-1;
+0-*DEPRECATED*-0;
 
 __END__
 

@@ -5,6 +5,7 @@ use Modoi;
 use Modoi::Fetcher;
 use Modoi::Watcher;
 use Modoi::Extractor;
+use Modoi::DB::Thread;
 
 use Coro;
 
@@ -17,7 +18,7 @@ with 'Modoi::Role::Configurable';
 has 'fetcher', (
     is  => 'rw',
     isa => 'Modoi::Fetcher',
-    default => sub { Modoi::Fetcher->new },
+    lazy_build => 1,
 );
 
 has 'extractor', (
@@ -38,6 +39,11 @@ no Any::Moose;
 
 sub DEFAULT_CONFIG {
     +{ proxy => { host => '*.2chan.net' } };
+}
+
+sub _build_fetcher {
+    my $self = shift;
+    Modoi::Fetcher->new(on_fresh_response => sub { $self->save_thread($_[0]) });
 }
 
 sub _build_watcher {
@@ -69,6 +75,11 @@ sub process {
     $self->do_prefetch($res);
 
     $res;
+}
+
+sub save_thread {
+    my ($self, $res) = @_;
+    Modoi::DB::Thread->save_response($res);
 }
 
 sub do_prefetch {

@@ -4,7 +4,6 @@ use Any::Moose;
 use Modoi;
 use Modoi::Config;
 use Modoi::Extractor;
-use Modoi::DB::Thread;
 use Modoi::Util::HTTP qw(
     should_serve_content
     may_return_not_modified
@@ -38,6 +37,12 @@ has 'ua', (
     is  => 'rw',
     isa => 'LWP::UserAgent',
     default => sub { LWP::UserAgent::AnyEvent::Coro->new(timeout => 30) },
+);
+
+has 'on_fresh_response', (
+    is  => 'rw',
+    isa => 'CodeRef',
+    default => sub { sub { } },
 );
 
 __PACKAGE__->meta->make_immutable;
@@ -154,8 +159,7 @@ sub fetch {
     if ($res->is_success
             && ($res->header('X-Modoi-Source') || '') ne 'cache'
             && $self->config->condition('save_thread')->pass($res)) {
-        Modoi->log(info => 'saving thread ' . $req->uri);
-        Modoi::DB::Thread->save_response($res);
+        $self->on_fresh_response->($res);
     }
 
     $res;

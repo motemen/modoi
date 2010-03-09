@@ -1,0 +1,3 @@
+[submodule "modules/WWW-Futaba-Parser"]
+	path = modules/WWW-Futaba-Parser
+	url = git://github.com/motemen/WWW-Futaba-Parser.git

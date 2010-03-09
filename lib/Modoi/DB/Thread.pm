@@ -2,7 +2,7 @@ package Modoi::DB::Thread;
 use strict;
 use warnings;
 use base 'Modoi::DB::Object';
-use Modoi::Parser;
+use WWW::Futaba::Parser;
 
 __PACKAGE__->meta->setup(
     table => 'thread',
@@ -17,7 +17,7 @@ __PACKAGE__->meta->column('updated_on')->add_trigger(
 );
 
 sub parser {
-    our $Parser ||= Modoi::Parser->new;
+    'WWW::Futaba::Parser';
 }
 
 # XXX 虹裏限定じゃないですか!!
@@ -31,15 +31,18 @@ sub catalog_thumbnail_uri {
 sub save_response {
     my ($class, $res) = @_;
 
-    # TODO パーズする前に判断
-    my $thread_info = $class->parser->parse($res) or return;
+    Modoi->log(info => 'saving thread ' . $res->request->uri);
+
+    my $parsed = $class->parser->parse($res) or return;
 
     my $thread = $class->new(uri => ($res->request ? $res->request->uri : $res->base));
-    $thread->load(speculative => 1);
-    while (my ($key, $value) = each %$thread_info) {
-        $thread->$key($value) if $class->meta->column($key);
-    };
-    $thread->response_count(scalar @{$thread_info->{responses}});
+    unless ($thread->load(speculative => 1)) {
+        $thread->thumbnail_uri($parsed->thumbnail_uri);
+        $thread->body($parsed->body);
+        $thread->created_on($parsed->head->{datetime});
+    }
+    $thread->posts_count(scalar @{$parsed->posts});
+    $thread->updated_on([$parsed->posts]->[-1] ? [$parsed->posts]->[-1]->head->{datetime} : $parsed->head->{datetime});
     $thread->save;
 }
 
