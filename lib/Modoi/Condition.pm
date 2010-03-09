@@ -64,6 +64,7 @@ sub _message_attr {
 sub make_regexp {
     my $pattern = shift;
     return qr/$pattern/ if _seems_like_regexp($pattern);
+    $pattern =~ s/\./\\./g;
     $pattern =~ s/(?<!\\)\*/.*?/g;
     qr/^$pattern$/;
 }

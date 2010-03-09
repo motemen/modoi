@@ -133,14 +133,13 @@ sub serve_rewriting_proxy {
 
     my $_res = $self->proxy->process($_req);
     if (($_res->header('Content-Type') || '') eq 'text/html') {
-        if (1 || $req->header('User-Agent') =~ /iPhone/) {
-            {
-                my $page   = Modoi->context->pages->classify($_res) or last;
-                my $parsed = Modoi->context->parser->parse($_res)   or last;
-                my $view   = do { require Modoi::View::iPhone; Modoi::View::iPhone->new(mt => $self->mt) };
-                my $content = $view->render($page, $parsed);
-                $_res->content(is_utf8($content) ? encode_utf8($content) : $content);
-            }
+        if ($req->header('User-Agent') =~ /iPhone/) {
+            # XXX experimental
+            my $page   = Modoi->context->pages->classify($_res) or last;
+            my $parsed = Modoi->context->parser->parse($_res)   or last;
+            my $view   = do { require Modoi::View::iPhone; Modoi::View::iPhone->new(mt => $self->mt) };
+            my $content = $view->render($page, $parsed);
+            $_res->content(is_utf8($content) ? encode_utf8($content) : $content);
         }
         $self->proxy->rewrite_links(
             $_res, sub {

@@ -100,9 +100,8 @@ sub fetch {
                     return HTTP::Response->new(RC_NOT_MODIFIED);
                 } else {
                     Modoi->log(debug => 'serve cache for ' . $req->uri);
-                    my $res = $cache_res->as_http_response;
-                    $res->headers->header(Expires => one_year_from_now);
-                    return $res;
+                    $cache_res->headers->header(Expires => one_year_from_now);
+                    return $cache_res;
                 }
             }
         }
@@ -153,8 +152,7 @@ sub fetch {
 
     # TODO ここに埋め込んじゃだめ
     if ($res->is_success
-            && !$fetch_args{NoNetwork}
-            && ($res->header('X-Modoi-Source') || '') eq 'cache'
+            && ($res->header('X-Modoi-Source') || '') ne 'cache'
             && $self->config->condition('save_thread')->pass($res)) {
         Modoi->log(info => 'saving thread ' . $req->uri);
         Modoi::DB::Thread->save_response($res);
