@@ -8,4 +8,6 @@ rules:
     rewrite: http://www.nijibox2.com/futabafiles/001/src/$1
   - regexp: (sp\d+\.\w+\b)
     rewrite: http://www.nijibox2.com/futabafiles/003/src/$1
+  - regexp: (fu\d+\.\w+\b)
+    rewrite: http://dec.2chan.net/up2/src/$1
   - xpath: //form/a/img/@src | //form/a[img]/@href

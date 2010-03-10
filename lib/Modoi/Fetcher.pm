@@ -24,12 +24,23 @@ use UNIVERSAL::require;
 with 'Modoi::Role::Configurable';
 
 sub DEFAULT_CONFIG {
-    +{ cache => { module => 'Cache::MemoryCache' } };
+    return {
+       cache => {
+         module => 'Modoi::Fetcher::FileCache',
+         args   => { cache_root => '.cache' },
+       }
+    };
 }
 
 has 'cache', (
     is  => 'rw',
-    isa => 'Cache::Cache',
+    isa => 'Object', # XXX duck_type(['get', 'set']);
+    lazy_build => 1,
+);
+
+has 'write_only_cache', (
+    is  => 'rw',
+    isa => 'Object', # XXX
     lazy_build => 1,
 );
 
@@ -56,6 +67,19 @@ sub _build_cache {
     $cache_config->{module}->new($cache_config->{args});
 }
 
+sub _build_write_only_cache {
+    my $self = shift;
+    my $cache = $self->cache;
+
+    {
+        package Modoi::Fetcher::Cache::WriteOnly;
+        sub get { undef }
+        sub set { my $self = shift; $$self->set(@_) }
+    }
+
+    bless \$cache, 'Modoi::Fetcher::Cache::WriteOnly';
+}
+
 sub simple_request {
     my $self = shift;
     $self->ua->simple_request(@_);
@@ -66,13 +90,29 @@ sub fetch_cache {
     $self->_fetch_simple($uri, NoNetwork => 1);
 }
 
+sub _uri_fetch_args {
+    my $self = shift;
+    my $cache = $self->cache;
+    if ($cache->can('uri_fetch_args')) {
+        return (
+            UserAgent     => $self->ua,
+            ForceResponse => 1,
+            $cache->uri_fetch_args,
+        );
+    } else {
+        return (
+            UserAgent     => $self->ua,
+            ForceResponse => 1,
+            Cache         => $cache,
+        );
+    }
+}
+
 sub _fetch_simple {
     my ($self, $uri, %args) = @_;
     my $fetch_res = URI::Fetch->fetch(
         "$uri",
-        Cache         => $self->cache,
-        ForceResponse => 1,
-        UserAgent     => $self->ua,
+        $self->_uri_fetch_args,
         %args,
     ) or return do {
         my $res = HTTP::Response->new(599);
@@ -111,12 +151,9 @@ sub fetch {
         }
     }
 
-    Modoi->log(debug => '>>> fetch ' . $req->uri);
-
-    if (should_serve_content($req)) {
+    if (!may_serve_cache($req)) {
         # スーパーリロードの場合はキャッシュをうまいこと無視しないといけない
-        # これだとレスポンスを格納できないのでダメそう FIXME
-        %fetch_args = ( Cache => '' );
+        %fetch_args = ( Cache => $self->write_only_cache );
     }
 
     if ($class->currently_fetching($req->uri)) {
@@ -126,12 +163,16 @@ sub fetch {
 
     my $guard = $class->fetch_guard($req->uri); # 他のジョブが取ってきていればここでストップする
 
+    Modoi->log(debug => '>>> fetch ' . $req->uri);
+
     my $fetch_res = $self->_fetch_simple($req->uri, %fetch_args);
+
+    undef $guard;
+
     if ($fetch_args{NoNetwork} && $fetch_res->is_error) {
         # おそらく別の Coro が fetch 中だったけど失敗したのでキャッシュを取得できなかったという状況
         # じゃあセマフォを消してもう一回
         Modoi->log(error => 'failed to retrieve cache; retry ' . $req->uri);
-        undef $guard;
         return $self->fetch($req);
     }
 
