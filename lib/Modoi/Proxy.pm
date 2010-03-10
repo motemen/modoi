@@ -77,11 +77,13 @@ sub process {
     $res;
 }
 
+# fetcher->on_fresh_response callback
 sub save_thread {
     my ($self, $res) = @_;
     Modoi::DB::Thread->save_response($res);
 }
 
+# watcher->on_response callback
 sub do_prefetch {
     my ($self, $res) = @_;
 
@@ -89,7 +91,7 @@ sub do_prefetch {
     return unless $res->content_type =~ m'^text/';
 
     foreach my $uri ($self->extractor->extract($res)) {
-        Modoi->log(debug => "prefetch $uri");
+        Modoi->log(info => "prefetch $uri");
         async { $self->fetcher->fetch(GET $uri) };
     }
 }

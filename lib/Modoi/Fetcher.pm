@@ -56,8 +56,6 @@ sub _build_cache {
     $cache_config->{module}->new($cache_config->{args});
 }
 
-our %UriSemaphore;
-
 sub simple_request {
     my $self = shift;
     $self->ua->simple_request(@_);
@@ -89,6 +87,7 @@ sub _fetch_simple {
 # TODO ながい
 sub fetch {
     my ($self, $req) = @_;
+    my $class = ref $self;
 
     my %fetch_args = (
         ETag          => scalar $req->header('If-None-Match'),
@@ -120,18 +119,18 @@ sub fetch {
         %fetch_args = ( Cache => '' );
     }
 
-    $UriSemaphore{$req->uri} ||= Coro::Semaphore->new;
-    if ($UriSemaphore{$req->uri}->count <= 0) {
+    if ($class->currently_fetching($req->uri)) {
         Modoi->log(debug => $req->uri . ': currently fetching');
         $fetch_args{NoNetwork} = 1; # 他のジョブが取ってきているキャッシュを期待する
     }
 
-    my $guard = $UriSemaphore{$req->uri}->guard;
-    my $fetch_res = $self->_fetch_simple($req->uri, %fetch_args);
+    my $guard = $class->fetch_guard($req->uri); # 他のジョブが取ってきていればここでストップする
 
+    my $fetch_res = $self->_fetch_simple($req->uri, %fetch_args);
     if ($fetch_args{NoNetwork} && $fetch_res->is_error) {
         # おそらく別の Coro が fetch 中だったけど失敗したのでキャッシュを取得できなかったという状況
         # じゃあセマフォを消してもう一回
+        Modoi->log(error => 'failed to retrieve cache; retry ' . $req->uri);
         undef $guard;
         return $self->fetch($req);
     }
@@ -170,12 +169,24 @@ sub fetch {
     $res;
 }
 
-# XXX
+our %UriSemaphore;
+
 sub cancel {
     my ($class, $uri) = @_;
     Modoi->log(info => "fetching $uri will be cancelled");
-    # TODO セマフォ削除…というかセマフォは LWP::UA::Coro にもっていくべきなのでは
     LWP::UserAgent::AnyEvent::Coro->cancel($uri);
+    delete $UriSemaphore{$uri};
+}
+
+sub currently_fetching {
+    my ($class, $uri) = @_;
+    my $sem = $UriSemaphore{$uri} or return;
+    return $sem->count <= 0;
+}
+
+sub fetch_guard {
+    my ($class, $uri) = @_;
+    ($UriSemaphore{$uri} ||= Coro::Semaphore->new)->guard;
 }
 
 sub uris_on_progress {
@@ -183,7 +194,8 @@ sub uris_on_progress {
 }
 
 sub logger_name {
-    sprintf '%s [%d]', __PACKAGE__, (scalar grep { $_->count == 0 } values %UriSemaphore);
+    my $class = shift;
+    sprintf '%s [%d]', __PACKAGE__, scalar $class->uris_on_progress;
 }
 
 sub URI::Fetch::Response::as_http_response {
