@@ -25,8 +25,8 @@ h2 {
 <ul>
 ? foreach my $thread (@$threads) {
     <li>
-    <a href="<?= $thread->uri ?>"><span class="catalog-thumbnail-container"><img src="<?= $thread->catalog_thumbnail_uri ?>" /></span></a> <a href="<?= $thread->uri ?>"><?= $thread->summary ?></a>
-    (<?= $thread->response_count ?>)
+    <a href="<?= $thread->uri ?>"><span class="catalog-thumbnail-container"><img src="<?= $thread->catalog_thumbnail_uri ?>" /></span></a> <a href="<?= $thread->uri ?>"><?= $thread->body ?></a>
+    (<?= $thread->posts_count ?>)
     <span class="timestamp"><?= $thread->created_on ?></span>/<span class="timestamp"><?= $thread->updated_on ?></span>
     </li>
 ? }
