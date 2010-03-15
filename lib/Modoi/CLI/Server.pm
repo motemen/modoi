@@ -35,6 +35,13 @@ has 'coro_debug_port', (
     cmd_flag  => 'coro-debug-port',
 );
 
+has 'plack', (
+    is  => 'rw',
+    isa => 'Bool',
+    default => sub { 0 },
+    metaclass   => 'Getopt',
+);
+
 has 'server', (
     is  => 'rw',
     isa => 'Modoi::Server',
@@ -69,6 +76,7 @@ sub run {
 
     $self->initialize_config;
 
+    $self->server->use_plack(1) if $self->plack;
     Modoi->context->server($self->server);
     Modoi->context->server->run;
 }

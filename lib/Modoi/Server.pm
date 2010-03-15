@@ -59,6 +59,12 @@ has 'mt', (
     lazy_build => 1,
 );
 
+has 'use_plack', (
+    is  => 'rw',
+    isa => 'Bool',
+    default => sub { 0 },
+);
+
 __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
@@ -194,7 +200,7 @@ sub _build_engine {
 
     HTTP::Engine->new(
         interface => {
-            module => 'AnyEvent',
+            module => $self->use_plack ? 'PSGI' : 'AnyEvent',
             args   => +{ %{$self->config} },
             request_handler => $self->request_handler,
         }
@@ -209,31 +215,58 @@ sub _build_mt {
 sub request_handler {
     my $self = shift;
     my $handler = $self->middleware->handler(sub { $self->handle_request(@_) });
-    unblock_sub {
-        my ($req, $cb) = @_;
-        my $res = $handler->($req);
-        $cb->($res);
-    };
+
+    $self->use_plack ?
+        sub {
+            my ($req) = @_;
+            my $res = $handler->($req);
+        } :
+        unblock_sub {
+            my ($req, $cb) = @_;
+            my $res = $handler->($req);
+            $cb->($res);
+        };
+}
+
+sub as_psgi_app {
+    my $self = shift;
+    return sub {
+        my @args = @_;
+        my $cv = AnyEvent->condvar;
+        async {
+            my $res = $self->engine->run(@args);
+            $cv->send($res);
+        };
+        $cv;
+    }
 }
 
 sub run {
     my $self = shift;
-    $self->engine->run;
 
-    # from Remedie
-    {
-        my $t; $t = AnyEvent->timer(
-            after    => 0,
-            interval => 1,
-            cb => sub {
-                scalar $t;
-                # just loop forever to avoid runaway processes
-                schedule;
-            },
-        );
+    if ($self->use_plack) {
+        require Plack::Loader;
+        Plack::Loader->load(
+            'AnyEvent', %{$self->config},
+        )->run($self->as_psgi_app);
+    } else {
+        $self->engine->run;
+
+        # from Remedie
+        {
+            my $t; $t = AnyEvent->timer(
+                after    => 0,
+                interval => 1,
+                cb => sub {
+                    scalar $t;
+                    # just loop forever to avoid runaway processes
+                    schedule;
+                },
+            );
+        }
+
+        AnyEvent->condvar->wait;
     }
-
-    AnyEvent->condvar->wait;
 }
 
 1;
