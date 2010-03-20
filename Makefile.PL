@@ -3,10 +3,6 @@ use inc::Module::Install;
 name 'Modoi';
 license 'perl';
 
-test_requires 'Test::More';
-test_requires 'Test::TCP';
-test_requires 'HTTP::Server::Simple::CGI';
-
 requires 'Any::Moose';
 requires 'AnyEvent';
 requires 'Coro';
@@ -26,5 +22,12 @@ requires 'URI::Fetch';
 requires 'YAML';
 
 requires_any_moose 'X::Getopt::Strict';
+
+tests 't/*.t';
+author_tests 'xt';
+
+test_requires 'Test::More';
+test_requires 'Test::TCP';
+test_requires 'HTTP::Server::Simple::CGI';
 
 WriteAll;
