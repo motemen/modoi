@@ -69,6 +69,11 @@ __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
 
+sub BUILD {
+    my $self = shift;
+    Modoi->context->server($self) unless Modoi->context->server;
+}
+
 sub handle_request {
     my ($self, $req) = @_;
 

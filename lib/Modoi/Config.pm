@@ -25,6 +25,12 @@ sub initialize {
     }
 }
 
+sub initialize_by_file {
+    my ($class, $file) = @_;
+    require YAML;
+    $class->initialize(YAML::LoadFile($file));
+}
+
 sub config () {
     $Config;
 }
