@@ -81,6 +81,7 @@ sub handle_request {
         $self->$serve($req, $res);
     };
     if (my $error = $@) {
+        chomp $error;
         Modoi->log(error => $error);
         $res->code(500);
         $res->content_type('text/plain; charset=utf8');
