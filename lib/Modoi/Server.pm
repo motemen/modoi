@@ -231,15 +231,21 @@ sub request_handler {
 
 sub as_psgi_app {
     my $self = shift;
+
     return sub {
         my @args = @_;
-        my $cv = AnyEvent->condvar;
-        async {
-            my $res = $self->engine->run(@args);
-            $cv->send($res);
+        return sub {
+            my $respond = shift;
+            my $cv = AnyEvent->condvar;
+            async {
+                my $res = $self->engine->run(@args);
+                $cv->send($res);
+            };
+            $cv->cb(sub {
+                $respond->($cv->recv)
+            });
         };
-        $cv;
-    }
+    };
 }
 
 sub run {
@@ -248,7 +254,7 @@ sub run {
     if ($self->use_plack) {
         require Plack::Loader;
         Plack::Loader->load(
-            'AnyEvent', %{$self->config},
+            'AnyEvent::HTTPD', %{$self->config},
         )->run($self->as_psgi_app);
     } else {
         $self->engine->run;
