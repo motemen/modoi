@@ -1,10 +1,12 @@
 server:
   port: 3128
-  middlewares:
-   - module: ModuleReload
+# middlewares:
+#   - module: Auth::Basic
+#     args:
+#       authenticator: !!perl/code |-
+#         { join(':', @_) eq 'user:modoi' }
 fetcher:
   cache:
-    module: Cache::FileCache
     args:
       cache_root: .cache
   serve_cache:
