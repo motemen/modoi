@@ -1,6 +1,10 @@
 server:
   port: 3128
-# middlewares:
+  middlewares:
+    - module: AccessLog
+      args:
+        logger: !!perl/code |-
+          { Modoi->log(debug => @_) }
 #   - module: Auth::Basic
 #     args:
 #       authenticator: !!perl/code |-
