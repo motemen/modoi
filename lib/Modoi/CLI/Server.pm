@@ -7,8 +7,6 @@ use Modoi;
 use Modoi::Config;
 use Modoi::Server;
 
-use YAML;
-
 has 'config_file', (
     is  => 'rw',
     isa => 'Str',
