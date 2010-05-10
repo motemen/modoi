@@ -180,6 +180,12 @@ sub fetch {
         debug => '<<< ' . $req->uri . ' (' . $fetch_res->code . do { my $source = $fetch_res->header('X-Modoi-Source'); $source ? ",$source" : '' } . ')'
     );
 
+    if ($fetch_res->is_error) {
+        Modoi->log(
+            info => $req->uri . ': ' . $fetch_res->message
+        );
+    }
+
     if ($fetch_res->code == RC_NOT_FOUND && may_serve_cache($req)) {
         # serve cache
         Modoi->log(info => 'serving cache for ' . $req->uri);

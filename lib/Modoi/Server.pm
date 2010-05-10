@@ -83,16 +83,20 @@ sub handle_request {
     $res->finalize;
 }
 
+sub Plack::Request::as_http_request {
+    my $self = shift;
+    HTTP::Request->new(
+        $self->method,
+        $self->request_uri,
+        $self->headers,
+        $self->content,
+    );
+}
+
 sub serve_proxy {
     my ($self, $req, $res) = @_;
 
-    my $http_req = HTTP::Request->new(
-        $req->method,
-        $req->request_uri,
-        $req->headers,
-        $req->content,
-    );
-
+    my $http_req = $req->as_http_request;
     my $http_res = $self->proxy->process($http_req);
     $res->code($http_res->code);
     $res->content($http_res->content);
