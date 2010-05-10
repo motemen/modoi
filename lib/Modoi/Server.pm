@@ -197,8 +197,13 @@ sub as_psgi_app {
         };
     };
 
+    my $builder = Plack::Builder->new;
+
+    $builder->add_middleware(
+        'Static', path => qr<^/css/>, root => $self->root,
+    );
+
     if (my $middlewares = $self->config->{middlewares}) {
-        my $builder = Plack::Builder->new;
         foreach (@$middlewares) {
             $builder->add_middleware($_->{module}, %{$_->{args} || {}});
         }
