@@ -11,8 +11,8 @@ use AnyEvent;
 use Coro;
 use Coro::AnyEvent;
 
-use HTTP::Engine;
-use HTTP::Engine::Middleware;
+use Plack::Request;
+use Plack::Builder;
 
 use Text::MicroTemplate 'encoded_string';
 use Text::MicroTemplate::File;
@@ -28,18 +28,6 @@ with 'Modoi::Role::Configurable';
 sub DEFAULT_CONFIG {
     +{ host => '0.0.0.0' };
 }
-
-has 'engine', (
-    is  => 'rw',
-    isa => 'HTTP::Engine',
-    lazy_build => 1,
-);
-
-has 'middleware', (
-    is  => 'rw',
-    isa => 'HTTP::Engine::Middleware',
-    lazy_build => 1,
-);
 
 has 'proxy', (
     is  => 'rw',
@@ -59,12 +47,6 @@ has 'mt', (
     lazy_build => 1,
 );
 
-has 'use_plack', (
-    is  => 'rw',
-    isa => 'Bool',
-    default => sub { 0 },
-);
-
 __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;
@@ -75,13 +57,15 @@ sub BUILD {
 }
 
 sub handle_request {
-    my ($self, $req) = @_;
+    my ($self, $env, @args) = @_;
+
+    my $req = Plack::Request->new($env);
 
     Modoi->log(debug => sprintf 'handle %s %s', $req->method, $req->request_uri);
 
-    my $serve = $req->proxy_request ? 'serve_proxy' : 'serve_internal';
+    my $serve = $req->request_uri =~ m<^https?://> ? 'serve_proxy' : 'serve_internal';
 
-    my $res = HTTP::Engine::Response->new;
+    my $res = $req->new_response(200);
     eval {
         $self->$serve($req, $res);
     };
@@ -95,16 +79,24 @@ sub handle_request {
     unless ($res->content) {
         $res->content($res->code . ' ' . status_message($res->code));
     }
-    $res;
+
+    $res->finalize;
 }
 
 sub serve_proxy {
     my ($self, $req, $res) = @_;
 
-    my $_req = $req->as_http_request;
-    $_req->uri($req->request_uri);
+    my $http_req = HTTP::Request->new(
+        $req->method,
+        $req->request_uri,
+        $req->headers,
+        $req->content,
+    );
 
-    $res->set_http_response($self->proxy->process($_req));
+    my $http_res = $self->proxy->process($http_req);
+    $res->code($http_res->code);
+    $res->content($http_res->content);
+    $res->headers($http_res->headers);
 }
 
 our @Route = (
@@ -179,61 +171,9 @@ sub serve_threads {
     $res->content($self->render_html('threads', $threads));
 }
 
-sub _build_middleware {
-    my $self = shift;
-
-    my $middleware = HTTP::Engine::Middleware->new(root => $self->root);
-
-    $middleware->install(
-        'HTTP::Engine::Middleware::Static' => {
-            regexp  => qr</css/.*>,
-            docroot => $self->root,
-        }
-    );
-
-    if (not $self->use_plack) {
-        foreach (@{$self->config->{middlewares}}) {
-            my $module = $_->{module};
-            $module = "HTTP::Engine::Middleware::$module" unless $module->require;
-            Modoi->log(info => "install $module");
-            $middleware->install($module => $_->{args} || {});
-        }
-    }
-
-    $middleware;
-}
-
-sub _build_engine {
-    my $self = shift;
-
-    HTTP::Engine->new(
-        interface => {
-            module => $self->use_plack ? 'PSGI' : 'AnyEvent',
-            args   => +{ %{$self->config} },
-            request_handler => $self->request_handler,
-        }
-    );
-}
-
 sub _build_mt {
     my $self = shift;
     Text::MicroTemplate::File->new(include_path => [ $self->root ]);
-}
-
-sub request_handler {
-    my $self = shift;
-    my $handler = $self->middleware->handler(sub { $self->handle_request(@_) });
-
-    $self->use_plack ?
-        sub {
-            my ($req) = @_;
-            my $res = $handler->($req);
-        } :
-        unblock_sub {
-            my ($req, $cb) = @_;
-            my $res = $handler->($req);
-            $cb->($res);
-        };
 }
 
 sub as_psgi_app {
@@ -248,7 +188,7 @@ sub as_psgi_app {
             my $respond = shift;
             my $cv = AnyEvent->condvar;
             async {
-                my $res = $self->engine->run($env, @args);
+                my $res = $self->handle_request($env, @args);
                 $cv->send($res);
             };
             $cv->cb(sub {
@@ -258,7 +198,6 @@ sub as_psgi_app {
     };
 
     if (my $middlewares = $self->config->{middlewares}) {
-        require Plack::Builder;
         my $builder = Plack::Builder->new;
         foreach (@$middlewares) {
             $builder->add_middleware($_->{module}, %{$_->{args} || {}});
@@ -272,29 +211,10 @@ sub as_psgi_app {
 sub run {
     my $self = shift;
 
-    if ($self->use_plack) {
-        require Plack::Loader;
-        Plack::Loader->load(
-            'AnyEvent::HTTPD', %{$self->config},
-        )->run($self->as_psgi_app);
-    } else {
-        $self->engine->run;
-
-        # from Remedie
-        {
-            my $t; $t = AnyEvent->timer(
-                after    => 0,
-                interval => 1,
-                cb => sub {
-                    scalar $t;
-                    # just loop forever to avoid runaway processes
-                    schedule;
-                },
-            );
-        }
-
-        AnyEvent->condvar->wait;
-    }
+    require Plack::Loader;
+    Plack::Loader->load(
+        'AnyEvent::HTTPD', %{$self->config},
+    )->run($self->as_psgi_app);
 }
 
 1;

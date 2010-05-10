@@ -79,7 +79,6 @@ sub setup_server {
         our $coro_debug_server = Coro::Debug->new_tcp_server($self->coro_debug_port);
     }
 
-    $self->server->use_plack(1) if $self->plack;
     Modoi->context->server($self->server);
 }
 

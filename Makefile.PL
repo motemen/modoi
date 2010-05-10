@@ -6,10 +6,11 @@ license 'perl';
 requires 'Any::Moose';
 requires 'AnyEvent';
 requires 'Coro';
+requires 'Plack';
+
 requires 'DateTime';
 requires 'DateTime::Format::HTTP';
 requires 'HTML::TreeBuilder::XPath';
-requires 'HTTP::Engine';
 requires 'HTTP::Request::Common';
 requires 'HTTP::Response';
 requires 'HTTP::Status';
