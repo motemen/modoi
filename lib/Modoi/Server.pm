@@ -191,11 +191,13 @@ sub _build_middleware {
         }
     );
 
-    foreach (@{$self->config->{middlewares}}) {
-        my $module = $_->{module};
-        $module = "HTTP::Engine::Middleware::$module" unless $module->require;
-        Modoi->log(info => "install $module");
-        $middleware->install($module => $_->{args} || {});
+    if (not $self->use_plack) {
+        foreach (@{$self->config->{middlewares}}) {
+            my $module = $_->{module};
+            $module = "HTTP::Engine::Middleware::$module" unless $module->require;
+            Modoi->log(info => "install $module");
+            $middleware->install($module => $_->{args} || {});
+        }
     }
 
     $middleware;
@@ -237,7 +239,7 @@ sub request_handler {
 sub as_psgi_app {
     my $self = shift;
 
-    return sub {
+    my $app = sub {
         my ($env, @args) = @_;
 
         $env->{'psgi.nonblocking'} or die 'psgi.nonblocking feature requied';
@@ -254,6 +256,17 @@ sub as_psgi_app {
             });
         };
     };
+
+    if (my $middlewares = $self->config->{middlewares}) {
+        require Plack::Builder;
+        my $builder = Plack::Builder->new;
+        foreach (@$middlewares) {
+            $builder->add_middleware($_->{module}, %{$_->{args} || {}});
+        }
+        $app = $builder->to_app($app);
+    }
+
+    $app;
 }
 
 sub run {

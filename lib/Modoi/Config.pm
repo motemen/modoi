@@ -29,6 +29,7 @@ sub initialize_by_yaml_file {
     my $class = shift;
     my $file  = shift;
     require YAML;
+    local $YAML::LoadCode = 1;
     $class->initialize(YAML::LoadFile($file), @_);
 }
 
