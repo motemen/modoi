@@ -55,7 +55,7 @@ no Any::Moose;
 
 sub initialize_config {
     my $self = shift;
-    my $config = -e $self->config_file ? YAML::LoadFile $self->config_file : {};
+
     my $extra_config;
     while (my ($key, $value) = each %{$self->extra_config}) {
         my @keys = split /\./, $key;
@@ -63,10 +63,15 @@ sub initialize_config {
         $c = $c->{ shift @keys } ||= {} until @keys == 1;
         $c->{ shift @keys } = $value;
     }
-    Modoi::Config->initialize($config, $extra_config);
+
+    if (-e $self->config_file) {
+        Modoi::Config->initialize_by_yaml_file($self->config_file, $extra_config);
+    } else {
+        Modoi::Config->initialize({}, $extra_config);
+    }
 }
 
-sub run {
+sub setup_server {
     my $self = shift;
 
     if ($self->coro_debug_port) {
@@ -74,11 +79,27 @@ sub run {
         our $coro_debug_server = Coro::Debug->new_tcp_server($self->coro_debug_port);
     }
 
-    $self->initialize_config;
-
     $self->server->use_plack(1) if $self->plack;
     Modoi->context->server($self->server);
+}
+
+sub run {
+    my $self = shift;
+
+    $self->initialize_config;
+    $self->setup_server;
+
     Modoi->context->server->run;
+}
+
+sub to_app {
+    my $self = shift;
+
+    $self->plack(1);
+    $self->initialize_config;
+    $self->setup_server;
+
+    Modoi->context->server->as_psgi_app;
 }
 
 1;

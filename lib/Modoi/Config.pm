@@ -25,10 +25,11 @@ sub initialize {
     }
 }
 
-sub initialize_by_file {
-    my ($class, $file) = @_;
+sub initialize_by_yaml_file {
+    my $class = shift;
+    my $file  = shift;
     require YAML;
-    $class->initialize(YAML::LoadFile($file));
+    $class->initialize(YAML::LoadFile($file), @_);
 }
 
 sub config () {

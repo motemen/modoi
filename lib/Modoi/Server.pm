@@ -238,12 +238,15 @@ sub as_psgi_app {
     my $self = shift;
 
     return sub {
-        my @args = @_;
+        my ($env, @args) = @_;
+
+        $env->{'psgi.nonblocking'} or die 'psgi.nonblocking feature requied';
+
         return sub {
             my $respond = shift;
             my $cv = AnyEvent->condvar;
             async {
-                my $res = $self->engine->run(@args);
+                my $res = $self->engine->run($env, @args);
                 $cv->send($res);
             };
             $cv->cb(sub {

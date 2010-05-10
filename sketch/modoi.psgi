@@ -5,7 +5,6 @@ use warnings;
 use lib 'lib';
 use lib glob 'modules/*/lib';
 
-use Modoi qw(Config Server);
+use Modoi 'CLI::Server';
 
-Modoi::Config->initialize_by_file('config.yaml');
-Modoi::Server->new(use_plack => 1)->as_psgi_app;
+Modoi::CLI::Server->new_with_options;
