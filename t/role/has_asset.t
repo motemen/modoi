@@ -1,6 +1,4 @@
-use strict;
-use Test::More tests => 5;
-use t::TestModoi;
+use t::Modoi;
 
 package Modoi::TestExtractor;
 use Any::Moose;
@@ -44,3 +42,5 @@ is +Modoi::TestParser->new->load_asset_module($res{index}),
 
 is +Modoi::TestParser->new->load_asset_module($res{thread}),
    undef; # 'Modoi::Asset::Module::2chan_net_parser_thread';
+
+done_testing;

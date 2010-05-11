@@ -18,7 +18,7 @@ use Text::MicroTemplate 'encoded_string';
 use Text::MicroTemplate::File;
 
 use Encode;
-Encode->import('is_utf8');
+BEGIN { Encode->import('is_utf8') }
 
 use Path::Class;
 use HTTP::Status;
@@ -186,7 +186,7 @@ sub as_psgi_app {
     my $app = sub {
         my ($env, @args) = @_;
 
-        $env->{'psgi.nonblocking'} or die 'psgi.nonblocking feature requied';
+        $env->{'psgi.nonblocking'} or die 'psgi.nonblocking feature required';
 
         return sub {
             my $respond = shift;

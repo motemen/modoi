@@ -1,8 +1,5 @@
-use strict;
-use warnings;
 use utf8;
-use Test::More tests => 19;
-use t::TestModoi;
+use t::Modoi;
 use Test::TCP;
 use LWP::Simple 'get';
 use HTTP::Request::Common;
@@ -102,6 +99,8 @@ client => sub {
         $f2->join;
     }
 };
+
+done_testing;
 
 package HTTPMock;
 use base 'HTTP::Server::Simple::CGI';

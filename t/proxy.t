@@ -1,11 +1,8 @@
-use strict;
-use utf8;
-use Test::More tests => 4;
-use t::TestModoi;
+use t::Modoi;
 
-BEGIN { use_ok 'Modoi::Proxy' }
+use_ok 'Modoi::Proxy';
 
-my $proxy = Modoi::Proxy->new;
+my $proxy = new_ok 'Modoi::Proxy';
 
 my $res = fake_http GET => 'http://img.2chan.net/b/res/69762910.htm';
 
@@ -15,3 +12,5 @@ my @uri = $res->decoded_content =~ /href="(.+?)"/g;
 ng scalar grep { m'^PROXY:javascript:' }              @uri;
 ng scalar grep { m'^PROXY:http://www.amazon.co.jp/' } @uri;
 ng scalar grep { m'^http://img.2chan.net' }           @uri;
+
+done_testing;
