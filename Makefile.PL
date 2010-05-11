@@ -22,6 +22,8 @@ requires 'UNIVERSAL::require';
 requires 'URI::Fetch';
 requires 'YAML';
 
+recommends 'Plack::Handler::AnyEvent::HTTPD';
+
 requires_any_moose 'X::Getopt::Strict';
 
 tests 't/*.t';
@@ -32,3 +34,17 @@ test_requires 'Test::TCP';
 test_requires 'HTTP::Server::Simple::CGI';
 
 WriteAll;
+
+sub MY::install {
+    <<__INSTALL__;
+install:
+	false
+__INSTALL__
+}
+
+sub MY::postamble {
+    <<__POSTAMBLE__;
+coverage:
+	cover -test -select_re '^blib'
+__POSTAMBLE__
+}
