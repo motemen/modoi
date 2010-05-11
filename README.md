@@ -1,23 +1,19 @@
 Modoi - Nijiura proxy
 =====================
 
-Modoi とは、虹裏プロキシです。機能はわりと未定です。
-書き直したくなったのでこのブランチで一から作り直しています。
-Remedie とかを参考にさせて頂いてます。
+DESCRIPTION
+-----------
+
+虹裏プロキシです。
+
+SYNOPSIS
+--------
+	perl sketch/modoi.psgi -c config.sample.yaml
+
+	plackup sketch/modoi.psg -s AnyEvent::HTTPD -p 9999
+
+プロキシとしてご利用下さい。
 
 TODO
 ----
- * スレの監視
-   * キャッシュなしで取ってきて、キャッシュなしで返す
- * DB か何かに保存
- * 本文の保存
- * 静的ファイルは永続的にキャッシュ
- * スレ消えてもキャッシュを渡す
- * 消えたスレは二度と取りにいかない
- * 静的ファイルは二度と取りにいかない
-   * 二度と取りにいかせない
- * HTTP::Message にマッチできるルール
- * URI::Fetch->fetch でリダイレクトされた場合の検出
-   * リダイレクトのあったものはキャッシュしない
-
-vim: set filetype=markdown:
+ * 古いモジュール消す
