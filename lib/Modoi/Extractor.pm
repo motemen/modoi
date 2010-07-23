@@ -42,6 +42,10 @@ sub extract {
             }
         }
     }
+    
+    if ($tree) {
+        $tree->delete;
+    }
 
     uniq @result;
 }

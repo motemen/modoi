@@ -10,8 +10,9 @@ use Modoi::DB::Thread;
 use Coro;
 
 use URI;
-use HTTP::Request::Common 'GET';
+use HTTP::Request::Common qw(GET);
 use HTML::TreeBuilder::XPath;
+use Scalar::Util qw(weaken);
 
 with 'Modoi::Role::Configurable';
 
@@ -43,12 +44,14 @@ sub DEFAULT_CONFIG {
 
 sub _build_fetcher {
     my $self = shift;
-    Modoi::Fetcher->new(on_fresh_response => sub { $self->save_thread($_[0]) });
+    weaken (my $proxy = $self);
+    Modoi::Fetcher->new(on_fresh_response => sub { $proxy->save_thread($_[0]) });
 }
 
 sub _build_watcher {
     my $self = shift;
-    Modoi::Watcher->new(fetcher => $self->fetcher, on_response => sub { $self->do_prefetch($_[0]) });
+    weaken (my $proxy = $self);
+    Modoi::Watcher->new(fetcher => $self->fetcher, on_response => sub { $proxy->do_prefetch($_[0]) });
 }
 
 sub process {

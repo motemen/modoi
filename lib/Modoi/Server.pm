@@ -201,6 +201,11 @@ sub as_psgi_app {
         };
     };
 
+    if ($ENV{MODOI_DEBUG} && eval { require Devel::LeakGuard::Object; 1 }) {
+        Modoi->log(notice => 'Devel::LeakGuard::Object loaded');
+        Devel::LeakGuard::Object::track($self);
+    }
+
     my $builder = Plack::Builder->new;
 
     $builder->add_middleware(

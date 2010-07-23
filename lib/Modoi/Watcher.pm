@@ -7,6 +7,7 @@ use Modoi;
 use AnyEvent;
 use Coro;
 use HTTP::Request::Common;
+use Scalar::Util qw(weaken);
 
 has 'fetcher', (
     is  => 'rw',
@@ -47,6 +48,8 @@ sub start_watching_if_necessary {
 sub watch {
     my ($self, $uri) = @_;
 
+    weaken (my $watcher = $self);
+
     $self->timers->{$uri} ||= do {
         Modoi->log(notice => "watch $uri");
         AnyEvent->timer(
@@ -54,9 +57,9 @@ sub watch {
             interval => $self->interval,
             cb => unblock_sub {
                 Modoi->log(info => "crawl $uri");
-                my $res = $self->fetcher->fetch(GET $uri, Cache_Control => 'no-cache');
-                $self->on_response->($res);
-                $self->unwatch($uri) unless $res->is_success;
+                my $res = $watcher->fetcher->fetch(GET $uri, Cache_Control => 'no-cache');
+                $watcher->on_response->($res);
+                $watcher->unwatch($uri) unless $res->is_success;
             },
         );
     };
@@ -68,6 +71,11 @@ sub unwatch {
     Modoi->log(notice => "unwatch $uri");
 
     delete $self->timers->{$uri};
+
+    if ($ENV{MODOI_DEBUG}) {
+        require Devel::Cycle;
+        Devel::Cycle::find_cycle($self);
+    }
 }
 
 1;

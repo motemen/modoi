@@ -53,7 +53,7 @@ sub set {
     (my $ct = $struct->{ContentType}) =~ s/;.*//;
     my $guessed_ct = guess_media_type("$file");
     if ($ct ne $guessed_ct) {
-        warn "Content-Type did not match: $ct != $guessed_ct, $uri";
+        Modoi->log(warning => "Content-Type did not match: $ct != $guessed_ct, $uri");
     }
 }
 

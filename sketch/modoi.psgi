@@ -1,6 +1,13 @@
 #!perl
 use strict;
 
+BEGIN {
+    if ($ENV{MODOI_DEBUG}) {
+        eval q{ use Devel::Leak::Object qw(GLOBAL_bless) };
+        die $@ if $@;
+    }
+}
+
 use lib 'lib';
 use lib glob 'modules/*/lib';
 
@@ -12,6 +19,15 @@ $SIG{INT} = sub {
 };
 
 sub logger_name { "$0 (pid $$)" }
+
+if ($ENV{MODOI_DEBUG}) {
+    require Modoi::Fetcher;
+    Modoi::Fetcher->meta->add_after_method_modifier(
+        fetch => sub {
+            Devel::Leak::Object::status();
+        }
+    );
+}
 
 my $server = Modoi::CLI::Server->new_with_options;
 
