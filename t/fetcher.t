@@ -15,6 +15,8 @@ use Modoi::Config {
     },
 };
 
+plan tests => 19;
+
 test_tcp
 
 server => sub {

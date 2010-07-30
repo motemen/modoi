@@ -4,10 +4,12 @@ use Plack::Test;
 use HTTP::Request::Common;
 
 use Modoi::Config {
-    logger => { dispatchers => [ 'screen' ], screen => { min_level => 'debug' } }
+    logger => { dispatchers => [] },
 };
 
 use Modoi::Server;
+
+plan tests => 1;
 
 $Plack::Test::Impl = 'Server';
 $ENV{PLACK_SERVER} = 'AnyEvent::HTTPD';

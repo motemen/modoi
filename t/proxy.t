@@ -1,5 +1,7 @@
 use t::Modoi;
 
+plan tests => 5;
+
 use_ok 'Modoi::Proxy';
 
 my $proxy = new_ok 'Modoi::Proxy';

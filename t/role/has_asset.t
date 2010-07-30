@@ -1,5 +1,7 @@
 use t::Modoi;
 
+plan tests => 5;
+
 package Modoi::TestExtractor;
 use Any::Moose;
 

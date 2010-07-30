@@ -1,6 +1,8 @@
 use t::Modoi;
 use HTTP::Request::Common;
 
+plan tests => 8;
+
 use_ok 'Modoi::Condition';
 
 my $cond = new_ok 'Modoi::Condition', [ host => '*.2chan.net' ];

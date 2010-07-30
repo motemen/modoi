@@ -1,6 +1,8 @@
 use strict;
 use t::Modoi;
 
+plan tests => 4;
+
 use_ok 'Modoi::Pages';
 
 my $pages = new_ok 'Modoi::Pages';

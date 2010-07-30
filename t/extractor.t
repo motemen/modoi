@@ -1,5 +1,7 @@
 use t::Modoi;
 
+plan tests => 3;
+
 use_ok 'Modoi::Extractor';
 
 my $extractor = new_ok 'Modoi::Extractor';
