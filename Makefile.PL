@@ -1,12 +1,13 @@
 use inc::Module::Install;
 
+all_from 'lib/Modoi.pm';
+
 name 'Modoi';
 license 'perl';
 
 requires 'Any::Moose';
 requires 'AnyEvent';
 requires 'Coro';
-requires 'Plack';
 
 requires 'DateTime';
 requires 'DateTime::Format::HTTP';
@@ -22,7 +23,8 @@ requires 'UNIVERSAL::require';
 requires 'URI::Fetch';
 requires 'YAML';
 
-recommends 'Plack::Handler::AnyEvent::HTTPD';
+requires 'Plack';
+requires 'Plack::Handler::AnyEvent::HTTPD';
 
 requires_any_moose 'X::Getopt::Strict';
 

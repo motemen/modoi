@@ -5,7 +5,7 @@ server:
       args:
         logger: !!perl/code |-
           { Modoi->log(debug => @_) }
-#   - module: Auth::Basic
+#   - module: ProxyAuth::Basic
 #     args:
 #       authenticator: !!perl/code |-
 #         { join(':', @_) eq 'user:modoi' }

@@ -1,4 +1,5 @@
 use t::Modoi;
+BEGIN { $Plack::Test::Impl = 'Server' }
 use Plack::Test;
 use HTTP::Request::Common;
 

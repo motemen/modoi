@@ -13,14 +13,14 @@ has 'host', (
     is  => 'rw',
     isa => 'Modoi::Types::Condition::Regexp',
     coerce => 1,
-    from_uri => 1,
+    # from_uri => 1,
 );
 
 has 'path', (
     is  => 'rw',
     isa => 'Modoi::Types::Condition::Regexp',
     coerce => 1,
-    from_uri => 1,
+    # from_uri => 1,
 );
 
 has 'content_type', (
@@ -51,7 +51,7 @@ sub _message_attr {
     my ($message, $attr) = @_;
     my $name = $attr->name;
 
-    if ($attr->{from_uri}) {
+    if ({ host => 1, path => 1 }->{ $attr->name }) {
         my $uri = $message->isa('HTTP::Response')
             ? $message->request && $message->request->uri
             : $message->uri;
