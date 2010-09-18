@@ -13,14 +13,12 @@ has 'host', (
     is  => 'rw',
     isa => 'Modoi::Types::Condition::Regexp',
     coerce => 1,
-    # from_uri => 1,
 );
 
 has 'path', (
     is  => 'rw',
     isa => 'Modoi::Types::Condition::Regexp',
     coerce => 1,
-    # from_uri => 1,
 );
 
 has 'content_type', (
@@ -55,9 +53,9 @@ sub _message_attr {
         my $uri = $message->isa('HTTP::Response')
             ? $message->request && $message->request->uri
             : $message->uri;
-        $uri && $uri->can($name) && $uri->$name;
+        return $uri && $uri->can($name) && $uri->$name;
     } else {
-        $message->$name;
+        return $message->$name;
     }
 }
 
@@ -66,7 +64,7 @@ sub make_regexp {
     return qr/$pattern/ if _seems_like_regexp($pattern);
     $pattern =~ s/\./\\./g;
     $pattern =~ s/(?<!\\)\*/.*?/g;
-    qr/^$pattern$/;
+    return qr/^$pattern$/;
 }
 
 sub _seems_like_regexp {

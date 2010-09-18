@@ -16,10 +16,6 @@ __PACKAGE__->meta->column('updated_on')->add_trigger(
     }
 );
 
-sub parser {
-    'WWW::Futaba::Parser';
-}
-
 # XXX 虹裏限定じゃないですか!!
 sub catalog_thumbnail_uri {
     my $self = shift;
@@ -34,7 +30,7 @@ sub save_response {
     Modoi->log(info => 'saving thread ' . $res->request->uri);
 
     # XXX
-    my $parsed = eval { $class->parser->parse($res) } or return;
+    my $parsed = eval { WWW::Futaba::Parser->parse($res) } or return;
     return unless $parsed->isa('WWW::Futaba::Parser::Result::Thread');
 
     my $thread = $class->new(uri => ($res->request ? $res->request->uri : $res->base));

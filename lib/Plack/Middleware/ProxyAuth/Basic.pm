@@ -17,7 +17,10 @@ sub prepare_app {
 }
 
 sub call {
-    my($self, $env) = @_;
+    my ($self, $env) = @_;
+
+    return $self->app->($env)
+        unless $env->{REQUEST_URI} =~ m<^https?://>;
 
     my $auth = $env->{HTTP_PROXY_AUTHORIZATION}
         or return $self->unauthorized;

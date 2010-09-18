@@ -20,13 +20,6 @@ has 'pages', (
     default => sub { require Modoi::Pages; Modoi::Pages->new },
 );
 
-# FIXME
-has 'parser', (
-    is  => 'rw',
-#   isa => 'Modoi::Parser',
-    default => sub { require Modoi::DB::Thread; Modoi::DB::Thread->parser },
-);
-
 __PACKAGE__->meta->make_immutable;
 
 no Any::Moose;

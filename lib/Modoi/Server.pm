@@ -17,6 +17,8 @@ use Plack::Builder;
 use Text::MicroTemplate 'encoded_string';
 use Text::MicroTemplate::File;
 
+use WWW::Futaba::Parser;
+
 use Encode;
 BEGIN { Encode->import('is_utf8') }
 
@@ -144,7 +146,7 @@ sub serve_rewriting_proxy {
         if ($req->header('User-Agent') =~ /iPhone/) {
             # XXX experimental
             my $page   = Modoi->context->pages->classify($_res) or last;
-            my $parsed = Modoi->context->parser->parse($_res)   or last;
+            my $parsed = WWW::Futaba::Parser->parse($_res)   or last;
             my $view   = do { require Modoi::View::iPhone; Modoi::View::iPhone->new(mt => $self->mt) };
             my $content = $view->render($page, $parsed);
             $_res->content(is_utf8($content) ? encode_utf8($content) : $content);

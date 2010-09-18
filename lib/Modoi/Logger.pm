@@ -28,13 +28,14 @@ no Any::Moose;
 
 sub log {
     my ($self, $level, $message) = @_;
-    $self->logger->log(level => $level, message => "$message\n");
+    $message .= "\n" unless $message =~ /\n$/;
+    $self->logger->log(level => $level, message => "$message");
 }
 
 sub _build_logger {
     my $self = shift;
     Log::Dispatch::Config->configure(Log::Dispatch::Configurator::HASH->new($self->config));
-    Log::Dispatch::Config->instance;
+    return Log::Dispatch::Config->instance;
 }
 
 package Log::Dispatch::Configurator::HASH;
@@ -42,17 +43,17 @@ use base 'Log::Dispatch::Configurator';
 
 sub new {
     my ($class, $hash) = @_;
-    bless $hash, $class;
+    return bless $hash, $class;
 }
 
 sub get_attrs_global {
     my $self = shift;
-    +{ format => undef, dispatchers => $self->{dispatchers} || [] };
+    return +{ format => undef, dispatchers => $self->{dispatchers} || [] };
 }
 
 sub get_attrs {
     my ($self, $name) = @_;
-    $self->{$name};
+    return $self->{$name};
 }
 
 1;
