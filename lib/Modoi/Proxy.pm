@@ -118,7 +118,9 @@ sub rewrite_links {
         }
     }
 
-    $res->content($tree->root->as_HTML);
+    my $content = $tree->root->as_HTML;
+    utf8::encode $content if utf8::is_utf8 $content;
+    $res->content($content);
 }
 
 1;

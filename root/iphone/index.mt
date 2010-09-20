@@ -1,11 +1,18 @@
 ? my ($index) = @_;
 ? $_mt->wrapper_file('iphone/_wrapper.mt')->(sub {
-
-? foreach my $thread (@{$index->{threads}}) {
+? foreach my $thread ($index->threads) {
 <div class="thread">
-?   foreach my $elem (@$thread) {
-?=    encoded_string(ref $elem ? $elem->as_HTML('') : $elem);
-?   }
+  <div class="thumbnail">
+?   my $link = $thread->image_link_elem;
+?   my $html = $link && $link->as_HTML('') || '';
+?   $html =~ s/align=\S+//; # XXX
+?=  encoded_string $html;
+  </div>
+? foreach my $post ($thread->posts) {
+    <div>
+?=    encoded_string $post->as_HTML('')
+    </div>
+? }
 </div>
 ? }
 

@@ -16,31 +16,24 @@ __PACKAGE__->meta->make_immutable;
 sub asset_name { 'view.iphone' }
 
 sub render {
-    my ($self, $page, $content) = @_;
+    my ($self, $page, $parsed) = @_;
     if (my $manipulate = $self->can("manipulate_$page")) {
-        $self->$manipulate($content);
+        $self->$manipulate($parsed);
     }
-    $self->mt->render_file("iphone/$page.mt", $content)->as_string;
+    return $self->mt->render_file("iphone/$page.mt", $parsed)->as_string;
 }
 
 sub manipulate_index {
-    my ($self, $content) = @_;
-    foreach my $elems (@{$content->{threads}}) {
-        splice @$elems, 0, 8;
-        foreach my $elem (@$elems) {
-            if (ref $elem) {
-                # スレ先頭の del リンクを削除
-                if ($elem->tag eq 'input' ||
-                   ($elem->tag eq 'a' && $elem->attr('href') =~ /^javascript:/)) {
-                    $elem->detach;
-                    $elem->delete;
-                    $elem = undef;
-                    next;
-                }
-                $self->_fixup_response_element($elem) if $elem->tag eq 'table';
-                # 左寄せにしない
-                $_->attr(align => undef) foreach $elem->look_down(_tag => 'img');
-            }
+    my ($self, $parsed) = @_;
+    foreach my $thread ($parsed->threads) {
+        foreach my $post ($thread->posts) {
+            # 削除系のなんかを削除
+            $_->detach for $post->tree->findnodes('//input');
+            $_->detach for $post->tree->findnodes('//a[@class="del"]');
+            # …を削除
+            $_->detach for $post->tree->findnodes('//td[@align="right"][@valign="top"]');
+            # 背景色を消す
+            $_->attr(bgcolor => undef) for $post->tree->findnodes('//*[@bgcolor]');
         }
     }
 }
@@ -59,9 +52,9 @@ sub _fixup_head_elements {
     foreach (@$elems) {
         next unless ref;
         if ($_->tag eq 'input' || ($_->tag eq 'a' && $_->attr('href') =~ /^javascript:/)) {
-            $_->detach;
-            $_->delete;
-            $_ = '';
+            # $_->detach;
+            # $_->delete;
+            # $_ = '';
         }
     }
 }
@@ -73,11 +66,11 @@ sub _fixup_response_element {
     $_->attr(bgcolor => undef) foreach $elem->look_down(_tag => 'td');
 
     # レスの del リンクと広告を削除
-    $_->detach && $_->delete foreach (
-        $elem->look_down(_tag => 'a', href => qr/^javascript:/),
-        $elem->look_down(_tag => 'input'),
-        $elem->look_down(_tag => 'td', align => 'right', valign => 'top'),
-    );
+#   $_->detach && $_->delete foreach (
+#       $elem->look_down(_tag => 'a', href => qr/^javascript:/),
+#       $elem->look_down(_tag => 'input'),
+#       $elem->look_down(_tag => 'td', align => 'right', valign => 'top'),
+#   );
 }
 
 1;

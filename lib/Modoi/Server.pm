@@ -145,25 +145,32 @@ sub serve_rewriting_proxy {
     if (($_res->header('Content-Type') || '') eq 'text/html') {
         if ($req->header('User-Agent') =~ /iPhone/) {
             # XXX experimental
+            require Modoi::View::iPhone;
             my $page   = Modoi->context->pages->classify($_res) or last;
-            my $parsed = WWW::Futaba::Parser->parse($_res)   or last;
-            my $view   = do { require Modoi::View::iPhone; Modoi::View::iPhone->new(mt => $self->mt) };
+            my $parsed = WWW::Futaba::Parser->parse($_res) or last;
+            my $view   = Modoi::View::iPhone->new(mt => $self->mt);
             my $content = $view->render($page, $parsed);
-            $_res->content(is_utf8($content) ? encode_utf8($content) : $content);
+            utf8::encode $content if utf8::is_utf8 $content;
+            $_res->content_type('text/html; charset=utf-8');
+            $_res->content($content);
+            $_res->header(Content_Length => length $content);
         }
-        $self->proxy->rewrite_links(
-            $_res, sub {
-                $uri->query($_);
-                "$uri";
-            }
-        );
+#       $self->proxy->rewrite_links(
+#           $_res, sub {
+#               $uri->query($_);
+#               "$uri";
+#           }
+#       );
     }
 
-    $res->set_http_response($_res);
+    $res->code($_res->code);
+    $res->content($_res->content);
+    $res->headers($_res->headers);
 }
 
 sub serve_status {
     my ($self, $req, $res) = @_;
+    $res->content_type('text/html; charset=utf-8');
     $res->content($self->render_html('status'));
 }
 
@@ -174,6 +181,7 @@ sub serve_threads {
         limit   => 50,
         offset  => (($req->param('page') || 1) - 1) * 50,
     );
+    $res->content_type('text/html; charset=utf-8');
     $res->content($self->render_html('threads', $threads));
 }
 
