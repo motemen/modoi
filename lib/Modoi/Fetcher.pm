@@ -196,8 +196,8 @@ sub fetch {
     my $res = $fetch_res;
     $res->request($req) unless $res->request;
 
-    if (!$fetch_res->is_error && should_serve_content($req)) {
-        # えーとなんだっけ、何だかの理由で必要
+    if (!$fetch_res->is_error && !may_return_not_modified($req)) {
+        # 304 が入ってる場合もあるので 200 にリセット
         $res->code(RC_OK);
         $res->header(Content_Type => $fetch_res->content_type);
     }
@@ -296,6 +296,8 @@ sub send_request {
         return $self->SUPER::send_request(@_);
     }
 
+    $request->remove_header('Accept-Encoding'); # XXX とりあえず
+
     my $t = [ Time::HiRes::gettimeofday ];
 
     my $uri = $request->uri;
@@ -308,6 +310,7 @@ sub send_request {
         on_body => sub {
             my ($partial_data, $header) = @_;
             $data .= $partial_data;
+            Modoi->log(debug => sprintf("$uri: %d/%s", length $data, $header->{'content-length'} || '-'));
             $Session{$uri}{progress} = [ length $data, $header->{'content-length'} ];
             1;
         },

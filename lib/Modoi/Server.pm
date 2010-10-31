@@ -76,7 +76,8 @@ sub handle_request {
         Modoi->log(error => $error);
         $res->code(500);
         $res->content_type('text/plain; charset=utf8');
-        $res->content(Encode::is_utf8($error) ? encode_utf8($error) : $error);
+        $res->content('Internal Server Error');
+        # $res->content(Encode::is_utf8($error) ? encode_utf8($error) : $error);
     }
     unless ($res->content) {
         $res->content($res->code . ' ' . status_message($res->code));
