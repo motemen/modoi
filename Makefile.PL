@@ -3,14 +3,16 @@ use inc::Module::Install;
 name 'Modoi';
 license 'perl';
 
-requires 'Plack';
-requires 'parent';
-requires 'LWP::UserAgent';
-requires 'UNIVERSAL::require';
-requires 'Path::Class';
-
 requires 'Mouse';
 requires 'MouseX::Types::Path::Class';
+
+requires 'Plack';
+requires 'Plack::App::Proxy';
+
+requires 'parent';
+requires 'LWP::UserAgent';
+requires 'Path::Class';
+requires 'UNIVERSAL::require';
 
 build_requires 'Test::More';
 

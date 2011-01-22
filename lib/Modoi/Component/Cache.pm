@@ -93,7 +93,8 @@ use Modoi;
 # TODO Cache-Control, serve 304, etc
 around serve => sub {
     my ($orig, $self, @args) = @_;
-    my $req = $args[0];
+    my $env = $args[0];
+    my $req = $self->prepare_request($env);
     my $res = Modoi->component('Cache')->get($req);
     if ($res) {
         Modoi->log(info => 'serving cache for ' . $req->request_uri);
