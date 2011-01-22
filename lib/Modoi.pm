@@ -8,7 +8,7 @@ our $VERSION = '0.01';
 
 sub log {
     my ($self, $level, @msgs) = @_;
-    printf STDERR "%-7s @msgs\n", "[$level]";
+    printf STDERR "%-7s %s\n", "[$level]", "@msgs";
 }
 
 sub initialize { __PACKAGE__->_context }

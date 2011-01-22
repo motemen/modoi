@@ -12,7 +12,7 @@ has ua => (
 sub request {
     my ($self, $req) = @_;
     my $http_req = $req->as_http_message;
-    my $http_res = $self->ua->request($http_req);
+    my $http_res = $self->ua->simple_request($http_req);
     Modoi->log(info => $req->method, $req->request_uri, '=>', $http_res->status_line);
     return $req->new_response_from_http_response($http_res);
 }
