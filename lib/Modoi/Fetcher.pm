@@ -9,6 +9,7 @@ has ua => (
     default => sub { LWP::UserAgent->new },
 );
 
+# TODO $fetcher->on_response($res, $req)
 sub request {
     my ($self, $req) = @_;
     my $http_req = $req->as_http_message;

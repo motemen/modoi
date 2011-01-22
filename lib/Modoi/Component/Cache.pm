@@ -22,6 +22,11 @@ sub get {
     my ($self, $req) = @_;
 
     return undef if $req->method ne 'GET';
+    
+    my $headers = $req->headers;
+    return undef if ($headers->header('Pragma') || '') eq 'no-cache';
+    return undef if ($headers->header('Cache-Control') || '') eq 'no-cache';
+    return undef if $headers->header('If-Modified-Since');
 
     my $value = $self->cache->get($req->request_uri) or return undef;
     return Modoi::Response->new(@$value);
@@ -43,12 +48,9 @@ sub update {
 
 sub INSTALL {
     my ($class, $context) = @_;
-    my $self = $class->new;
-
     Modoi::Fetcher::Role::Cache->meta->apply($context->fetcher);
     Modoi::Proxy::Role::Cache->meta->apply($context->proxy);
-
-    return $self;
+    return $class->new;
 }
 
 package Modoi::Component::Cache::Cache::File;

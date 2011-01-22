@@ -9,6 +9,8 @@ requires 'MouseX::Types::Path::Class';
 requires 'Plack';
 requires 'Plack::App::Proxy';
 
+requires 'Teng';
+
 requires 'parent';
 requires 'LWP::UserAgent';
 requires 'Path::Class';
