@@ -19,4 +19,17 @@ sub as_http_message {
     );
 }
 
+sub new_response {
+    my $self = shift;
+    require Modoi::Response;
+    Modoi::Response->new(@_);
+}
+
+sub new_response_from_http_response {
+    my ($self, $http_res) = @_;
+    my $res = $self->new_response($http_res->code, $http_res->headers, $http_res->content);
+    $res->_original_http_response($http_res);
+    return $res;
+}
+
 1;

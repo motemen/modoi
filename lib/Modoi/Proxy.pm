@@ -10,6 +10,7 @@ has fetcher => (
 
 sub serve {
     my ($self, $req) = @_;
+    Modoi->log(debug => 'proxy serve ' . $req->request_uri);
     foreach ($req->headers->header_field_names) {
         $req->headers->remove_header($_) if /^Proxy-/i;
     }

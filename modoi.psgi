@@ -8,6 +8,7 @@ use Modoi;
 use Modoi::Request;
 
 Modoi->initialize;
+Modoi->install_component('Cache');
 
 my $app = sub {
     my $env = shift;
