@@ -1,6 +1,7 @@
 package Modoi::Component::Cache;
 use Mouse;
 use Mouse::Util::TypeConstraints;
+use Modoi::Response;
 
 # TODO make configurable
 has cache => (
@@ -17,11 +18,20 @@ sub _default_cache {
     );
 }
 
+sub get {
+    my ($self, $req) = @_;
+
+    return undef if $req->method ne 'GET';
+
+    my $value = $self->cache->get($req->request_uri) or return undef;
+    return Modoi::Response->new(@$value);
+}
+
 # TODO last-modified みたりキャッシュすべきかどうか判定したり
 sub update {
     my ($self, $res, $req) = @_;
 
-    if ($req->method eq 'GET') {
+    if ($req->method eq 'GET' && $res->code eq '200') {
         my $url = $req->request_uri;
         Modoi->log(debug => "updating cache -> $url");
 
@@ -36,6 +46,7 @@ sub INSTALL {
     my $self = $class->new;
 
     Modoi::Fetcher::Role::Cache->meta->apply($context->fetcher);
+    Modoi::Proxy::Role::Cache->meta->apply($context->proxy);
 
     return $self;
 }
@@ -71,9 +82,25 @@ around request => sub {
     my ($orig, $self, @args) = @_;
     my $req = $args[0];
     my $res = $self->$orig(@args);
-    my $cache = Modoi->component('Cache');
-    $cache->update($res, $req);
+    Modoi->component('Cache')->update($res, $req);
     return $res;
+};
+
+package Modoi::Proxy::Role::Cache;
+use Mouse::Role;
+use Modoi;
+
+# TODO Cache-Control, serve 304, etc
+around serve => sub {
+    my ($orig, $self, @args) = @_;
+    my $req = $args[0];
+    my $res = Modoi->component('Cache')->get($req);
+    if ($res) {
+        Modoi->log(info => 'serving cache for ' . $req->request_uri);
+        return $res;
+    } else {
+        return $self->$orig(@args);
+    }
 };
 
 1;
