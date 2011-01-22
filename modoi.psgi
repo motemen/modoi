@@ -4,14 +4,14 @@ use warnings;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
 
+use Modoi;
 use Modoi::Request;
-use Modoi::Proxy;
 
-our $proxy = Modoi::Proxy->new;
+Modoi->initialize;
 
 my $app = sub {
     my $env = shift;
     my $req = Modoi::Request->new($env);
-    my $res = $proxy->serve($req);
+    my $res = Modoi->proxy->serve($req);
     $res->finalize;
 };
