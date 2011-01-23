@@ -19,6 +19,7 @@ Modoi->initialize;
 Modoi->install_component('Cache');
 Modoi->install_component('StoreDB');
 Modoi->install_component('Watch');
+Modoi->install_component('ExtendExpires');
 
 my $app = sub {
     my $env = shift;

@@ -21,7 +21,7 @@ has watchers => (
 has interval => (
     is  => 'rw',
     isa => 'Int',
-    default => 30,
+    default => 60,
 );
 
 sub _default_watch_condition {

@@ -9,7 +9,6 @@ sub INSTALL {
 
 sub RESTORE_STATE {
     my $self = shift;
-    warn $self;
     # override this
 }
 

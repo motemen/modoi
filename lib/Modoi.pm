@@ -48,6 +48,7 @@ foreach my $method (qw(proxy fetcher db internal install_component component ses
     };
 }
 
+# TODO 消す
 sub start_session {
     my ($class, $code) = @_;
     local $Modoi::Context::SessionCache = {};

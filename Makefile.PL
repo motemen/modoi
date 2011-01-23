@@ -20,6 +20,8 @@ requires 'LWP::UserAgent';
 requires 'Path::Class';
 requires 'UNIVERSAL::require';
 requires 'Script::State';
+requires 'DateTime';
+requires 'DateTime::Format::HTTP';
 
 build_requires 'Test::More';
 build_requires 'Test::TCP';
