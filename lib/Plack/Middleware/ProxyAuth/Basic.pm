@@ -19,8 +19,6 @@ sub prepare_app {
 sub call {
     my ($self, $env) = @_;
 
-    warn $env->{REQUEST_URI};
-
     return $self->app->($env)
         unless $env->{REQUEST_URI} =~ m<^https?://>;
 

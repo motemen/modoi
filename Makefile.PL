@@ -20,5 +20,6 @@ requires 'Path::Class';
 requires 'UNIVERSAL::require';
 
 build_requires 'Test::More';
+build_requires 'Test::TCP';
 
 WriteAll;

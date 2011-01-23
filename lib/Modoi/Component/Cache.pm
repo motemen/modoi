@@ -65,6 +65,7 @@ package Modoi::Component::Cache::Cache::File;
 use Mouse;
 use MouseX::Types::Path::Class;
 
+# TODO
 # レスポンスの内容をそのまま保存するキャッシュ
 # - http/https 区別しない
 # - / のあとに勝手に index.html つける
