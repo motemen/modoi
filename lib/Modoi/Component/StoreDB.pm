@@ -23,36 +23,34 @@ package Modoi::Fetcher::Role::StoreDB;
 use Mouse::Role;
 use Modoi;
 
-around request => sub {
-    my ($orig, $self, @args) = @_;
+after modify_response => sub {
+    my ($self, $res, $req) = @_;
 
-    my $req = $args[0];
+    return unless $res->code eq '200';
+
     my $url = $req->request_uri;
-    my $res = $self->$orig(@args);
-
     Modoi->log(debug => "parsing $url");
-    if (my $parsed = Modoi->component('ParseHTML')->parse($res, $url)) {
-        Modoi->log(debug => "parsed: $url ->", $parsed);
-        if ($parsed->isa('WWW::Futaba::Parser::Result::Thread')) {
-            my %args = (
-                image_url     => $parsed->image_url,
-                thumbnail_url => $parsed->thumbnail_url,
-                body          => $parsed->body,
-                posts_count   => scalar @{[ $parsed->posts ]},
-                created_on    => $parsed->datetime,
-                updated_on    => $parsed->posts->[-1] && $parsed->posts->[-1]->datetime,
+
+    my $parsed = Modoi->component('ParseHTML')->parse($res, $url) or return;
+    Modoi->log(debug => "parsed: $url ->", $parsed);
+
+    if ($parsed->isa('WWW::Futaba::Parser::Result::Thread')) {
+        my %args = (
+            image_url     => $parsed->image_url,
+            thumbnail_url => $parsed->thumbnail_url,
+            body          => $parsed->body,
+            posts_count   => scalar @{[ $parsed->posts ]},
+            created_on    => $parsed->datetime,
+            updated_on    => $parsed->posts->[-1] && $parsed->posts->[-1]->datetime,
+        );
+        if (my $row = Modoi->db->single(thread => { url => $url })) {
+            $row->update({ %args });
+        } else {
+            Modoi->db->insert(
+                thread => { url => $url, %args }
             );
-            if (my $row = Modoi->db->single(thread => { url => $url })) {
-                $row->update({ %args });
-            } else {
-                Modoi->db->insert(
-                    thread => { url => $url, %args }
-                );
-            }
         }
     }
-
-    return $res;
 };
 
 package Modoi::DB::Schema;

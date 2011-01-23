@@ -12,6 +12,12 @@ has cache => (
     default => \&_default_cache,
 );
 
+has override_404 => (
+    is  => 'rw',
+    isa => 'Bool',
+    default => sub { 1 },
+);
+
 sub _default_cache {
     require CHI;
     return CHI->new(
@@ -21,14 +27,16 @@ sub _default_cache {
 }
 
 sub get {
-    my ($self, $req) = @_;
+    my ($self, $req, $option) = @_;
 
     return undef if $req->method ne 'GET';
     
-    my $headers = $req->headers;
-    return undef if ($headers->header('Pragma') || '') eq 'no-cache';
-    return undef if ($headers->header('Cache-Control') || '') eq 'no-cache';
-    return undef if $headers->header('If-Modified-Since');
+    unless ($option->{force}) {
+        my $headers = $req->headers;
+        return undef if ($headers->header('Pragma') || '') eq 'no-cache';
+        return undef if ($headers->header('Cache-Control') || '') eq 'no-cache';
+        return undef if $headers->header('If-Modified-Since');
+    }
 
     my $value = $self->cache->get($req->request_uri) or return undef;
     return Modoi::Response->new(@$value);
@@ -89,12 +97,9 @@ package Modoi::Fetcher::Role::Cache;
 use Mouse::Role;
 use Modoi;
 
-around request => sub {
-    my ($orig, $self, @args) = @_;
-    my $req = $args[0];
-    my $res = $self->$orig(@args);
+after modify_response => sub {
+    my ($self, $res, $req) = @_;
     Modoi->component('Cache')->update($res, $req);
-    return $res;
 };
 
 package Modoi::Proxy::Role::Cache;
@@ -106,12 +111,21 @@ around serve => sub {
     my ($orig, $self, @args) = @_;
     my $env = $args[0];
     my $req = $self->prepare_request($env);
-    my $res = Modoi->component('Cache')->get($req);
+
+    my $cache_component = Modoi->component('Cache');
+    my $res = $cache_component->get($req);
     if ($res) {
-        Modoi->log(info => 'serving cache for ' . $req->request_uri);
+        Modoi->log(info => 'serving cache for', $req->request_uri);
         return $res;
     } else {
-        return $self->$orig(@args);
+        my $res = $self->$orig(@args);
+        if ($res->code eq '404' && $cache_component->override_404) {
+            if (my $cached_res = $cache_component->get($req, { force => 1 })) {
+                Modoi->log(info => 'overriding 404:', $req->request_uri);
+                $res = $cached_res;
+            }
+        }
+        return $res;
     }
 };
 

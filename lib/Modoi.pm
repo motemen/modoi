@@ -66,7 +66,7 @@ has internal => (
 
 has installed_components => (
     is  => 'rw',
-    isa => 'HashRef', # TODO HashRef[Modoi::Component]
+    isa => 'HashRef[Modoi::Component]',
     default => sub { +{} },
 );
 

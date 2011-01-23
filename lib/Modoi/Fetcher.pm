@@ -12,10 +12,19 @@ has ua => (
 # TODO $fetcher->on_response($res, $req)
 sub request {
     my ($self, $req) = @_;
-    my $http_req = $req->as_http_message;
-    my $http_res = $self->ua->simple_request($http_req);
-    Modoi->log(info => $req->method, $req->request_uri, '=>', $http_res->status_line);
-    return $req->new_response_from_http_response($http_res);
+
+    my $http_res = $self->ua->simple_request($req->as_http_message);
+    my $res = $req->new_response_from_http_response($http_res);
+
+    $self->modify_response($res, $req);
+    Modoi->log(info => $req->method, $req->request_uri, '=>', $res->code);
+
+    return $res;
+}
+
+sub modify_response {
+    my ($self, $res, $req) = @_;
+    # hook this
 }
 
 1;
