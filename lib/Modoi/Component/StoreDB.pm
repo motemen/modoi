@@ -1,11 +1,22 @@
 package Modoi::Component::StoreDB;
 use Mouse;
+use Modoi;
+
+extends 'Modoi::Component';
 
 sub INSTALL {
-    my ($class, $context) = @_;
+    my ($self, $context) = @_;
     $context->install_component('ParseHTML');
     Modoi::Fetcher::Role::StoreDB->meta->apply($context->fetcher);
-    return $class->new;
+}
+
+sub status {
+    my $self = shift;
+    return {
+        'dsn' => Modoi->db->connect_info->[0],
+        'Stored threads'
+            => Modoi->db->search_by_sql('SELECT COUNT(*) AS count FROM thread')->next->get_column('count')
+    };
 }
 
 package Modoi::Fetcher::Role::StoreDB;
@@ -19,7 +30,7 @@ around request => sub {
     my $url = $req->request_uri;
     my $res = $self->$orig(@args);
 
-    Modoi->log(debug => "parging $url");
+    Modoi->log(debug => "parsing $url");
     if (my $parsed = Modoi->component('ParseHTML')->parse($res, $url)) {
         Modoi->log(debug => "parsed: $url ->", $parsed);
         if ($parsed->isa('WWW::Futaba::Parser::Result::Thread')) {

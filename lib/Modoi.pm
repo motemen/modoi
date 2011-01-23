@@ -25,7 +25,7 @@ sub log {
 sub initialize { __PACKAGE__->_context }
 sub _context { our $Modoi ||= Modoi::Context->new }
 
-foreach my $method (qw(proxy fetcher db install_component component session_cache)) {
+foreach my $method (qw(proxy fetcher db internal install_component component session_cache)) {
     no strict 'refs';
     *$method = sub {
         my ($class, @args) = @_;
@@ -43,6 +43,7 @@ package Modoi::Context;
 use Mouse;
 use Modoi::Proxy;
 use Modoi::DB;
+use Modoi::Internal;
 
 has proxy => (
     is  => 'rw',
@@ -55,6 +56,12 @@ has db => (
     is  => 'rw',
     isa => 'Modoi::DB',
     default => sub { Modoi::DB->new({ connect_info => [ 'dbi:SQLite:modoi.db' ] }) },
+);
+
+has internal => (
+    is  => 'rw',
+    isa => 'Modoi::Internal',
+    default => sub { Modoi::Internal->new },
 );
 
 has installed_components => (
@@ -74,7 +81,7 @@ sub install_component {
     } else {
         my $component_class = "Modoi::Component::$name";
         $component_class->require or die $@;
-        $self->{installed_components}->{$name} = $component_class->INSTALL($self);
+        $self->{installed_components}->{$name} = $component_class->install($self);
         Modoi->log(info => "installed component '$name'");
     }
 }

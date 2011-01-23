@@ -3,6 +3,8 @@ use Mouse;
 use Mouse::Util::TypeConstraints;
 use Modoi::Response;
 
+extends 'Modoi::Component';
+
 # TODO make configurable
 has cache => (
     is  => 'rw',
@@ -47,10 +49,16 @@ sub update {
 }
 
 sub INSTALL {
-    my ($class, $context) = @_;
+    my ($self, $context) = @_;
     Modoi::Fetcher::Role::Cache->meta->apply($context->fetcher);
     Modoi::Proxy::Role::Cache->meta->apply($context->proxy);
-    return $class->new;
+}
+
+sub status {
+    my $self = shift;
+    return {
+        'Cache object' => ref $self->cache,
+    };
 }
 
 package Modoi::Component::Cache::Cache::File;

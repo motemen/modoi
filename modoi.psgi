@@ -11,8 +11,17 @@ Modoi->install_component('StoreDB');
 
 my $app = sub {
     my $env = shift;
-    Modoi->start_session(sub {
-        my $res = Modoi->proxy->serve($env);
-        $res->finalize;
-    });
+
+    my $res;
+    if ($env->{REQUEST_URI} =~ m(^/)) {
+        $res = Modoi->internal->serve($env);
+    } else {
+        $res = Modoi->proxy->serve($env);
+    }
+    return ref $res eq 'ARRAY' ? $res : $res->finalize;
+};
+
+sub {
+    my $env = shift;
+    return Modoi->start_session(sub { $app->($env) });
 };

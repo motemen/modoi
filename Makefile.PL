@@ -11,6 +11,9 @@ requires 'Plack::App::Proxy';
 
 requires 'Teng';
 
+requires 'Text::Xslate';
+requires 'HTML::Entities';
+
 requires 'parent';
 requires 'LWP::UserAgent';
 requires 'Path::Class';
