@@ -36,6 +36,21 @@ sub INSTALL {
     Modoi::Fetcher::Role::Watch->meta->apply($context->fetcher);
 }
 
+sub RESTORE_STATE {
+    my $self = shift;
+
+    my @urls = @{ Modoi->package_state->{urls} || [] } or return;
+    Modoi->log(notice => 'restoring state ...');
+    foreach my $url (@urls) {
+        $self->start_watching_url($url);
+    }
+}
+
+sub STORE_STATE {
+    my $self = shift;
+    Modoi->package_state->{urls} = [ keys %{ $self->watchers } ];
+}
+
 sub watch {
     my ($self, $res, $req) = @_;
 
@@ -44,6 +59,12 @@ sub watch {
 
     return unless $res->code eq '200';
     return unless $self->watch_condition->matching($url, $req->as_http_message, $res->as_http_message);
+
+    $self->start_watching_url($url);
+}
+
+sub start_watching_url {
+    my ($self, $url) = @_;
 
     $self->watchers->{$url} = AE::timer(
         $self->interval,

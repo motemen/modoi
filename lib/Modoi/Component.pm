@@ -7,9 +7,25 @@ sub INSTALL {
     # override this
 }
 
+sub RESTORE_STATE {
+    my $self = shift;
+    warn $self;
+    # override this
+}
+
+sub STORE_STATE {
+    my $self = shift;
+    # override this
+}
+
 sub status {
     my $self = shift;
     # override this
+}
+
+sub BUILD {
+    my $self = shift;
+    $self->RESTORE_STATE;
 }
 
 sub status_as_html {

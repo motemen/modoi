@@ -5,15 +5,30 @@ use 5.8.8;
 use UNIVERSAL::require;
 use Guard;
 use Data::Dumper ();
+use Script::State -datafile => '.modoi.state';
+
+my $State;
+BEGIN { script_state $State } # XXX
+
+END {
+    foreach (values %{ Modoi->_context->installed_components }) {
+        $_->STORE_STATE;
+    }
+}
 
 our $VERSION = '0.01';
+
+sub package_state {
+    my $pkg = caller;
+    return $State->{$pkg} ||= {};
+}
 
 sub log {
     my ($self, $level, @args) = @_;
     my $pkg = caller;
     $pkg =~ s/^Modoi:://;
-    printf STDERR "%s %-8s %s - %s\n",
-        scalar(localtime), "[$level]", $pkg,
+    printf STDERR "[%s] %-6s %s - %s\n",
+        scalar(localtime), uc $level, $pkg,
         join ' ', map {
             local $Data::Dumper::Indent = 0;
             local $Data::Dumper::Maxdepth = 1;

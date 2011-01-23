@@ -19,6 +19,7 @@ requires 'parent';
 requires 'LWP::UserAgent';
 requires 'Path::Class';
 requires 'UNIVERSAL::require';
+requires 'Script::State';
 
 build_requires 'Test::More';
 build_requires 'Test::TCP';

@@ -6,6 +6,15 @@ use lib 'lib', glob 'modules/*/lib';
 use Modoi;
 use Plack::Builder;
 
+$SIG{TERM} = sub {
+    Modoi->log(notice => 'got SIGTERM, exiting');
+    exit 0;
+};
+$SIG{INT} = sub {
+    Modoi->log(notice => 'got SIGINT, exiting');
+    exit 0;
+};
+
 Modoi->initialize;
 Modoi->install_component('Cache');
 Modoi->install_component('StoreDB');

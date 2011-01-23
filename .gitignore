@@ -5,6 +5,8 @@ TAGS
 blib/
 inc/
 pm_to_blib
-.cache/
+.cache*/
 modoi.db
 config.yaml
+.modoi.state
+modoi.access_log
