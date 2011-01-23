@@ -31,6 +31,9 @@ sub _htmlify {
 
     if (blessed $object && $object->can('as_html')) {
         return $object->as_html;
+    } elsif (blessed $object && $object->isa('URI')) {
+        my $url_html = $self->_htmlify("$object");
+        return qq(<a href="$url_html">$url_html</a>);
     } elsif (!ref $object) {
         return encode_entities("$object", '<>&"');
     } elsif (UNIVERSAL::isa($object, 'ARRAY')) {

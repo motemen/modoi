@@ -1,7 +1,10 @@
 package Modoi::Fetcher;
 use Mouse;
 use Modoi;
+use Modoi::Request;
 use LWP::UserAgent;
+use HTTP::Request::Common;
+use HTTP::Message::PSGI;
 
 has ua => (
     is  => 'rw',
@@ -9,7 +12,6 @@ has ua => (
     default => sub { LWP::UserAgent->new },
 );
 
-# TODO $fetcher->on_response($res, $req)
 sub request {
     my ($self, $req) = @_;
 
@@ -20,6 +22,16 @@ sub request {
     Modoi->log(info => $req->method, $req->request_uri, '=>', $res->code);
 
     return $res;
+}
+
+sub fetch {
+    my ($self, $url) = @_;
+
+    my $env = GET($url)->to_psgi;
+    $env->{REQUEST_URI} = $url;
+
+    my $req = Modoi::Request->new($env);
+    return $self->request($req);
 }
 
 sub modify_response {

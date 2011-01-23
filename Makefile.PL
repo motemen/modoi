@@ -14,6 +14,7 @@ requires 'Teng';
 requires 'Text::Xslate';
 requires 'HTML::Entities';
 
+requires 'AnyEvent';
 requires 'parent';
 requires 'LWP::UserAgent';
 requires 'Path::Class';

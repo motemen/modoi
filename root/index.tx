@@ -12,6 +12,6 @@
 <h3 id="<: $name :>"><: $name :></h3>
     : my $component = $context.component($name)
     : $component.status_as_html | raw
-    <pre><: $component.dump :></pre>
+    <pre><: $component.dump(2) :></pre>
   : }
 : }

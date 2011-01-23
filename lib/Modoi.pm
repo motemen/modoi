@@ -12,8 +12,8 @@ sub log {
     my ($self, $level, @args) = @_;
     my $pkg = caller;
     $pkg =~ s/^Modoi:://;
-    printf STDERR "%-7s %s %s\n",
-        "[$level]", $pkg,
+    printf STDERR "%s %-8s %s - %s\n",
+        scalar(localtime), "[$level]", $pkg,
         join ' ', map {
             local $Data::Dumper::Indent = 0;
             local $Data::Dumper::Maxdepth = 1;

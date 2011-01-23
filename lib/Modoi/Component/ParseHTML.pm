@@ -9,7 +9,7 @@ sub parse {
     if (($res->headers->header('Content-Type') || '') ne 'text/html') {
         return undef;
     }
-    return Modoi->session_cache->{$res} ||= do {
+    return $res->data->{ParseHTML} ||= do {
         my $parser = WWW::Futaba::Parser->parser_for_url($url);
         $parser && eval { $parser->parse($res->as_http_message->decoded_content) }; # TODO
     };

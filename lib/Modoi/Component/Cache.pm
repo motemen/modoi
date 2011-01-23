@@ -12,7 +12,7 @@ has cache => (
     default => \&_default_cache,
 );
 
-has override_404 => (
+has override_not_found => (
     is  => 'rw',
     isa => 'Bool',
     default => sub { 1 },
@@ -31,10 +31,11 @@ sub get {
 
     return undef if $req->method ne 'GET';
     
+    my $headers = $req->headers;
+    return undef if ($headers->header('Pragma') || '') eq 'no-cache';
+    return undef if ($headers->header('Cache-Control') || '') eq 'no-cache';
+
     unless ($option->{force}) {
-        my $headers = $req->headers;
-        return undef if ($headers->header('Pragma') || '') eq 'no-cache';
-        return undef if ($headers->header('Cache-Control') || '') eq 'no-cache';
         return undef if $headers->header('If-Modified-Since');
     }
 
@@ -113,20 +114,22 @@ around serve => sub {
     my $req = $self->prepare_request($env);
 
     my $cache_component = Modoi->component('Cache');
-    my $res = $cache_component->get($req);
-    if ($res) {
+    my $cached_res = $cache_component->get($req);
+    if ($cached_res) {
         Modoi->log(info => 'serving cache for', $req->request_uri);
-        return $res;
-    } else {
-        my $res = $self->$orig(@args);
-        if ($res->code eq '404' && $cache_component->override_404) {
-            if (my $cached_res = $cache_component->get($req, { force => 1 })) {
-                Modoi->log(info => 'overriding 404:', $req->request_uri);
-                $res = $cached_res;
-            }
-        }
-        return $res;
+        return $cached_res;
     }
+
+    my $res = $self->$orig(@args);
+    if ($res->code eq '404' && $cache_component->override_not_found) {
+        if (my $cached_res = $cache_component->get($req, { force => 1 })) {
+            Modoi->log(info => 'overriding 404:', $req->request_uri);
+            $res = $cached_res;
+            $res->headers->push_header('X-Modoi-Source' => 'Cache');
+            $res->headers->push_header('X-Modoi-Original-Status' => '404');
+        }
+    }
+    return $res;
 };
 
 1;

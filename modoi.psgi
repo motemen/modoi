@@ -9,6 +9,7 @@ use Plack::Builder;
 Modoi->initialize;
 Modoi->install_component('Cache');
 Modoi->install_component('StoreDB');
+Modoi->install_component('Watch');
 
 my $app = sub {
     my $env = shift;
