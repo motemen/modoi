@@ -27,7 +27,7 @@ use Modoi;
 use DateTime;
 use DateTime::Format::HTTP;
 
-sub modify_response {
+after modify_response => sub {
     my ($self, $res, $req) = @_;
 
     Modoi->component('ExtendExpires')->condition->matching(
@@ -37,6 +37,6 @@ sub modify_response {
     my $dt = DateTime->now->add(years => 1);
     $dt->set_formatter('DateTime::Format::HTTP');
     $res->headers->header(Expires => "$dt");
-}
+};
 
 1;

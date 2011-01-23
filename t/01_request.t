@@ -16,8 +16,3 @@ my $env = {
 my $req = new_ok 'Modoi::Request', [ $env ];
 my $http_req = $req->as_http_message;
 isa_ok $http_req, 'HTTP::Request';
-
-use HTTP::Request::Common;
-use HTTP::Message::PSGI;
-my $req = new_ok 'Modoi::Request', [ GET('http://www.example.com/')->to_psgi ];
-warn $req->request_uri;

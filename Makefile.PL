@@ -3,6 +3,8 @@ use inc::Module::Install;
 name 'Modoi';
 license 'perl';
 
+all_from 'lib/Modoi.pm';
+
 requires 'Mouse';
 requires 'MouseX::Types::Path::Class';
 
@@ -20,6 +22,7 @@ requires 'LWP::UserAgent';
 requires 'Path::Class';
 requires 'UNIVERSAL::require';
 requires 'Script::State';
+requires 'HTTP::Config';
 requires 'DateTime';
 requires 'DateTime::Format::HTTP';
 

@@ -66,6 +66,7 @@ sub watch {
 sub start_watching_url {
     my ($self, $url) = @_;
 
+    Modoi->log(info => "Start watching $url");
     $self->watchers->{$url} = AE::timer(
         $self->interval,
         $self->interval,
@@ -79,7 +80,6 @@ sub start_watching_url {
             }
         },
     );
-    Modoi->log(info => "Start watching $url");
 }
 
 sub status {
