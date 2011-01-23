@@ -29,7 +29,6 @@ after modify_response => sub {
     return unless $res->code eq '200';
 
     my $url = $req->request_uri;
-    Modoi->log(debug => "parsing $url");
     my $parsed = Modoi->component('ParseHTML')->parse($res, $url) or return;
     Modoi->log(debug => "parsed: $url ->", $parsed);
 

@@ -6,7 +6,7 @@ extends 'Modoi::Component';
 
 sub parse {
     my ($self, $res, $url) = @_;
-    if (($res->headers->header('Content-Type') || '') ne 'text/html') {
+    if (($res->headers->header('Content-Type') || '') !~ m(^text/html\b)) {
         return undef;
     }
     return $res->data->{ParseHTML} ||= do {
