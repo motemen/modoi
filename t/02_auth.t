@@ -5,16 +5,10 @@ use Plack::Loader;
 use Test::TCP;
 use LWP::UserAgent;
 
-# modoi recommends these middlewares
-my $app = builder {
-    enable 'ProxyAuth::Basic',
-        authenticator => sub { "@_[0,1]" eq "proxy pass" };
-    enable_if { not $_[0]{REMOTE_USER} } 'Auth::Basic',
-        authenticator => sub { "@_[0,1]" eq "user pass" };
-    do 'modoi.psgi';
-};
+local $ENV{MODOI_AUTH} = 'user:pass';
+my $app = do 'modoi.psgi';
 
-# XXX Plack::Test does not allow proxy test
+# XXX Plack::Test does not support proxy test
 
 my $ua = LWP::UserAgent->new;
 
@@ -40,9 +34,6 @@ test_tcp(
 
             my $res = $ua->get("http://127.0.0.1:$port/", Authorization => 'Basic dXNlcjpwYXNz');
             is $res->code, 200, 'internal with auth';
-
-            # XXX get server port here
-            $port = $res->request->uri->port;
         };
 
         subtest proxy => sub {
@@ -51,7 +42,7 @@ test_tcp(
             my $res = $ua->get("http://127.0.0.1:$external_port/external");
             is $res->code, 407, 'proxy without auth';
 
-            my $res = $ua->get("http://127.0.0.1:$external_port/external", Proxy_Authorization => 'Basic cHJveHk6cGFzcw==');
+            my $res = $ua->get("http://127.0.0.1:$external_port/external", Proxy_Authorization => 'Basic dXNlcjpwYXNz');
             is $res->code, 200, 'proxy with auth';
         };
     },
