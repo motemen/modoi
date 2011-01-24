@@ -1,5 +1,6 @@
 package Modoi::Internal::Engine;
 use Mouse;
+use Modoi;
 use Text::Xslate;
 
 sub tx {
@@ -21,6 +22,7 @@ sub default {
 # FIXME 暫定
 sub render {
     my ($self, $string, $args) = @_;
+    $args->{context} ||= Modoi->_context;
     my $template = <<__TX__;
 : cascade _wrapper
 : override content -> {

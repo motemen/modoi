@@ -91,6 +91,16 @@ sub search {
     }
 }
 
+sub status {
+    my $self = shift;
+    return {
+        'Node URL'   => $self->node->{url},
+        'Name'       => $self->node->name,
+        '#Documents' => $self->node->doc_num,
+        '#Words'     => $self->node->word_num,
+    };
+}
+
 package Modoi::Fetcher::Role::IndexEstraier;
 use Mouse::Role;
 
@@ -146,15 +156,15 @@ __DATA__
   <input type="submit" value="Search" />
 </form>
 
-<ul>
+<ul class="threads">
 : for $docs -> $doc {
   <li>
-  <a href="<: $doc.attr('@uri') :>"><: $doc.attr('@title') :></a>
+  <a href="<: $doc.attr('@uri') :>" class="title"><: $doc.attr('@title') :></a>
   <time><: $doc.attr('@cdate') :></time>
-  <blockquote><: $doc.snippet | highlight_estraier_snippet :></blockquote>
   : if $doc.attr('@thumbnail_url') {
-    <img src="<: $doc.attr('@thumbnail_url') :>">
+    <img src="<: $doc.attr('@thumbnail_url') :>" class="thumbnail">
   : }
+  <blockquote class="snippet"><: $doc.snippet | highlight_estraier_snippet :></blockquote>
   </li>
 : }
 </ul>

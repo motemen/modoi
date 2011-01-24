@@ -1,13 +1,6 @@
 : cascade _wrapper
 
 : override content -> {
-<h2>Registered Routes</h2>
-  <ul>
-  : for $context.internal.registered_routes -> $route {
-    <li><a href="<: $route.pattern :>"><: $route.name :></a></li>
-  : }
-  </ul>
-
 <h2>Installed Components</h2>
   <ul>
   : for $context.installed_components.keys() -> $name {

@@ -7,6 +7,7 @@ extends 'Modoi::Component';
 sub INSTALL {
     my ($self, $context) = @_;
     $context->install_component('ParseHTML');
+    $context->internal->router->connect(threads => '/threads', { handler => Modoi::Internal::Engine::StoreDB->new, method => 'threads' });
     Modoi::Fetcher::Role::StoreDB->meta->apply($context->fetcher);
 }
 
@@ -60,4 +61,33 @@ table {
     columns qw(url image_url thumbnail_url body posts_count created_on updated_on);
 };
 
+package Modoi::Internal::Engine::StoreDB;
+use Mouse;
+use Modoi;
+
+extends 'Modoi::Internal::Engine';
+
+our $DATA = do { local $/; <DATA> };
+
+sub threads {
+    my ($self, $req) = @_;
+
+    my @threads = Modoi->db->search('thread', {}, { order_by => 'created_on DESC' });
+    return $self->render($DATA, { threads => \@threads });
+}
+
 1;
+
+__DATA__
+
+<ul class="threads">
+: for $threads -> $thread {
+  <li>
+  <a href="<: $thread.url :>" class="title"><: $thread.body :></a>
+  <time><: $thread.created_on :></time>
+  : if $thread.thumbnail_url {
+    <img src="<: $thread.thumbnail_url :>" class="thumbnail">
+  : }
+  </li>
+: }
+</ul>

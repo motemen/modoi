@@ -2,10 +2,67 @@
   <head>
     <title>Modoi</title>
     <style type="text/css">
+body {
+    padding-left: 10%;
+    padding-right: 10%;
+}
+h1 a {
+    text-decoration: none;
+}
+ul.threads li {
+    padding: 1em 0;
+    border-bottom: 1px solid #EEE;
+    clear: both;
+    min-height: 130px;
+    list-style: none;
+}
+ul.threads li a.title {
+    font-size: larger;
+}
+ul.threads li img.thumbnail {
+    max-height: 120px;
+    max-width: 150px;
+    float: right;
+    vertical-align: middle;
+    margin: 0.5em;
+}
+ul#menu {
+    margin: 1em;
+    padding: 0;
+}
+ul#menu li {
+    float: left;
+    list-style: none;
+    padding: 0;
+    padding-right: 0.5em;
+    margin: 0;
+    margin-bottom: 0.5em;
+}
+div#content {
+    clear: both;
+}
+time {
+    font-size: smaller;
+    color: #999;
+}
+blockquote.snippet strong {
+    background-color: #FF7;
+}
+input[type=text] {
+    padding: 0.2em;
+    width: 20em;
+}
     </style>
   </head>
   <body>
     <h1><a href="/">Modoi</a></h1>
+    <ul id="menu">
+    : for $context.internal.registered_routes -> $route {
+      <li><a href="<: $route.pattern :>"><: $route.name :></a></li>
+    : }
+    </ul>
+    <div id="content">
 : block content -> { }
+    </div>
   </body>
 </html>
