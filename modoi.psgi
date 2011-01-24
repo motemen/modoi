@@ -4,6 +4,7 @@ use warnings;
 use lib 'lib', glob 'modules/*/lib';
 
 use Modoi;
+use Coro;
 use Plack::Builder;
 
 $SIG{TERM} = sub {
@@ -21,17 +22,24 @@ Modoi->install_component('StoreDB');
 Modoi->install_component('Watch');
 Modoi->install_component('ExtendExpires');
 Modoi->install_component('IndexEstraier');
+Modoi->install_component('Prefetch');
 
 my $app = sub {
     my $env = shift;
 
-    my $res;
-    if ($env->{REQUEST_URI} =~ m(^/)) {
-        $res = Modoi->internal->serve($env);
-    } else {
-        $res = Modoi->proxy->serve($env);
-    }
-    return ref $res eq 'ARRAY' ? $res : $res->finalize;
+    return sub {
+        my $respond = shift;
+
+        async {
+            my $res;
+            if ($env->{REQUEST_URI} =~ m(^/)) {
+                $res = Modoi->internal->serve($env);
+            } else {
+                $res = Modoi->proxy->serve($env);
+            }
+            $respond->(ref $res eq 'ARRAY' ? $res : $res->finalize);
+        };
+    };
 };
 
 builder {

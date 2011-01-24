@@ -2,6 +2,7 @@ package Modoi::Component::Watch;
 use Mouse;
 use Modoi;
 use AnyEvent;
+use Coro;
 use HTTP::Config;
 
 extends 'Modoi::Component';
@@ -71,13 +72,16 @@ sub start_watching_url {
         $self->interval,
         $self->interval,
         sub {
-            Modoi->log(info => "Timered fetch: $url");
-            my $res = Modoi->fetcher->fetch($url);
-            my $original_status = $res->headers->header('X-Modoi-Original-Status');
-            if ($res->code =~ /^4\d\d$/ || ($original_status && $original_status =~ /^4\d\d$/)) {
-                Modoi->log(info => "Stop watching $url");
-                delete $self->watchers->{$url};
-            }
+            async {
+                # TODO 実行完了後 interval 待つ、という風に
+                Modoi->log(info => "Timered fetch: $url");
+                my $res = Modoi->fetcher->fetch($url);
+                my $original_status = $res->headers->header('X-Modoi-Original-Status');
+                if ($res->code =~ /^4\d\d$/ || ($original_status && $original_status =~ /^4\d\d$/)) {
+                    Modoi->log(info => "Stop watching $url");
+                    delete $self->watchers->{$url};
+                }
+            };
         },
     );
 }

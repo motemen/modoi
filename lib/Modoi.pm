@@ -3,6 +3,8 @@ use strict;
 use warnings;
 use 5.8.8;
 use UNIVERSAL::require;
+use Coro ();
+use AnyEvent;
 use Guard;
 use Data::Dumper ();
 use Script::State -datafile => '.modoi.state';

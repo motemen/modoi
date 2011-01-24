@@ -26,6 +26,11 @@ sub _default_cache {
     );
 }
 
+sub has_cache {
+    my ($self, $url) = @_;
+    return !!$self->cache->get("$url");
+}
+
 sub get {
     my ($self, $req, $option) = @_;
 

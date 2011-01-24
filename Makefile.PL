@@ -17,8 +17,10 @@ requires 'Text::Xslate';
 requires 'HTML::Entities';
 
 requires 'AnyEvent';
+requires 'Coro';
 requires 'parent';
 requires 'LWP::UserAgent';
+requires 'Coro::LWP';
 requires 'Path::Class';
 requires 'UNIVERSAL::require';
 requires 'Script::State';
