@@ -50,13 +50,6 @@ foreach my $method (qw(proxy fetcher db internal install_component component ses
     };
 }
 
-# TODO 消す
-sub start_session {
-    my ($class, $code) = @_;
-    local $Modoi::Context::SessionCache = {};
-    $code->();
-}
-
 package Modoi::Context;
 use Mouse;
 use Modoi::Proxy;
@@ -87,10 +80,6 @@ has installed_components => (
     isa => 'HashRef[Modoi::Component]',
     default => sub { +{} },
 );
-
-our $SessionCache;
-
-sub session_cache { $SessionCache }
 
 sub install_component {
     my ($self, $name) = @_;

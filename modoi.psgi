@@ -49,8 +49,5 @@ builder {
         enable_if { not $_[0]{REMOTE_USER} } 'Auth::Basic',
             authenticator => sub { join(':', @_[0,1]) eq $auth };
     }
-    sub {
-        my $env = shift;
-        return Modoi->start_session(sub { $app->($env) });
-    };
+    $app;
 };
