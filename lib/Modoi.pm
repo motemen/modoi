@@ -27,8 +27,9 @@ sub package_state {
 
 sub log {
     my ($self, $level, @args) = @_;
-    my $pkg = caller;
+    my ($pkg, $filename) = caller;
     $pkg =~ s/^Modoi:://;
+    $pkg = $filename if $filename =~ /\.psgi$/;
     printf STDERR "[%s] %-6s %s - %s\n",
         scalar(localtime), uc $level, $pkg,
         join ' ', map {

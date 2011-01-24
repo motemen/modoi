@@ -29,6 +29,7 @@ requires 'HTTP::Config';
 requires 'DateTime';
 requires 'DateTime::Format::HTTP';
 requires 'Try::Tiny';
+requires 'Data::Dumper';
 
 recommends 'Search::Estraier';
 

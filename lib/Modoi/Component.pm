@@ -20,6 +20,7 @@ sub STORE_STATE {
 sub status {
     my $self = shift;
     # override this
+    return undef;
 }
 
 sub BUILD {

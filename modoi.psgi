@@ -5,6 +5,7 @@ use lib 'lib', glob 'modules/*/lib';
 
 use Modoi;
 use Coro;
+use Data::Dumper;
 use Plack::Builder;
 
 $SIG{TERM} = sub {
@@ -24,8 +25,16 @@ Modoi->install_component('ExtendExpires');
 Modoi->install_component('IndexEstraier');
 Modoi->install_component('Prefetch');
 
+# XXX not to cause error in xslate
+foreach (keys %{ Modoi->_context->installed_components }) {
+    Modoi->log(debug => "$_ status:", Data::Dumper->new([ Modoi->component($_)->status ])->Indent(0)->Terse(1)->Dump);
+}
+
 my $app = sub {
     my $env = shift;
+
+    $env->{'psgi.streaming'} or die 'modoi requires psgi.streaming feature!';
+    $env->{'psgi.nonblocking'} or die 'modoi requires psgi.nonblocking feature!';
 
     return sub {
         my $respond = shift;
