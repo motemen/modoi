@@ -10,6 +10,7 @@ requires 'MouseX::Types::Path::Class';
 
 requires 'Plack';
 requires 'Plack::App::Proxy';
+requires 'Twiggy';
 
 requires 'Teng';
 
