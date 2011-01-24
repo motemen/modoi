@@ -28,6 +28,7 @@ sub fetch {
     my ($self, $url) = @_;
 
     my $env = GET($url)->to_psgi;
+    # HTTP::Message::PSGI does not support proxy request
     $env->{REQUEST_URI} = $url;
 
     my $req = Modoi::Request->new($env);

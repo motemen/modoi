@@ -26,18 +26,21 @@ sub _default_cache {
     );
 }
 
-# TODO max-age
 sub get {
     my ($self, $req, $option) = @_;
 
     return undef if $req->method ne 'GET';
     
     my $headers = $req->headers;
+    # 以下はたぶんスーパーリロードなので従う
     return undef if ($headers->header('Pragma') || '') eq 'no-cache';
     return undef if ($headers->header('Cache-Control') || '') eq 'no-cache';
 
     unless ($option->{force}) {
+        # 以下はたぶん普通のリロードなので従わない場合も
+        # キャッシュの日時とか考えるべきだが気にしない
         return undef if $headers->header('If-Modified-Since');
+        return undef if ($headers->header('Cache-Control') || '') =~ /^max-age=\d+$/;
     }
 
     my $value = $self->cache->get($req->request_uri) or return undef;
