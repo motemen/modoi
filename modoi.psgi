@@ -20,6 +20,7 @@ Modoi->install_component('Cache');
 Modoi->install_component('StoreDB');
 Modoi->install_component('Watch');
 Modoi->install_component('ExtendExpires');
+Modoi->install_component('IndexEstraier');
 
 my $app = sub {
     my $env = shift;

@@ -30,7 +30,6 @@ after modify_response => sub {
 
     my $url = $req->request_uri;
     my $parsed = Modoi->component('ParseHTML')->parse($res, $url) or return;
-    Modoi->log(debug => "parsed: $url ->", $parsed);
 
     if ($parsed->isa('WWW::Futaba::Parser::Result::Thread')) {
         my %args = (
@@ -41,6 +40,7 @@ after modify_response => sub {
             created_on    => $parsed->datetime,
             updated_on    => $parsed->posts->[-1] && $parsed->posts->[-1]->datetime,
         );
+        Modoi->log(debug => 'store db:', \%args);
         if (my $row = Modoi->db->single(thread => { url => $url })) {
             $row->update({ %args });
         } else {

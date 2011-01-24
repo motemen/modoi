@@ -25,6 +25,9 @@ requires 'Script::State';
 requires 'HTTP::Config';
 requires 'DateTime';
 requires 'DateTime::Format::HTTP';
+requires 'Try::Tiny';
+
+recommends 'Search::Estraier';
 
 build_requires 'Test::More';
 build_requires 'Test::TCP';
