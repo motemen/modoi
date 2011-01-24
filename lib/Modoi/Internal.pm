@@ -1,8 +1,8 @@
 package Modoi::Internal;
 use Mouse;
 use Modoi::Request;
+use Modoi::Internal::Engine;
 use Router::Simple;
-use Text::Xslate;
 
 has router => (
     is  => 'rw',
@@ -10,15 +10,15 @@ has router => (
     default => sub { Router::Simple->new },
 );
 
-has tx => (
-    is  => 'rw',
-    isa => 'Text::Xslate',
-    default => sub { Text::Xslate->new(path => [ 'root' ]) },
-);
-
 sub BUILD {
     my $self = shift;
-    $self->router->connect('/', { handler => $self, method => 'default' });
+    $self->router->connect(index => '/', { handler => Modoi::Internal::Engine->new, method => 'default' });
+}
+
+# XXX
+sub registered_routes {
+    my $self = shift;
+    return $self->router->{routes};
 }
 
 sub serve {
@@ -37,15 +37,6 @@ sub serve {
     }
 
     return $res;
-}
-
-sub _html {
-    return [ 200, [ 'Content-Type' => 'text/html' ], [ @_ ] ];
-}
-
-sub default {
-    my ($self, $req) = @_;
-    return _html $self->tx->render('index.tx', { context => Modoi->_context });
 }
 
 1;

@@ -44,6 +44,7 @@ sub _build_node {
 sub INSTALL {
     my ($self, $context) = @_;
     $context->install_component('ParseHTML');
+    $context->internal->router->connect(search => '/search', { handler => Modoi::Internal::Engine::IndexEstraier->new, method => 'search' });
     Modoi::Fetcher::Role::IndexEstraier->meta->apply($context->fetcher);
 }
 
@@ -62,6 +63,8 @@ sub add {
         my $doc = Search::Estraier::Document->new;
         $doc->add_attr('@uri', $req->request_uri);
         $doc->add_attr('@title', _utf8_off $parsed->body);
+        $doc->add_attr('@thumbnail_url', $parsed->thumbnail_url) if $parsed->thumbnail_url;
+        $doc->add_attr('@cdate', $parsed->datetime->iso8601) if $parsed->datetime;
         foreach ($parsed, $parsed->posts) {
             $doc->add_text(_utf8_off $_->body);
         }
@@ -74,6 +77,20 @@ sub add {
     }
 }
 
+sub search {
+    my ($self, $q) = @_;
+    Modoi->log(debug => "search: $q");
+    my $cond = Search::Estraier::Condition->new;
+       $cond->set_phrase($q);
+    my $res = $self->node->search($cond, 0);
+    if (not defined $res) {
+        Modoi->log(warn => 'search failed:', $self->node->status);
+        return;
+    } else {
+        return [ map { $res->get_doc($_) } ( 0 .. $res->doc_num - 1 ) ];
+    }
+}
+
 package Modoi::Fetcher::Role::IndexEstraier;
 use Mouse::Role;
 
@@ -83,4 +100,61 @@ after modify_response => sub {
     Modoi->component('IndexEstraier')->add($res, $req);
 };
 
+package Modoi::Internal::Engine::IndexEstraier;
+use Mouse;
+use Modoi;
+use Text::Xslate qw(html_builder html_escape);
+
+extends 'Modoi::Internal::Engine';
+
+our $DATA = do { local $/; <DATA> };
+
+sub highlight_estraier_snippet {
+    my $string = shift;
+    my $html = '';
+    foreach (split /\n/, $string) {
+        if (/^(.+?)\t(.+)$/) {
+            $html .= '<strong>' . html_escape($2) . '</strong>';
+        } else {
+            $html .= html_escape($_);
+        }
+    }
+    return $html;
+}
+
+sub search {
+    my ($self, $req) = @_;
+
+    $self->tx->{function}->{highlight_estraier_snippet} ||= html_builder \&highlight_estraier_snippet;
+
+    my $args = {};
+    if (my $q = $req->param('q')) {
+        $args->{q} = $q;
+        if (my $docs = Modoi->component('IndexEstraier')->search($q)) {
+            $args->{docs} = $docs;
+        }
+    }
+    return $self->render($DATA, $args);
+}
+
 1;
+
+__DATA__
+
+<form action="/search">
+  <input type="text" name="q" value="<: $q :>" />
+  <input type="submit" value="Search" />
+</form>
+
+<ul>
+: for $docs -> $doc {
+  <li>
+  <a href="<: $doc.attr('@uri') :>"><: $doc.attr('@title') :></a>
+  <time><: $doc.attr('@cdate') :></time>
+  <blockquote><: $doc.snippet | highlight_estraier_snippet :></blockquote>
+  : if $doc.attr('@thumbnail_url') {
+    <img src="<: $doc.attr('@thumbnail_url') :>">
+  : }
+  </li>
+: }
+</ul>
