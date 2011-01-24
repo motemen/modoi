@@ -92,14 +92,17 @@ sub session_cache { $SessionCache }
 
 sub install_component {
     my ($self, $name) = @_;
-    if ($self->{installed_components}->{$name}) {
+
+    if (my $component = $self->{installed_components}->{$name}) {
         Modoi->log(info => "component '$name' is already installed");
-    } else {
-        my $component_class = "Modoi::Component::$name";
-        $component_class->require or die $@;
-        $self->{installed_components}->{$name} = $component_class->install($self);
-        Modoi->log(info => "installed component '$name'");
+        return $component;
     }
+
+    my $component_class = "Modoi::Component::$name";
+    $component_class->require or die $@;
+    my $component = $self->{installed_components}->{$name} = $component_class->install($self);
+    Modoi->log(info => "installed component '$name'");
+    return $component;
 }
 
 sub component {
