@@ -7,6 +7,7 @@ use LWP::UserAgent;
 
 local $ENV{MODOI_AUTH} = 'user:pass';
 my $app = do 'modoi.psgi';
+die $@ if $@;
 
 # XXX Plack::Test does not support proxy test
 

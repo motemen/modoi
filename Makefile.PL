@@ -19,17 +19,19 @@ requires 'HTML::Entities';
 
 requires 'AnyEvent';
 requires 'Coro';
-requires 'parent';
-requires 'LWP::UserAgent';
 requires 'Coro::LWP';
-requires 'Path::Class';
-requires 'UNIVERSAL::require';
-requires 'Script::State';
-requires 'HTTP::Config';
+
+requires 'Data::Dumper';
 requires 'DateTime';
 requires 'DateTime::Format::HTTP';
+requires 'HTTP::Config';
+requires 'LWP::UserAgent';
+requires 'Path::Class';
+requires 'Router::Simple';
+requires 'Script::State';
 requires 'Try::Tiny';
-requires 'Data::Dumper';
+requires 'UNIVERSAL::require';
+requires 'parent';
 
 recommends 'Search::Estraier';
 

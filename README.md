@@ -21,13 +21,13 @@ How To Use
 	git clone --recursive git://github.com/motemen/modoi.git
 	cd modoi/
 	cpanm --installdeps .
-	cd modules/WWW-Futaba-Parser/
-	cpanm --installdeps .
-	cd ../..
+	(cd modules/WWW-Futaba-Parser/; cpanm --installdeps .)
 	sqlite3 modoi.db < db/*.sql
-	MODOI_AUTH=user:pass plackup modoi.psgi -p 5678
+	plackup modoi.psgi -p 5678
 
 プロキシサーバが起動します。example/proxy.pac などを利用して、ブラウザがこのプロキシを通るようにすれば設定完了です。
+
+環境変数 `MODOI_AUTH` を `user:password` の形式にしておくと、Basic 認証をかけることができます。
 
 TODO
 ----
