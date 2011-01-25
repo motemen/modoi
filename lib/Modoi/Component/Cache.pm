@@ -19,10 +19,8 @@ has override_not_found => (
 );
 
 sub _default_cache {
-    require CHI;
-    return CHI->new(
-        driver   => 'File',
-        root_dir => '.cache-chi',
+    return Modoi::Component::Cache::Cache::File->new(
+        cache_root => '.cache',
     );
 }
 
@@ -83,10 +81,11 @@ package Modoi::Component::Cache::Cache::File;
 use Mouse;
 use MouseX::Types::Path::Class;
 
-# TODO
-# レスポンスの内容をそのまま保存するキャッシュ
+# レスポンスの content をそのまま保存するキャッシュ
+# - ディレクトリに URL の構造をそのまま使用
 # - http/https 区別しない
 # - / のあとに勝手に index.html つける
+# - ヘッダは .meta/ 以下に
 
 has cache_root => (
     is  => 'rw',
@@ -95,12 +94,55 @@ has cache_root => (
     required => 1,
 );
 
-sub _url_to_file {
-    my ($self, $url) = @_;
+has cache_meta_root => (
+    is  => 'rw',
+    isa => 'Path::Class::Dir',
+    lazy_build => 1,
+);
+
+sub _build_cache_meta_root {
+    my $self = shift;
+    return $self->cache_root->subdir('.meta');
+}
+
+sub _url_to_path_component {
+    my ($url) = @_;
     $url =~ s(^https?://)();
     $url =~ s(/$)(/index.html);
     $url =~ s(/+)(/)g;
-    return $self->cache_root->file(split '/', $url);
+    return split '/', $url;
+}
+
+sub url_to_content_file {
+    my ($self, $url) = @_;
+    return $self->cache_root->file(_url_to_path_component($url));
+}
+
+sub url_to_meta_file {
+    my ($self, $url) = @_;
+    my @components = _url_to_path_component($url);
+    $components[-1] .= '.meta';
+    return $self->cache_meta_root->file(@components);
+}
+
+sub get {
+    my ($self, $url) = @_;
+    my $meta_file = $self->url_to_meta_file($url);
+    my $content_file = $self->url_to_content_file($url);
+    return undef unless -r $meta_file && -r $content_file;
+    my $http_res = HTTP::Response->parse("HTTP/1.1 200 OK\r\n" . $meta_file->slurp . "\r\n" . $content_file->slurp);
+    return Modoi::Request->new_response_from_http_response($http_res)->finalize;
+}
+
+sub set {
+    my ($self, $url, $psgi_res) = @_;
+    my (undef, $headers, $lines) = @$psgi_res; # ステータスは 200 決め打ち
+    my $meta_file = $self->url_to_meta_file($url);
+    my $content_file = $self->url_to_content_file($url);
+    $meta_file->dir->mkpath;
+    $meta_file->openw->print(HTTP::Headers->new(@$headers)->as_string);
+    $content_file->dir->mkpath;
+    $content_file->openw->print(join "\n", @$lines); # XXX IO::Handle 的なものは未対応 (まあそういうのはこない)
 }
 
 package Modoi::Fetcher::Role::Cache;
@@ -116,7 +158,7 @@ package Modoi::Proxy::Role::Cache;
 use Mouse::Role;
 use Modoi;
 
-# TODO Cache-Control, serve 304, etc
+# TODO Cache-Control, serve 304, X-Cache, X-Cache-Lookup
 around serve => sub {
     my ($orig, $self, @args) = @_;
     my $env = $args[0];
