@@ -22,7 +22,7 @@ has watchers => (
 has interval => (
     is  => 'rw',
     isa => 'Int',
-    default => 60,
+    default => 120,
 );
 
 sub _default_watch_condition {
@@ -73,7 +73,7 @@ sub start_watching_url {
         $self->interval,
         sub {
             async {
-                # TODO 実行完了後 interval 待つ、という風に
+                # TODO 実行完了後 interval 待つ、という風に/スケジューラ
                 Modoi->log(info => "Timered fetch: $url");
                 my $res = Modoi->fetcher->fetch($url);
                 my $original_status = $res->headers->header('X-Modoi-Original-Status');

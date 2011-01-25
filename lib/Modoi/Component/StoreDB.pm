@@ -83,11 +83,11 @@ __DATA__
 <ul class="threads">
 : for $threads -> $thread {
   <li>
-  <a href="<: $thread.url :>" class="title"><: $thread.body :></a>
-  <time><: $thread.created_on :></time>
   : if $thread.thumbnail_url {
     <img src="<: $thread.thumbnail_url :>" class="thumbnail">
   : }
+  <a href="<: $thread.url :>" class="title"><: $thread.body :></a>
+  <time><: $thread.created_on :></time>
   </li>
 : }
 </ul>

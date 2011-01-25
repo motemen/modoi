@@ -11,7 +11,7 @@ sub parse {
     }
     return $res->data->{ParseHTML} ||= do {
         my $parser = WWW::Futaba::Parser->parser_for_url($url);
-        my $result = $parser && eval { $parser->parse($res->as_http_message->decoded_content) }; # TODO
+        my $result = $parser && eval { $parser->parse($res->as_http_message->decoded_content) }; # TODO 失敗したらファイル残す
         Modoi->log(warn => 'parse failed:', $url, $@) if $@;
         $result;
     };

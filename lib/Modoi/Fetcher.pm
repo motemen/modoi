@@ -3,7 +3,7 @@ use Mouse;
 use Modoi;
 use Modoi::Request;
 use LWP::UserAgent;
-use Coro::LWP; # TODO timeout
+use Coro::LWP; # TODO timeout の実装
 use HTTP::Request::Common;
 use HTTP::Message::PSGI;
 

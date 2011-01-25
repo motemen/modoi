@@ -5,9 +5,16 @@
 body {
     padding-left: 10%;
     padding-right: 10%;
+    font-size: 90%;
+}
+h1 {
+    margin-bottom: 0.5em;
 }
 h1 a {
     text-decoration: none;
+}
+h3 {
+    border-bottom: 1px solid #DDD;
 }
 ul.threads li {
     padding: 1em 0;
@@ -27,7 +34,7 @@ ul.threads li img.thumbnail {
     margin: 0.5em;
 }
 ul#menu {
-    margin: 1em;
+    margin: 0;
     padding: 0;
 }
 ul#menu li {
@@ -48,8 +55,10 @@ time {
 blockquote.snippet strong {
     background-color: #FF7;
 }
-input[type=text] {
+input {
     padding: 0.2em;
+}
+input[type=text] {
     width: 20em;
 }
     </style>
