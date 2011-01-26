@@ -37,7 +37,7 @@ sub find_media {
     my @texts = ( $parsed->body, $parsed->head->{mail} );
     push @media, $parsed->image_url if $parsed->image_url;
     foreach my $post ($parsed->posts) {
-        # push @media, $post->image_url if $post->image_url; # TODO WWW-Futaba-Parser: post に image_url 生やす
+        push @media, $post->image_url if $post->image_url;
         push @texts, $post->body, $post->head->{mail};
     }
     my $text = join '', grep { defined } @texts;
