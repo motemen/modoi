@@ -34,23 +34,37 @@ sub get {
 
     return undef if $req->method ne 'GET';
     
-    my $headers = $req->headers;
-    # 以下はたぶんスーパーリロードなので従う
-    return undef if ($headers->header('Pragma') || '') eq 'no-cache';
-    return undef if ($headers->header('Cache-Control') || '') eq 'no-cache';
-
-    unless ($option->{force}) {
-        # 以下はたぶん普通のリロードなので従わない場合も
-        # キャッシュの日時とか考えるべきだが気にしない
-        return undef if $headers->header('If-Modified-Since');
-        return undef if ($headers->header('Cache-Control') || '') =~ /^max-age=\d+$/;
-    }
-
     my $value = $self->cache->get($req->request_uri) or return undef;
-    my $res = Modoi::Response->new(@$value);
+    return Modoi::Response->new(@$value);
+}
+
+use constant {
+    CACHE_STATUS_INVALID => 'invalid',         # キャッシュ返しちゃだめ
+    CACHE_STATUS_MAYBE_VALID => 'maybe_valid', # 場合によってはキャッシュ返していい
+    CACHE_STATUS_VALID => 'valid',             # キャッシュ返していい
+};
+
+sub cache_status {
+    my ($self, $cached_res, $req) = @_;
+
+    return CACHE_STATUS_INVALID unless $cached_res;
+
+    my $headers = $req->headers;
+
+    # 以下はたぶんスーパーリロードなのでキャッシュ返さない
+    return CACHE_STATUS_INVALID if ($headers->header('Pragma') || '') eq 'no-cache';
+    return CACHE_STATUS_INVALID if ($headers->header('Cache-Control') || '') eq 'no-cache';
+
+    # 以下はたぶん普通のリロードなのでキャッシュ返していい
+    # キャッシュの日時とか考えるべきだが気にしない
+    return CACHE_STATUS_MAYBE_VALID if $headers->header('If-Modified-Since');
+    return CACHE_STATUS_MAYBE_VALID if $headers->header('If-Non-Match');
+    return CACHE_STATUS_MAYBE_VALID if ($headers->header('Cache-Control') || '') =~ /^max-age=\d+$/;
+
     # Last-Modified がなければキャッシュを返さない (キャッシュはするけど)
-    return undef unless $res->headers->header('Last-Modified');
-    return $res;
+    return CACHE_STATUS_INVALID unless $cached_res->headers->header('Last-Modified');
+
+    return CACHE_STATUS_VALID;
 }
 
 # とりあえず全部キャッシュして get 時に返すべきかどうか判定する
@@ -160,28 +174,33 @@ package Modoi::Proxy::Role::Cache;
 use Mouse::Role;
 use Modoi;
 
-# TODO Cache-Control, serve 304, X-Cache, X-Cache-Lookup
+# ながい
 around serve => sub {
     my ($orig, $self, @args) = @_;
     my $env = $args[0];
     my $req = $self->prepare_request($env);
 
     my $cache_component = Modoi->component('Cache');
-    my $cached_res = $cache_component->get($req);
-    if ($cached_res) {
-        Modoi->log(info => 'serving cache for', $req->request_uri);
-        return $cached_res;
-    }
+    my $cached_res   = $cache_component->get($req);
+    my $cache_status = $cache_component->cache_status($cached_res, $req);
 
-    my $res = $self->$orig(@args);
-    if ($res->code eq '404' && $cache_component->override_not_found) {
-        if (my $cached_res = $cache_component->get($req, { force => 1 })) {
+    my $res;
+    if ($cache_status eq $cache_component->CACHE_STATUS_VALID) {
+        Modoi->log(info => 'serving cache for', $req->request_uri);
+        $res = $cached_res;
+    } else {
+        $res = $self->$orig(@args);
+        if ($res->code eq '404' && $cache_component->override_not_found && $cache_status eq $cache_component->CACHE_STATUS_MAYBE_VALID) {
             Modoi->log(info => 'overriding 404:', $req->request_uri);
             $res = $cached_res;
             $res->headers->push_header('X-Modoi-Source' => 'Cache');
             $res->headers->push_header('X-Modoi-Original-Status' => '404');
         }
     }
+
+    $res->headers->push_header('X-Cache-Lookup'  => ($cached_res ? 'HIT' : 'MISS') . ' from Modoi');
+    $res->headers->push_header('X-Cache' => ($res == $cached_res ? 'HIT' : 'MISS') . ' from Modoi');
+
     return $res;
 };
 
