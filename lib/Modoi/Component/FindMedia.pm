@@ -52,7 +52,7 @@ sub find_media {
             push @media, $rewrote;
         }
     }
-    Modoi->log(debug => 'found media:', @media ? @media : '(none)');
+    Modoi->log(debug => 'found media:', @media > 10 ? (@media[0..9], 'and', @media - 10, 'more') : @media ? @media : '(none)');
     return @media;
 };
 

@@ -92,7 +92,7 @@ sub install_component {
     my ($self, $name) = @_;
 
     if (my $component = $self->{installed_components}->{$name}) {
-        Modoi->log(info => "component '$name' is already installed");
+        Modoi->log(debug => "component '$name' is already installed");
         return $component;
     }
 
