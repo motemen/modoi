@@ -23,6 +23,7 @@ requires 'Coro';
 requires 'Coro::LWP';
 
 requires 'LWPx::ParanoidAgent';
+requires 'YAML::Syck';
 requires 'DateTime';
 requires 'DateTime::Format::HTTP';
 requires 'HTTP::Config';

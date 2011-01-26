@@ -1,7 +1,9 @@
 package Modoi::Config;
 use Mouse;
 use MouseX::Types::Path::Class;
-use YAML::Tiny;
+use YAML::Syck;
+
+$YAML::Syck::ImplicitTyping = 1;
 
 has config_file => (
     is  => 'rw',
@@ -18,12 +20,12 @@ has _config => (
 
 sub _build__config {
     my $self = shift;
-    return YAML::Tiny->new->read($self->config_file)->[0];
+    return YAML::Syck::LoadFile($self->config_file);
 }
 
 sub package_config {
     my $self = shift;
-    my $pkg = caller;
+    my $pkg  = shift || caller;
     $pkg =~ s/^Modoi:://;
     return $self->_config->{$pkg} || {};
 }

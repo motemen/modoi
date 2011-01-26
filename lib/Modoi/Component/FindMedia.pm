@@ -11,16 +11,12 @@ has rules => (
     auto_deref => 1,
 );
 
-use constant DEFAULT => {
-    rules => [
+sub _default_rules {
+    return [
         { regexp => qr/(fu\d+\.\w+)\b/, rewrite => 'http://dec.2chan.net/up2/src/$1' },
         { regexp => qr/(f\d+\.\w+)\b/,  rewrite => 'http://dec.2chan.net/up/src/$1'  },
     ]
 };
-
-sub _default_rules {
-    return (Modoi->config->package_config || DEFAULT)->{rules};
-}
 
 sub INSTALL {
     my ($self, $context) = @_;

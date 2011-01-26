@@ -5,6 +5,18 @@ use Modoi::Response;
 
 extends 'Modoi::Component';
 
+has cache_root => (
+    is  => 'rw',
+    isa => 'Str',
+    default => '.cache',
+);
+
+has override_not_found => (
+    is  => 'rw',
+    isa => 'Bool',
+    default => 1,
+);
+
 # TODO make configurable
 has cache => (
     is  => 'rw',
@@ -12,15 +24,10 @@ has cache => (
     default => \&_default_cache,
 );
 
-has override_not_found => (
-    is  => 'rw',
-    isa => 'Bool',
-    default => sub { 1 },
-);
-
 sub _default_cache {
+    my $self = shift;
     return Modoi::Component::Cache::Cache::File->new(
-        cache_root => '.cache',
+        cache_root => $self->cache_root,
     );
 }
 

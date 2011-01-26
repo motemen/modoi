@@ -35,7 +35,8 @@ sub status_as_html {
 
 sub install {
     my ($class, $context) = @_;
-    my $self = $class->new;
+    my $config = Modoi->config->package_config($class) || {};
+    my $self = $class->new(%$config);
     $self->INSTALL($context);
     return $self;
 }
