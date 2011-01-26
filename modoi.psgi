@@ -21,12 +21,6 @@ $SIG{INT} = sub {
 };
 
 Modoi->initialize;
-Modoi->install_component('Cache');
-Modoi->install_component('StoreDB');
-Modoi->install_component('Watch');
-Modoi->install_component('UseBrowserCache');
-Modoi->install_component('IndexEstraier');
-Modoi->install_component('Prefetch');
 
 # XXX not to cause error in xslate
 foreach (keys %{ Modoi->_context->installed_components }) {

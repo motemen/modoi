@@ -46,10 +46,16 @@ sub log {
         } @args;
 }
 
-sub initialize { __PACKAGE__->_context }
+sub initialize {
+    my $class = shift;
+    foreach (@{$class->config->package_config->{components} || []}) {
+        $class->install_component($_);
+    }
+}
+
 sub _context { our $Modoi ||= Modoi::Context->new }
 
-foreach my $method (qw(proxy fetcher db internal install_component component session_cache)) {
+foreach my $method (qw(proxy fetcher db internal install_component component config)) {
     no strict 'refs';
     *$method = sub {
         my ($class, @args) = @_;
@@ -62,6 +68,7 @@ use Mouse;
 use Modoi::Proxy;
 use Modoi::DB;
 use Modoi::Internal;
+use Modoi::Config;
 
 has proxy => (
     is  => 'rw',
@@ -80,6 +87,12 @@ has internal => (
     is  => 'rw',
     isa => 'Modoi::Internal',
     default => sub { Modoi::Internal->new },
+);
+
+has config => (
+    is  => 'rw',
+    isa => 'Modoi::Config',
+    default => sub { Modoi::Config->new },
 );
 
 has installed_components => (

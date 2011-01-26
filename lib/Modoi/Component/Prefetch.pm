@@ -33,7 +33,7 @@ after modify_response => sub {
                 sleep 3;
             }
         }
-        Modoi->log(info => "total $i prefetch done (from " . $req->request_uri . ')');
+        Modoi->log(info => "total $i prefetch done (from " . $req->request_uri . ')') if $i;
     } if @media;
 };
 

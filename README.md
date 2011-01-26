@@ -22,6 +22,7 @@ How To Use
 	cd modoi/
 	cpanm --installdeps . ./modules/WWW-Futaba-Parser
 	sqlite3 modoi.db < db/*.sql
+    cp config.sample.yaml config.yaml
 	plackup modoi.psgi -p 5678
 
 プロキシサーバが起動します。example/proxy.pac などを利用して、ブラウザがこのプロキシを通るようにすれば設定完了です。

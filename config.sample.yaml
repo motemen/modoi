@@ -1,0 +1,17 @@
+Modoi:
+  components:
+    - Cache
+    - UseBrowserCache
+#   - Watch
+#   - IndexEstraier
+
+Component::Cache:
+  override_not_found: yes
+
+Component::IndexEstraier:
+  node_url: http://localhost:1978/node/modoi
+  node_user: admin
+  node_password: admin
+
+Component::Watch:
+  interval: 120

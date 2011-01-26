@@ -11,11 +11,15 @@ has rules => (
     auto_deref => 1,
 );
 
-sub _default_rules {
-    return [
+use constant DEFAULT => {
+    rules => [
         { regexp => qr/(fu\d+\.\w+)\b/, rewrite => 'http://dec.2chan.net/up2/src/$1' },
         { regexp => qr/(f\d+\.\w+)\b/,  rewrite => 'http://dec.2chan.net/up/src/$1'  },
-    ];
+    ]
+};
+
+sub _default_rules {
+    return (Modoi->config->package_config || DEFAULT)->{rules};
 }
 
 sub INSTALL {
@@ -40,7 +44,7 @@ sub find_media {
         push @media, $post->image_url if $post->image_url;
         push @texts, $post->body, $post->head->{mail};
     }
-    my $text = join '', grep { defined } @texts;
+    my $text = join ' ', grep { defined } @texts;
     foreach my $rule ($self->rules) {
         my $regexp  = $rule->{regexp} or next;
         my $rewrite = $rule->{rewrite} or next;
