@@ -47,17 +47,19 @@ sub get {
     }
 
     my $value = $self->cache->get($req->request_uri) or return undef;
-    return Modoi::Response->new(@$value);
+    my $res = Modoi::Response->new(@$value);
+    # Last-Modified がなければキャッシュを返さない (キャッシュはするけど)
+    return undef unless $res->headers->header('Last-Modified');
+    return $res;
 }
 
-# TODO last-modified みたりキャッシュすべきかどうか判定したり
+# とりあえず全部キャッシュして get 時に返すべきかどうか判定する
 sub update {
     my ($self, $res, $req) = @_;
 
     if ($req->method eq 'GET' && $res->code eq '200') {
         my $url = $req->request_uri;
         Modoi->log(debug => "updating cache -> $url");
-
         # Content- 系でないヘッダを削除
         $res = (ref $res)->new($res->code, $res->headers->clone->remove_content_headers, $res->content);
         $self->cache->set("$url", $res->finalize);
