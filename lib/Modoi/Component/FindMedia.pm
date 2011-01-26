@@ -11,10 +11,9 @@ has rules => (
     auto_deref => 1,
 );
 
+# { regexp => '(fu\d+\.[a-z]+)', rewrite => 'http://some.host/$1' } みたいに指定する
 sub _default_rules {
     return [
-        { regexp => qr/(fu\d+\.\w+)\b/, rewrite => 'http://dec.2chan.net/up2/src/$1' },
-        { regexp => qr/(f\d+\.\w+)\b/,  rewrite => 'http://dec.2chan.net/up/src/$1'  },
     ]
 };
 
@@ -32,7 +31,6 @@ sub find_media {
 
     return unless $parsed->isa('WWW::Futaba::Parser::Result::Thread');
 
-    # XXX ここ遅そうだな〜
     my @media;
     my @texts = ( $parsed->body, $parsed->head->{mail} );
     push @media, $parsed->image_url if $parsed->image_url;

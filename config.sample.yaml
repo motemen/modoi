@@ -12,17 +12,7 @@ Modoi:
 #   cache_root: .cache
 #   override_not_found: yes
 # 
-# Component::FindMedia:
-#   rules:
-#     - regexp: (f\d+\.\w+)\b
-#       rewrite: http://dec.2chan.net/up/src/$1
-#     - regexp: (fu\d+\.\w+)\b
-#       rewrite: http://dec.2chan.net/up2/src/$1
-# 
 # Component::IndexEstraier:
 #   node_url: http://localhost:1978/node/modoi
 #   node_user: admin
 #   node_password: admin
-# 
-# Component::Watch:
-#   interval: 120
