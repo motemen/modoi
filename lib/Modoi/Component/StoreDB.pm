@@ -71,15 +71,24 @@ our $DATA = do { local $/; <DATA> };
 
 sub threads {
     my ($self, $req) = @_;
-
-    my @threads = Modoi->db->search('thread', {}, { order_by => 'created_on DESC' });
-    return $self->render($DATA, { threads => \@threads });
+    my $page = $req->param('page') || 1;
+    my ($threads, $pager) = Modoi->db->search_with_pager('thread', {}, { order_by => 'created_on DESC', page => $page, rows => 10 });
+    return $self->render($DATA, { threads => $threads, pager => $pager });
 }
 
 1;
 
 __DATA__
 
+<p class="pager">
+: if $pager.previous_page {
+  <a href="?page=<: $pager.previous_page :>">&laquo; prev</a>
+: }
+page <: $pager.current_page :>
+: if $pager.has_next {
+  <a href="?page=<: $pager.next_page :>">next &raquo;</a>
+: }
+</p>
 <ul class="threads">
 : for $threads -> $thread {
   <li>
