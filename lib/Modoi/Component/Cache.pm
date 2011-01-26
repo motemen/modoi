@@ -30,7 +30,7 @@ sub has_cache {
 }
 
 sub get {
-    my ($self, $req, $option) = @_;
+    my ($self, $req) = @_;
 
     return undef if $req->method ne 'GET';
     
@@ -198,8 +198,8 @@ around serve => sub {
         }
     }
 
-    $res->headers->push_header('X-Cache-Lookup'  => ($cached_res ? 'HIT' : 'MISS') . ' from Modoi');
-    $res->headers->push_header('X-Cache' => ($res == $cached_res ? 'HIT' : 'MISS') . ' from Modoi');
+    $res->headers->push_header('X-Cache-Lookup' => ($cached_res ? 'HIT' : 'MISS') . ' from Modoi');
+    $res->headers->push_header('X-Cache' => ($cached_res && $res == $cached_res ? 'HIT' : 'MISS') . ' from Modoi');
 
     return $res;
 };

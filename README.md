@@ -9,7 +9,7 @@ Feature
 以下の機能があります。このうち必要な機能だけを使うように設定できます。
 
  * スレッド・画像をキャッシュ=スレが落ちても閲覧できる (Component::Cache)
- * ブラウザに強くキャッシュさせて通信量を削減 (Component::ExtendExpires)
+ * ブラウザのキャッシュを利用して通信量を削減 (Component::UseBrowserCache)
  * スレッド情報を DB に保存 (Component::StoreDB)
  * スレッドを定期監視 (Component::Watch)
  * 画像・ファイルの先読み (Component::Prefetch)
@@ -31,7 +31,6 @@ How To Use
 TODO
 ----
 
- * ForceBrowserCache
  * 設定
 
 Author
