@@ -10,10 +10,13 @@ use Plack::Builder;
 
 $SIG{TERM} = sub {
     Modoi->log(notice => 'got SIGTERM, exiting');
+    Modoi->store_state;
     exit 0;
 };
+
 $SIG{INT} = sub {
     Modoi->log(notice => 'got SIGINT, exiting');
+    Modoi->store_state;
     exit 0;
 };
 

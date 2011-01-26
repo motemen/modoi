@@ -11,6 +11,7 @@ requires 'MouseX::Types::Path::Class';
 requires 'Plack';
 requires 'Plack::App::Proxy';
 requires 'Twiggy';
+requires 'Router::Simple';
 
 requires 'Teng';
 
@@ -21,16 +22,15 @@ requires 'AnyEvent';
 requires 'Coro';
 requires 'Coro::LWP';
 
-requires 'Data::Dumper';
+requires 'LWPx::ParanoidAgent';
 requires 'DateTime';
 requires 'DateTime::Format::HTTP';
 requires 'HTTP::Config';
-requires 'LWP::UserAgent';
 requires 'Path::Class';
-requires 'Router::Simple';
 requires 'Script::State';
 requires 'Try::Tiny';
 requires 'UNIVERSAL::require';
+requires 'Data::Dumper';
 requires 'parent';
 
 recommends 'Search::Estraier';

@@ -12,10 +12,16 @@ use Script::State -datafile => '.modoi.state';
 my $State;
 BEGIN { script_state $State } # XXX
 
-END {
+sub store_state {
+    Modoi->log(info => 'storing state...');
     foreach (values %{ Modoi->_context->installed_components }) {
         $_->STORE_STATE;
     }
+    Script::State->store;
+}
+
+END {
+    __PACKAGE__->store_state;
 }
 
 our $VERSION = '0.01';
