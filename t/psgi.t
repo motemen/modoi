@@ -24,6 +24,7 @@ is $res->code, 200, 'precondition: external server without proxy';
 
 test_tcp(
     server => sub {
+        Modoi->fetcher->ua(LWP::UserAgent->new); # replace paranoid agent
         Plack::Loader->auto(port => $_[0], host => '127.0.0.1')->run($app);
     },
     client => sub {
@@ -44,7 +45,7 @@ test_tcp(
             is $res->code, 407, 'proxy without auth';
 
             my $res = $ua->get("http://127.0.0.1:$external_port/external", Proxy_Authorization => 'Basic dXNlcjpwYXNz');
-            is $res->code, 200, 'proxy with auth';
+            is $res->code, 200, 'proxy with auth' or diag explain $res;
         };
     },
 );
