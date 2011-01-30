@@ -12,7 +12,12 @@ has router => (
 
 sub BUILD {
     my $self = shift;
-    $self->router->connect(index => '/', { handler => Modoi::Internal::Engine->new, method => 'default' });
+    $self->router->connect(
+        index => '/', {
+            handler => Modoi::Internal::Engine->new,
+            method  => 'default'
+        }
+    );
 }
 
 # XXX
@@ -21,6 +26,14 @@ sub registered_routes {
     return $self->router->{routes};
 }
 
+sub registered_simple_routes {
+    my $self = shift;
+    return [
+        grep { $_->pattern !~ /[*:]/ } @{ $self->router->{routes} }
+    ];
+}
+
+# PSGI env -> Modoi::Response | PSGI res
 sub serve {
     my ($self, $env) = @_;
 
@@ -30,7 +43,7 @@ sub serve {
     if (my $m = $self->router->match($env)) {
         my $handler = $m->{handler};
         my $method  = $m->{method};
-        $res = $handler->$method($req);
+        $res = $handler->$method($req, $m);
     } else {
         $res = $req->new_response;
         $res->redirect('/');

@@ -37,6 +37,6 @@ requires 'parent';
 recommends 'Search::Estraier';
 
 build_requires 'Test::More';
-build_requires 'Test::TCP';
+build_requires 'Test::TCP', '1.00';
 
 WriteAll;

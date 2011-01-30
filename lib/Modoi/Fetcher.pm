@@ -26,6 +26,7 @@ has timeout => (
     default => 180,
 );
 
+# Modoi::Request -> Modoi::Response
 sub request {
     my ($self, $req) = @_;
 
@@ -50,6 +51,7 @@ sub request {
     return $res;
 }
 
+# url -> Modoi::Response
 sub fetch {
     my ($self, $url) = @_;
 

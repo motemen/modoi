@@ -2,7 +2,7 @@ use strict;
 use Test::More tests => 3;
 use Plack::Builder;
 use Plack::Loader;
-use Test::TCP;
+use Test::TCP '1.00';
 use LWP::UserAgent;
 
 local $ENV{MODOI_AUTH} = 'user:pass';

@@ -17,4 +17,11 @@ sub as_http_message {
     res_from_psgi($_[0]->finalize);
 }
 
+sub from_http_response {
+    my ($class, $http_res) = @_;
+    my $self = $class->new($http_res->code, $http_res->headers, $http_res->content);
+    $self->_original_http_response($http_res);
+    return $self;
+}
+
 1;

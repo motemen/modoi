@@ -2,7 +2,7 @@ package Modoi::Proxy;
 use Mouse;
 use Modoi::Fetcher;
 use Modoi::Request;
-use Plack::App::Proxy '0.17';
+use Plack::App::Proxy;
 use HTTP::Headers;
 
 has fetcher => (
@@ -31,6 +31,7 @@ sub prepare_request {
     return $req;
 }
 
+# PSGI env -> Modoi::Response
 sub serve {
     my ($self, $env) = @_;
     my $req = $self->prepare_request($env);

@@ -9,6 +9,8 @@ use Guard;
 use Data::Dumper ();
 use Script::State -datafile => '.modoi.state';
 
+our $VERSION = '0.01';
+
 my $State;
 BEGIN { script_state $State } # XXX
 
@@ -23,8 +25,6 @@ sub store_state {
 END {
     __PACKAGE__->store_state;
 }
-
-our $VERSION = '0.01';
 
 sub package_state {
     my $pkg = caller;
