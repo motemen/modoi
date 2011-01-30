@@ -22,15 +22,16 @@ requires 'AnyEvent';
 requires 'Coro';
 requires 'Coro::LWP';
 
-requires 'LWPx::ParanoidAgent';
-requires 'YAML::Syck';
+requires 'Data::Dumper';
 requires 'DateTime';
 requires 'DateTime::Format::HTTP';
 requires 'HTTP::Config';
+requires 'LWPx::ParanoidAgent';
 requires 'Path::Class';
 requires 'Try::Tiny';
 requires 'UNIVERSAL::require';
-requires 'Data::Dumper';
+requires 'URI::Escape';
+requires 'YAML::Syck';
 requires 'parent';
 
 recommends 'Search::Estraier';
