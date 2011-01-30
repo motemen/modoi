@@ -37,12 +37,15 @@ sub proxy {
     my ($self, $req, $m) = @_;
 
     my $env = $req->env;
-    my $url = $m->{splat}->[0] or die;
+    my $url = $m->{splat}->[0] or return [ 400, [] , [] ];
     $url .= "?$env->{QUERY_STRING}" if length $env->{QUERY_STRING};
 
     my $base = $env->{REQUEST_URI};
     substr($base, -length $url) = '';
     $env->{REQUEST_URI} = "http://$url";
+
+    Modoi->component('WebProxy')->condition->matching($env->{REQUEST_URI})
+        or return [ 400, [], [] ];
 
     my $res = Modoi->proxy->serve($env);
     my $content_type = $res->content_type;
