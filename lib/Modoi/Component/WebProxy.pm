@@ -10,6 +10,12 @@ has condition => (
     default => \&_default_condition,
 );
 
+has handler => (
+    is  => 'rw',
+    isa => 'Modoi::Internal::Engine::WebProxy',
+    default => sub { Modoi::Internal::Engine::WebProxy->new },
+);
+
 sub _default_condition {
     my $config = HTTP::Config->new;
     $config->add(m_domain => '.2chan.net');
@@ -20,7 +26,7 @@ sub INSTALL {
     my ($self, $context) = @_;
     $context->internal->router->connect(
         proxy => '/http/*', {
-            handler => Modoi::Internal::Engine::WebProxy->new,
+            handler => $self->handler,
             method  => 'proxy',
         }
     );
@@ -48,6 +54,13 @@ sub proxy {
         or return [ 400, [], [] ];
 
     my $res = Modoi->proxy->serve($env);
+    $self->modify_proxy_response($res, $req, $base);
+    return $res;
+}
+
+sub modify_proxy_response {
+    my ($self, $res, $req, $base) = @_;
+
     my $content_type = $res->content_type;
     if ($content_type =~ m(^text/x?html\b) && $res->code eq '200') {
         my $content = $res->as_http_message->decoded_content;
@@ -70,7 +83,6 @@ sub proxy {
         $res->content_type($content_type);
         $res->content_length(length $content);
     }
-    return $res;
 }
 
 1;

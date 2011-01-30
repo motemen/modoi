@@ -32,4 +32,10 @@ __TX__
     return $self->html($self->tx->render_string($template, $args));
 }
 
+sub render_template {
+    my ($self, $file, $args) = @_;
+    $args->{context} ||= Modoi->context;
+    return $self->html($self->tx->render($file, $args));
+}
+
 1;
