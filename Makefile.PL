@@ -28,7 +28,6 @@ requires 'DateTime';
 requires 'DateTime::Format::HTTP';
 requires 'HTTP::Config';
 requires 'Path::Class';
-requires 'Script::State';
 requires 'Try::Tiny';
 requires 'UNIVERSAL::require';
 requires 'Data::Dumper';

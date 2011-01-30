@@ -1,9 +1,10 @@
-use strict;
-use Test::More tests => 3;
+use t::TestModoi;
 use Plack::Builder;
 use Plack::Loader;
 use Test::TCP '1.00';
 use LWP::UserAgent;
+
+plan tests => 3;
 
 local $ENV{MODOI_AUTH} = 'user:pass';
 my $app = do 'modoi.psgi';

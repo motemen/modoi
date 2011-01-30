@@ -16,13 +16,13 @@ sub html {
 
 sub default {
     my ($self, $req) = @_;
-    return $self->html($self->tx->render('index.tx', { context => Modoi->_context }));
+    return $self->html($self->tx->render('index.tx', { context => Modoi->context }));
 }
 
 # FIXME 暫定
 sub render {
     my ($self, $string, $args) = @_;
-    $args->{context} ||= Modoi->_context;
+    $args->{context} ||= Modoi->context;
     my $template = <<__TX__;
 : cascade _wrapper
 : override content -> {

@@ -20,10 +20,14 @@ $SIG{INT} = sub {
     exit 0;
 };
 
+END {
+    Modoi->store_state;
+}
+
 Modoi->initialize;
 
 # XXX not to cause error in xslate
-foreach (keys %{ Modoi->_context->installed_components }) {
+foreach (keys %{ Modoi->context->installed_components }) {
     Modoi->log(debug => "$_ status:", Data::Dumper->new([ Modoi->component($_)->status ])->Indent(0)->Terse(1)->Dump);
 }
 

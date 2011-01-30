@@ -10,6 +10,7 @@ has config_file => (
     isa => 'Path::Class::File',
     default => 'config.yaml',
     coerce  => 1,
+    lazy    => 1,
 );
 
 has _config => (
@@ -27,7 +28,7 @@ sub package_config {
     my $self = shift;
     my $pkg  = shift || caller;
     $pkg =~ s/^Modoi:://;
-    return $self->_config->{$pkg} || {};
+    return $self->_config->{$pkg} ||= {};
 }
 
 1;

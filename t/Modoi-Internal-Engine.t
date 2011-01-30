@@ -1,5 +1,7 @@
 use strict;
-use Test::More tests => 2;
+use t::TestModoi;
+
+plan tests => 2;
 
 use_ok 'Modoi::Internal::Engine';
 
