@@ -1,10 +1,13 @@
 Modoi:
+# auth: user:pass
   components:
     - Cache
     - UseBrowserCache
     - StoreDB
 #   - Watch
 #   - IndexEstraier
+#   - WebProxy
+#   - WebProxy::TouchView
 
 # below are default config
 
