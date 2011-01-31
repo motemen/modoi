@@ -1,0 +1,67 @@
+body {
+  background-color: #222;
+  color: #FFFFFF;
+  font-size: larger;
+}
+a {
+  color: #BBD;
+}
+div.thumbnail img {
+  max-width: 90%;
+}
+div.thumbnail {
+  text-align: center;
+  margin: 0.5em;
+}
+div.catalog div.thumbnail {
+  margin: 0;
+}
+div.head, div.post {
+  padding: 0.8em;
+}
+div.post {
+  border-top: 1px solid #555555;
+  clear: both;
+}
+div.post div.thumbnail {
+  float: right;
+  max-width: 35%;
+}
+.meta {
+  color: #999999;
+  padding-bottom: 0.5em;
+}
+div.thumbnail a img {
+  padding: 1px;
+  border: 1px solid #666;
+}
+div.thread {
+  border-top: 2px solid #999;
+  padding-top: 0.5em;
+  clear: both;
+}
+div.catalog div.thumbnail {
+  border: none;
+  padding: 0;
+  float: left;
+  width: 20%;
+  height: 80px;
+  position: relative;
+  overflow: hidden;
+}
+div.catalog div.thumbnail .posts {
+  position: absolute;
+  font-size: larger;
+  font-weight: bold;
+  left: 0.1em;
+  top: 0.1em;
+  opacity: 0.8;
+}
+div.catalog div.thumbnail a {
+  display: block;
+  height: 80px;
+  text-align: center;
+}
+div.catalog div.thumbnail a img {
+  max-width: 100%;
+}

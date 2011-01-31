@@ -1,0 +1,21 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width" />
+  <meta name="format-detection" content="telephone=no" />
+  <link rel="stylesheet" href="//<: $req.uri.host_port :>/css/webproxy/touchview.css" />
+</head>
+<body>
+  <h1><: $req.request_uri :></h1>
+  <p><a href="./">index</a> | catalog</p>
+  <div class="catalog">
+  : for $catalog.threads -> $thread {
+    <div class="thumbnail">
+      <span class="posts"><: $thread.head.posts_count :></span>
+      <a href="<: $thread.head.path :>">
+        <img src="<: $thread.thumbnail_url :>">
+      </a>
+    </div>
+  : }
+  </div>
+</body>
+</html>

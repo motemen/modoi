@@ -23,14 +23,17 @@ after modify_proxy_response => sub {
 
     my $parsed = Modoi->component('ParseHTML')->parse($res, $req->request_uri)
         or return;
+    $req->header('User-Agent') =~ /iPhone|Android/ or return;
 
     $self->tx->{function}->{html_br} ||= html_builder \&html_br;
 
     my $content;
     if ($parsed->isa('WWW::Futaba::Parser::Result::Index')) {
-        $content = $self->tx->render('webproxy/index.tx', { index => $parsed });
+        $content = $self->tx->render('webproxy/touchview/index.tx',   { req => $req, index => $parsed });
     } elsif ($parsed->isa('WWW::Futaba::Parser::Result::Thread')) {
-        $content = $self->tx->render('webproxy/thread.tx', { thread => $parsed });
+        $content = $self->tx->render('webproxy/touchview/thread.tx',  { req => $req, thread => $parsed });
+    } elsif ($parsed->isa('WWW::Futaba::Parser::Result::Catalog')) {
+        $content = $self->tx->render('webproxy/touchview/catalog.tx', { req => $req, catalog => $parsed });
     }
     
     if ($content) {

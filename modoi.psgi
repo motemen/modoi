@@ -59,5 +59,7 @@ builder {
         enable_if { not $_[0]{REMOTE_USER} } 'Auth::Basic',
             authenticator => sub { join(':', @_[0,1]) eq $auth };
     }
+    enable_if { $_[0]{REQUEST_URI} =~ m(^/) } 'Static',
+        root => './root/', path => qr<^/(images|css)/>;
     $app;
 };
