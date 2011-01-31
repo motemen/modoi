@@ -53,7 +53,7 @@ my $app = sub {
 };
 
 builder {
-    if (my $auth = $ENV{MODOI_AUTH}) {
+    if (my $auth = Modoi->config->package_config('Modoi')->{auth} || $ENV{MODOI_AUTH}) {
         enable 'ProxyAuth::Basic',
             authenticator => sub { join(':', @_[0,1]) eq $auth };
         enable_if { not $_[0]{REMOTE_USER} } 'Auth::Basic',
