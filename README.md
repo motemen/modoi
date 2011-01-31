@@ -14,6 +14,9 @@ Feature
  * スレッドを定期監視 (Component::Watch)
  * 画像・ファイルの先読み (Component::Prefetch)
  * HyperEstraier による検索 (Component::IndexEstraier)
+ * プロキシの設定をしない利用 (Component::WebProxy)
+   * http://localhost:5678/http/www.2chan.net/b/ などにアクセスできるようになります。
+   * さらに Component::WebProxy::TouchView を使用すると、スマートフォン用のビューも用意されます。
 
 How To Use
 ----------
@@ -27,7 +30,7 @@ How To Use
 
 プロキシサーバが起動します。example/proxy.pac などを利用して、ブラウザがこのプロキシを通るようにすれば設定完了です。
 
-環境変数 `MODOI_AUTH` を `user:password` の形式にしておくと、Basic 認証をかけることができます。
+config.yaml 内の Modoi > auth もしくは環境変数 `MODOI_AUTH` を `user:password` の形式にしておくと、Basic 認証をかけることができます。
 
 TODO
 ----
