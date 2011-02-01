@@ -39,5 +39,8 @@ recommends 'Search::Estraier';
 
 build_requires 'Test::More';
 build_requires 'Test::TCP', '1.00';
+build_requires 'Exporter::Lite';
+build_requires 'Carp';
+build_requires 'HTTP::Request::Common';
 
 WriteAll;
