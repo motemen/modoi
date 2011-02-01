@@ -23,6 +23,7 @@ How To Use
 
 	git clone --recursive git://github.com/motemen/modoi.git
 	cd modoi/
+	cpanm Module::Install Module::Install::AuthorTests
 	cpanm --installdeps . ./modules/WWW-Futaba-Parser
 	sqlite3 modoi.db < db/*.sql
     cp config.sample.yaml config.yaml
@@ -36,6 +37,8 @@ TODO
 ----
 
  * 設定
+   * HTTP::Config つかってるところの設定
+ * スマフォビュー
 
 Author
 ------

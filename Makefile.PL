@@ -14,6 +14,7 @@ requires 'Twiggy';
 requires 'Router::Simple';
 
 requires 'Teng';
+requires 'DBD::SQLite';
 
 requires 'Text::Xslate';
 requires 'HTML::Entities';
