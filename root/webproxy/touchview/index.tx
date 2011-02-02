@@ -7,16 +7,20 @@
 <body>
   <h1><: $req.request_uri :></h1>
   <p>index | <a href="futaba.php?mode=cat">catalog</a></p>
+  <ul>
 : for $index.threads -> $thread {
-  <div class="thread" onclick="location.href='<: $thread.head.path :>'">
+  <li class="thread" onclick="location.href='<: $thread.head.path :>'">
     <div class="thumbnail"><a href="<: $thread.image_url :>"><img src="<: $thread.thumbnail_url :>"></a></div>
     <div class="head">
       <div class="meta">#<: $thread.head.no :> <: $thread.datetime :></div>
     : $thread.body | html_br
     </div>
+    : if $thread.head.omitted_posts {
+    <div class="omitted-posts"><a href="<: $thread.head.path :>">レス <: $thread.head.omitted_posts :> 件省略</a></div>
+    : }
+    <div class="recent-posts">
     : for $thread.posts -> $post {
       <div class="post">
-        <div class="meta">#<: $post.head.no :> <: $post.datetime :></div>
         : if $post.thumbnail_url {
           <div class="thumbnail"><a href="<: $post.image_url :>"><img src="<: $post.thumbnail_url :>"></a></div>
         : }
@@ -24,6 +28,8 @@
       </div>
     : }
   </div>
+    </li>
 : }
+  </ul>
 </body>
 </html>

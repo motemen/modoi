@@ -13,6 +13,11 @@ h1 {
     text-align: center;
     color: #666;
 }
+ul, li {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
 div.thumbnail img {
   max-width: 90%;
 }
@@ -43,10 +48,28 @@ div.thumbnail a img {
   padding: 1px;
   border: 1px solid #666;
 }
-div.thread {
+.thread {
   border-top: 2px solid #999;
   padding-top: 0.5em;
   clear: both;
+}
+.thread .omitted-posts {
+  text-align: center;
+  font-size: 90%;
+  background: #333;
+  -webkit-border-radius: 0.5em;
+  margin-bottom: 0.5em;
+}
+.thread .omitted-posts a {
+  padding: 0.3em;
+  display: block;
+  text-decoration: none;
+  color: #999;
+}
+.recent-posts {
+  font-size: 80%;
+  color: #CCC;
+  padding-left: 5%;
 }
 div.catalog div.thumbnail {
   border: none;
