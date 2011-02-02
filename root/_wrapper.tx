@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Modoi</title>
+    <title>openmodoi.org</title>
     <style type="text/css">
 body {
     padding-left: 10%;
@@ -66,12 +66,11 @@ input[type=text] {
     </style>
   </head>
   <body>
-    <h1><a href="/">Modoi</a></h1>
-    <ul id="menu">
-    : for $context.internal.registered_simple_routes -> $route {
-      <li><a href="<: $route.pattern :>"><: $route.name :></a></li>
-    : }
-    </ul>
+    <h1>
+: block title -> {
+openmodoi.org
+: }
+    </h1>
     <div id="content">
 : block content -> { }
     </div>
