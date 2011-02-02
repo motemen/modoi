@@ -1,10 +1,17 @@
 body {
   background-color: #222;
   color: #FFFFFF;
-  font-size: larger;
+  font-family: Verdana, sans-serif;
+  overflow: hidden;
+  word-break: break-all;
 }
 a {
   color: #BBD;
+}
+h1 {
+    font-size: 18px;
+    text-align: center;
+    color: #666;
 }
 div.thumbnail img {
   max-width: 90%;
@@ -29,6 +36,7 @@ div.post div.thumbnail {
 }
 .meta {
   color: #999999;
+  font-size: 90%;
   padding-bottom: 0.5em;
 }
 div.thumbnail a img {
@@ -45,7 +53,7 @@ div.catalog div.thumbnail {
   padding: 0;
   float: left;
   width: 20%;
-  height: 80px;
+  height: 60px;
   position: relative;
   overflow: hidden;
 }
@@ -53,9 +61,10 @@ div.catalog div.thumbnail .posts {
   position: absolute;
   font-size: larger;
   font-weight: bold;
-  left: 0.1em;
+  left: 0.2em;
   top: 0.1em;
   opacity: 0.8;
+  text-shadow: 1px 1px 0 #777;
 }
 div.catalog div.thumbnail a {
   display: block;

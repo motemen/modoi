@@ -9,6 +9,7 @@ body {
 }
 h1 {
     margin-bottom: 0.5em;
+    font-family: "Trebuchet MS", sans-serif;
 }
 h1 a {
     text-decoration: none;
@@ -56,7 +57,8 @@ blockquote.snippet strong {
     background-color: #FF7;
 }
 input {
-    padding: 0.2em;
+    padding: 0.3em;
+    font-size: larger;
 }
 input[type=text] {
     width: 20em;
