@@ -61,5 +61,7 @@ builder {
     }
     enable_if { $_[0]{REQUEST_URI} =~ m(^/) } 'Static',
         root => './root/', path => qr<^/(images|css)/>;
+    enable_if { $_[0]->{REMOTE_ADDR} eq '127.0.0.1' } 'ReverseProxy';
+
     $app;
 };
