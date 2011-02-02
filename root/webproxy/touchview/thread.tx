@@ -2,7 +2,7 @@
 <head>
   <meta name="viewport" content="width=device-width" />
   <meta name="format-detection" content="telephone=no" />
-  <link rel="stylesheet" href="//<: $req.uri.host_port :>/css/webproxy/touchview.css" />
+  <link rel="stylesheet" href="/css/webproxy/touchview.css" />
 </head>
 <body>
   <p><a href="../">index</a> | <a href="../futaba.php?mode=cat">catalog</a></p>
