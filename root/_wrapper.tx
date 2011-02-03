@@ -5,6 +5,7 @@
 body {
     padding-left: 10%;
     padding-right: 10%;
+    padding-top: 1em;
     font-size: 90%;
 }
 h1 {
@@ -63,14 +64,12 @@ input {
 input[type=text] {
     width: 20em;
 }
+div.search {
+    text-align: center;
+}
     </style>
   </head>
   <body>
-    <h1>
-: block title -> {
-openmodoi.org
-: }
-    </h1>
     <div id="content">
 : block content -> { }
     </div>

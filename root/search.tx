@@ -1,18 +1,20 @@
 : cascade _wrapper
 
 : override content -> {
+<div class="search">
 <form action="/search">
   <input type="text" name="q" value="<: $q :>" />
   <input type="submit" value="Search" />
 </form>
+</div>
 
 <ul class="threads">
 : for $docs -> $doc {
   <li>
-  <a href="<: $doc.attr('@uri') :>" class="title"><: $doc.attr('@title') :></a>
+  <a href="http://openmodoi.org/<: $doc.attr('@uri') :>" class="title"><: $doc.attr('@title') :></a>
   <time><: $doc.attr('@cdate') :></time>
   : if $doc.attr('@thumbnail_url') {
-    <img src="<: $doc.attr('@thumbnail_url') :>" class="thumbnail">
+    <img src="http://openmodoi.org/<: $doc.attr('@thumbnail_url') :>" class="thumbnail">
   : }
   <blockquote class="snippet"><: $doc.snippet | highlight_estraier_snippet :></blockquote>
   </li>
