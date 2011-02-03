@@ -79,7 +79,9 @@ sub add {
 
 sub search {
     my ($self, $q) = @_;
+
     Modoi->log(debug => "search: $q");
+
     my $cond = Search::Estraier::Condition->new;
        $cond->set_phrase($q);
 
@@ -91,8 +93,7 @@ sub search {
         }
     } catch {
         Modoi->log(warn => "search failed: $_");
-    }
-
+    };
     return $res && [ map { $res->get_doc($_) } ( 0 .. $res->doc_num - 1 ) ];
 }
 
