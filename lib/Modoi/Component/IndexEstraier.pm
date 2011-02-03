@@ -82,13 +82,18 @@ sub search {
     Modoi->log(debug => "search: $q");
     my $cond = Search::Estraier::Condition->new;
        $cond->set_phrase($q);
-    my $res = $self->node->search($cond, 0);
-    if (not defined $res) {
-        Modoi->log(warn => 'search failed:', $self->node->status);
-        return;
-    } else {
-        return [ map { $res->get_doc($_) } ( 0 .. $res->doc_num - 1 ) ];
+
+    my $res;
+    try {
+        $res = $self->node->search($cond, 0);
+        if (not defined $res) {
+            Modoi->log(warn => 'search failed:', $self->node->status);
+        }
+    } catch {
+        Modoi->log(warn => "search failed: $_");
     }
+
+    return $res && [ map { $res->get_doc($_) } ( 0 .. $res->doc_num - 1 ) ];
 }
 
 sub status {
@@ -142,7 +147,7 @@ sub search {
             $args->{docs} = $docs;
         }
     }
-    return $self->render_template('search.tx');
+    return $self->render_template('search.tx', $args);
 }
 
 1;
