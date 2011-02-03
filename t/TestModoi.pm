@@ -5,6 +5,7 @@ use Test::More;
 use Modoi;
 use Carp;
 use Exporter::Lite ();
+use lib 'lib', glob 'modules/*/lib';
 
 our @EXPORT = qw(
     test_proxy

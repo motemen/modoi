@@ -117,8 +117,6 @@ use Text::Xslate qw(html_builder html_escape);
 
 extends 'Modoi::Internal::Engine';
 
-our $DATA = do { local $/; <DATA> };
-
 sub highlight_estraier_snippet {
     my $string = shift;
     my $html = '';
@@ -144,27 +142,7 @@ sub search {
             $args->{docs} = $docs;
         }
     }
-    return $self->render($DATA, $args);
+    return $self->render_template('search.tx');
 }
 
 1;
-
-__DATA__
-
-<form action="/search">
-  <input type="text" name="q" value="<: $q :>" />
-  <input type="submit" value="Search" />
-</form>
-
-<ul class="threads">
-: for $docs -> $doc {
-  <li>
-  <a href="<: $doc.attr('@uri') :>" class="title"><: $doc.attr('@title') :></a>
-  <time><: $doc.attr('@cdate') :></time>
-  : if $doc.attr('@thumbnail_url') {
-    <img src="<: $doc.attr('@thumbnail_url') :>" class="thumbnail">
-  : }
-  <blockquote class="snippet"><: $doc.snippet | highlight_estraier_snippet :></blockquote>
-  </li>
-: }
-</ul>

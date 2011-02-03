@@ -1,0 +1,21 @@
+: cascade _wrapper
+
+: override content -> {
+<form action="/search">
+  <input type="text" name="q" value="<: $q :>" />
+  <input type="submit" value="Search" />
+</form>
+
+<ul class="threads">
+: for $docs -> $doc {
+  <li>
+  <a href="<: $doc.attr('@uri') :>" class="title"><: $doc.attr('@title') :></a>
+  <time><: $doc.attr('@cdate') :></time>
+  : if $doc.attr('@thumbnail_url') {
+    <img src="<: $doc.attr('@thumbnail_url') :>" class="thumbnail">
+  : }
+  <blockquote class="snippet"><: $doc.snippet | highlight_estraier_snippet :></blockquote>
+  </li>
+: }
+</ul>
+: }
