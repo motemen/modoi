@@ -47,7 +47,8 @@ sub proxy {
     $url .= "?$env->{QUERY_STRING}" if length $env->{QUERY_STRING};
 
     my $base = $env->{REQUEST_URI};
-    substr($base, -length $url) = '';
+    # substr($base, -length $url) = '';
+    $base = 'http://openmodoi.org/http/'; # XXX
     $env->{REQUEST_URI} = "http://$url";
 
     Modoi->component('WebProxy')->condition->matching($env->{REQUEST_URI})
