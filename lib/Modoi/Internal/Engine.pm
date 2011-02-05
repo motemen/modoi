@@ -11,6 +11,9 @@ sub tx {
 
 sub html {
     my $self = shift;
+    for (@_) {
+        utf8::encode $_ if utf8::is_utf8 $_;
+    }
     return [ 200, [ 'Content-Type' => 'text/html; charset=utf-8' ], [ @_ ] ];
 }
 
