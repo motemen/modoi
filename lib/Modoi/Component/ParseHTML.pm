@@ -6,6 +6,9 @@ extends 'Modoi::Component';
 
 sub parse {
     my ($self, $res, $url) = @_;
+    if ($res->code ne '200') {
+        return undef;
+    }
     if ($res->content_type !~ m(^text/html\b)) {
         return undef;
     }
