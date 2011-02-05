@@ -21,7 +21,7 @@ around request => sub {
     my ($orig, $self, $req) = @_;
 
     unless ($IdempotentMethods{ uc $req->method }) {
-        return Modoi::Response->new(405, [ 'Content-Type' => 'text/plain' ], []);
+        return Modoi::Response->new(405, [ 'Content-Type' => 'text/plain' ], [ 'Method not allowed' ]);
     }
 
     return $self->$orig($req);
