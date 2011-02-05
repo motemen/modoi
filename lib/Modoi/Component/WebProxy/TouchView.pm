@@ -21,9 +21,10 @@ use DateTime::Format::Strptime; # xslate の中で require すると変になる
 after modify_proxy_response => sub {
     my ($self, $res, $req, $base) = @_;
 
+    $req->header('User-Agent') =~ /iPhone|Android/ or return;
+
     my $parsed = Modoi->component('ParseHTML')->parse($res, $req->request_uri)
         or return;
-    $req->header('User-Agent') =~ /iPhone|Android/ or return;
 
     $self->tx->{function}->{html_br} ||= html_builder \&html_br;
 
