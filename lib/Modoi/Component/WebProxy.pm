@@ -66,7 +66,7 @@ sub modify_proxy_response {
         my $content = $res->as_http_message->decoded_content;
         # XXX Regexp::Common 使ってると empty response になることがある、謎
         $content =~ s#
-            \b(http://[a-zA-Z0-9\-_.!~*'():@&=+\$,]+)
+            \b(http://[a-zA-Z0-9\-_.!~*'():@&=+\$,/]+)
         #
             my $url = $1;
             if (Modoi->component('WebProxy')->condition->matching($url)) {
@@ -78,6 +78,7 @@ sub modify_proxy_response {
         utf8::encode $content;
         $content_type =~ s/(;.+)?$/; charset=utf-8/;
 
+        undef $res->data->{ParseHTML}; # XXX これ以降のパーズでは書き換えた URL とかを見る (ウム
         $res->headers->remove_content_headers;
         $res->content($content);
         $res->content_type($content_type);
