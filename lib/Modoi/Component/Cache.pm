@@ -197,7 +197,7 @@ around serve => sub {
         $res = $cached_res;
     } else {
         $res = $self->$orig(@args);
-        if ($res->code eq '404' && $cache_component->override_not_found) { #  && $cache_status eq $cache_component->CACHE_STATUS_MAYBE_VALID) {
+        if ($res->code eq '404' && $cached_res && $cache_component->override_not_found) { #  && $cache_status eq $cache_component->CACHE_STATUS_MAYBE_VALID) {
             Modoi->log(info => 'overriding 404:', $req->request_uri);
             $res = $cached_res;
             $res->headers->push_header('X-Modoi-Source' => 'Cache');
