@@ -2,12 +2,16 @@
 <html>
   <head>
     <title>openmodoi.org</title>
+    <meta name="viewport" content="width=device-width" />
+    <meta name="format-detection" content="telephone=no" />
     <style type="text/css">
 body {
-    padding-left: 10%;
-    padding-right: 10%;
+    padding-left: 5%;
+    padding-right: 5%;
     padding-top: 1em;
     font-size: 90%;
+    word-break: break-all;
+    font-family: sans-serif;
 }
 h1 {
     margin-bottom: 0.5em;
@@ -18,6 +22,10 @@ h1 a {
 }
 h3 {
     border-bottom: 1px solid #DDD;
+}
+ul.threads {
+  margin: 0;
+  padding: 0;
 }
 ul.threads li {
     padding: 1em 0;
@@ -51,9 +59,12 @@ ul#menu li {
 div#content {
     clear: both;
 }
-time {
+ul.threads span.meta {
     font-size: smaller;
     color: #999;
+}
+blockquote {
+  margin: 1em;
 }
 blockquote.snippet strong {
     background-color: #FF7;
@@ -63,7 +74,7 @@ input {
     font-size: larger;
 }
 input[type=text] {
-    width: 20em;
+    width: 55%;
 }
 div.search {
     text-align: center;
