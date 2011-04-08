@@ -34,12 +34,14 @@ has node => (
 sub _build_node {
     my $self = shift;
 
-    return Search::Estraier::Node->new(
+    my $node = Search::Estraier::Node->new(
         url => $self->node_url,
         user => $self->node_user,
         passwd => $self->node_password,
         croak_on_error => 1,
     );
+    $node->set_snippet_width(240, 96, 96);
+    return $node;
 }
 
 sub INSTALL {
@@ -66,6 +68,7 @@ sub add {
         $doc->add_attr('@title', _utf8_off $parsed->body);
         $doc->add_attr('@thumbnail_url', $parsed->thumbnail_url) if $parsed->thumbnail_url;
         $doc->add_attr('@cdate', $parsed->datetime->iso8601) if $parsed->datetime;
+        $doc->add_attr('@posts_count', scalar @{$parsed->posts});
         foreach ($parsed, $parsed->posts) {
             $doc->add_text(_utf8_off $_->body);
         }

@@ -6,6 +6,13 @@ use Text::Xslate;
 sub tx {
     our $tx ||= Text::Xslate->new(
         path => [ 'root' ],
+        function => {
+            replace => sub {
+                my ($string, $from, $to) = @_;
+                $string =~ s/$from/$to/g;
+                return $string;
+            }
+        },
     );
 }
 

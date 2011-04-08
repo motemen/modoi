@@ -11,10 +11,15 @@
 <ul class="threads">
 : for $docs -> $doc {
   <li>
-  <a href="http://openmodoi.org/<: $doc.attr('@uri') :>" class="title"><: $doc.attr('@title') :></a>
+  <a href="<: replace($doc.attr('@uri'), '^http://', '/http/') :>" class="title"><: $doc.attr('@title') :></a>
+  <span class="meta">
   <time><: $doc.attr('@cdate') :></time>
+  : if $doc.attr('@posts_count') {
+    <span class="posts-count">(<: $doc.attr('@posts_count') :> posts)</span>
+  : }
+  </span>
   : if $doc.attr('@thumbnail_url') {
-    <img src="http://openmodoi.org/<: $doc.attr('@thumbnail_url') :>" class="thumbnail">
+    <img src="<: replace($doc.attr('@thumbnail_url'), '^http://', '/http/') :>" class="thumbnail">
   : }
   <blockquote class="snippet"><: $doc.snippet | highlight_estraier_snippet :></blockquote>
   </li>
@@ -31,4 +36,17 @@
 : }
 </p>
 
+<div style="text-align: center; margin-top: 1em">
+<script type="text/javascript"><!--
+google_ad_client = "pub-4031405268309770";
+/* openmodoi */
+google_ad_slot = "3680475298";
+google_ad_width = 728;
+google_ad_height = 90;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
 : }
