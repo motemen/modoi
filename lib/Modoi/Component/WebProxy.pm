@@ -19,6 +19,7 @@ has handler => (
 sub _default_condition {
     my $config = HTTP::Config->new;
     $config->add(m_domain => '.2chan.net');
+    $config->add(m_domain => '.nijibox5.com');
     return $config;
 }
 
