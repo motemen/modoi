@@ -3,6 +3,7 @@ use Mouse;
 use Modoi;
 use Search::Estraier;
 use Try::Tiny;
+use Data::Page;
 
 extends 'Modoi::Component';
 
@@ -78,12 +79,16 @@ sub add {
 }
 
 sub search {
-    my ($self, $q) = @_;
+    my ($self, $q, %args) = @_;
+
+    $args{per_page} ||= 10
+    $args{page}     ||= 1;
 
     Modoi->log(debug => "search: $q");
 
     my $cond = Search::Estraier::Condition->new;
        $cond->set_phrase($q);
+       $cond->set_skip($args{per_page} * ( $args{page} - 1 ));
 
     my $res;
     try {
@@ -94,7 +99,17 @@ sub search {
     } catch {
         Modoi->log(warn => "search failed: $_");
     };
-    return $res && [ map { $res->get_doc($_) } ( 0 .. $res->doc_num - 1 ) ];
+    return undef unless $res;
+
+    my $pager = Data::Page->new;
+    $pager->entries_per_page($args{per_page});
+    $pager->current_page($args{page});
+    $pager->total_entries($res->hits);
+
+    return {
+        docs => [ map { $res->get_doc($_) } ( 0 .. $res->doc_num - 1 ) ],
+        pager => $pager,
+    };
 }
 
 sub status {
@@ -144,8 +159,9 @@ sub search {
     my $args = {};
     if (my $q = $req->param('q')) {
         $args->{q} = $q;
-        if (my $docs = Modoi->component('IndexEstraier')->search($q)) {
-            $args->{docs} = $docs;
+        if (my $res = Modoi->component('IndexEstraier')->search($q, page => scalar $req->param('page'))) {
+            $args->{docs} = $res->{docs};
+            $args->{pager} = $res->{pager};
         }
     }
     return $self->render_template('search.tx', $args);
