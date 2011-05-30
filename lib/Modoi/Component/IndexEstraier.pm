@@ -81,7 +81,7 @@ sub add {
 sub search {
     my ($self, $q, %args) = @_;
 
-    $args{per_page} ||= 10
+    $args{per_page} ||= 10;
     $args{page}     ||= 1;
 
     Modoi->log(debug => "search: $q");
