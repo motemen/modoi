@@ -1,17 +1,4 @@
 : cascade _wrapper
 
 : override content -> {
-<h2>Installed Components</h2>
-  <ul>
-  : for $context.installed_components.keys() -> $name {
-    <li><a href="#<: $name :>"><: $name :></a></li>
-  : }
-  </ul>
-
-  : for $context.installed_components.keys() -> $name {
-<h3 id="<: $name :>"><: $name :></h3>
-    : my $component = $context.component($name)
-    : $component.status_as_html | raw
-:#  <pre><: $component.dump(2) :></pre>
-  : }
 : }
