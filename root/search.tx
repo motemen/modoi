@@ -20,4 +20,15 @@
   </li>
 : }
 </ul>
+
+<p class="pager">
+: for [ $pager.first_page .. $pager.last_page ] -> $p {
+  : if $p == $pager.current_page {
+    <strong><: $p :></strong>
+  : } else {
+    <a href="?q=<: $q | uri :>&amp;page=<: $p :>"><: $p :></a>
+  : }
+: }
+</p>
+
 : }
