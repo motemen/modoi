@@ -1,4 +1,15 @@
 : cascade _wrapper
 
 : override content -> {
+    <h1>openmodoi</h1>
+    <p>openmodoi は、<br/><a href="http://www.2chan.net/">ふたば★ちゃんねる</a> を快適に閲覧するためのサイトです。</p>
+    <p>閲覧したスレのログが保存されたり、それを<a href="/search">検索</a>したりできます。</p>
+    <p>応援して下さいね☆</p>
+    <p>お友達にもここを<br/>教えてあげて下さいね。</p>
+
+    <ul>
+    <li><a href="/http/dec.2chan.net/b/futaba.htm">二次元裏</a></li>
+    <li><a href="/http/jun.2chan.net/b/futaba.htm">二次元裏</a></li>
+    <li><a href="/http/may.2chan.net/b/futaba.htm">二次元裏</a></li>
+    </ul>
 : }

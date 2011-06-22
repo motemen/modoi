@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>openmodoi.org</title>
+    <title><: block title -> { } :>openmodoi</title>
     <meta name="viewport" content="width=device-width" />
     <meta name="format-detection" content="telephone=no" />
     <style type="text/css">

@@ -1,5 +1,11 @@
 : cascade _wrapper
 
+: override title -> {
+:   if $q {
+      <: $q :> -
+:   }
+: }
+
 : override content -> {
 <div class="search">
 <form action="/search">
