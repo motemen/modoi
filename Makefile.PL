@@ -24,6 +24,7 @@ requires 'Coro';
 requires 'Coro::LWP';
 
 requires 'Data::Dumper';
+requires 'Data::Page';
 requires 'DateTime';
 requires 'DateTime::Format::HTTP';
 requires 'HTTP::Config';
