@@ -24,8 +24,8 @@ sub log {
     my ($pkg, $filename) = caller;
     $pkg =~ s/^Modoi:://;
     $pkg = $filename if $filename =~ /\.psgi$/;
-    printf STDERR "[%s] %-6s %s - %s\n",
-        scalar(localtime), uc $level, $pkg,
+    printf STDERR "[%s] %-6s %s %s - %s\n",
+        scalar(localtime), uc $level, 0+$Coro::current, $pkg,
         join ' ', map {
             local $Data::Dumper::Indent = 0;
             local $Data::Dumper::Maxdepth = 1;

@@ -3,6 +3,8 @@ use Mouse;
 use Modoi;
 use AnyEvent;
 use Coro;
+use Coro::Timer;
+use Coro::Semaphore;
 use HTTP::Config;
 
 extends 'Modoi::Component';
@@ -23,6 +25,29 @@ has interval => (
     is  => 'rw',
     isa => 'Int',
     default => 300,
+);
+
+has semaphore => (
+    is  => 'rw',
+    isa => 'Coro::Semaphore',
+    default => sub {
+        my $self = shift;
+        warn $self->max_request_at_once;
+        return Coro::Semaphore->new($self->max_request_at_once);
+    },
+    lazy => 1,
+);
+
+has max_request_at_once => (
+    is  => 'rw',
+    isa => 'Int',
+    default => 4,
+);
+
+has least_request_interval => (
+    is  => 'rw',
+    isa => 'Int',
+    default => 10,
 );
 
 sub _default_watch_condition {
@@ -68,22 +93,31 @@ sub start_watching_url {
     my ($self, $url) = @_;
 
     Modoi->log(info => "Start watching $url");
-    $self->watchers->{$url} = AE::timer(
-        $self->interval,
-        $self->interval,
-        sub {
-            async {
-                # TODO 実行完了後 interval 待つ、という風に/スケジューラ
-                Modoi->log(info => "Timered fetch: $url");
-                my $res = Modoi->fetcher->fetch($url);
-                my $original_status = $res->headers->header('X-Modoi-Original-Status');
-                if ($res->code =~ /^4\d\d$/ || ($original_status && $original_status =~ /^4\d\d$/)) {
-                    Modoi->log(info => "Stop watching $url");
-                    delete $self->watchers->{$url};
-                }
-            };
-        },
-    );
+    $self->watchers->{$url} = async_pool {
+        while (1) {
+            Coro::Timer::sleep $self->interval;
+
+            Modoi->log(info => "Timered fetch: $url");
+            Modoi->log(debug => 'Semaphore =', $self->semaphore->count);
+
+            $self->semaphore->down;
+
+            my $res = Modoi->fetcher->fetch($url);
+            my $original_status = $res->headers->header('X-Modoi-Original-Status');
+
+            Modoi->log(debug => 'Sleep for 10 secs before releasing semaphore...');
+            Coro::Timer::sleep $self->least_request_interval;
+            $self->semaphore->up;
+            Modoi->log(debug => 'Semaphore released -> ' . $self->semaphore->count);
+
+            if ($res->code =~ /^4\d\d$/ || ($original_status && $original_status =~ /^4\d\d$/)) {
+                delete $self->watchers->{$url};
+                last;
+            }
+        }
+
+        Modoi->log(info => "Stop watching $url");
+    };
 }
 
 sub status {
