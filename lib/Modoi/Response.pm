@@ -24,4 +24,22 @@ sub from_http_response {
     return $self;
 }
 
+sub modify_content {
+    my ($self, $code) = @_;
+
+    local $_ = $self->as_http_message->decoded_content;
+    $code->();
+
+    my $content = $_;
+    utf8::encode $content;
+
+    my $content_type = $self->content_type;
+       $content_type =~ s/(;.+)?$/; charset=utf-8/;
+
+    $self->headers->remove_content_headers;
+    $self->content($content);
+    $self->content_type($content_type);
+    $self->content_length(length $content);
+}
+
 1;
